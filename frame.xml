@@ -43,7 +43,7 @@
     </Frame>
     <!--User input block template for dragging and dropping spell/item icons onto-->
     <Frame name="SocketBlockTemplate" inherits="MacroBlockTemplate" virtual="true">
-        <Size x="43" y="28"/>
+        <Size x="52" y="28"/>
         <Layers>
             <Layer level="ARTWORK">
                 <FontString parentKey="handle" text="⣿" justifyH="CENTER" justifyV="CENTER" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf">
@@ -59,15 +59,15 @@
             <Button name="$parentSocket" parentKey="socket" inherits="BackdropTemplate">
                 <!--<Size x="24" y="24"/>-->
                 <Anchors>
-		        	<Anchor point="TOPLEFT"/>
-                    <Anchor point="BOTTOMRIGHT" x="-16" y="0"/>
+		        	<Anchor point="TOPLEFT" x="0" y="4"/>
+                    <Anchor point="BOTTOMRIGHT" x="-16" y="-4"/>
 		        </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND">
                         <Texture parentKey="icon" setAllPoints="true"/>
                         <MaskTexture parentKey="mask" atlas="UI-Frame-IconMask">
                             <Size>
-                                <AbsDimension x="24" y="24"/>
+                                <AbsDimension x="36" y="36"/>
                             </Size>
                             <Anchors>
                                 <Anchor point="CENTER">

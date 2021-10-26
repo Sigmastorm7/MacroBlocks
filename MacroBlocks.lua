@@ -23,11 +23,7 @@ mb.BlockColors = {
 	["mawEdge"] = {0.31, 0.459, 0.463},
 }
 
-local frameColors = {
-	{0.718, 0.561, 0.416},			-- RUNEFORGE_LEGENDARY_SPEC_COLOR
-}
-
-blockBackdrop = {
+local blockBackdrop = {
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 	tile = true,
@@ -54,14 +50,15 @@ local function MBBackdropColorSetter(f, color)
 	f:SetBackdropBorderColor(ColorUnpack(mb.BlockColors[color], 1, 0.2))
 end
 
--- PALETTE FRAMES START --
+-- Palette frames
+do
 	MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
 	MBPalette = CreateFrame("Frame", "$parentPalette", MBFrame, "TooltipBackdropTemplate")
 	MBPalette:SetFrameStrata("HIGH")
 	MBPalette:SetBackdropColor(0.05, 0.05, 0.05)
 	MBPalette.blocks = {}
-
+--[[
 	MBBasic = CreateFrame("Frame", "$parentBasic", MBPalette, "TooltipBackdropTemplate")
 
 	MBCommand = CreateFrame("Frame", "$parentCommand", MBPalette, "TooltipBackdropTemplate")
@@ -92,8 +89,8 @@ end
 	MBSocial:SetPoint("TOPLEFT", MBUser, "BOTTOMLEFT")
 	MBSocial:SetPoint("BOTTOMRIGHT", MBUser, "BOTTOMRIGHT", 0, -68)
 	MBBackdropColorSetter(MBSocial, "Social")
-	MBSocial.blocks = {}
--- PALETTE FRAMES END --
+	MBSocial.blocks = {}]]
+end
 
 local debug = {
 	["str"] = "Debug: ",
@@ -101,54 +98,18 @@ local debug = {
 }
 
 local function MB_BlockPoolResetter(self, block)
-	debug.MB_BlockPoolResetter.count = debug.MB_BlockPoolResetter.count + 1
+	-- debug.MB_BlockPoolResetter.count = debug.MB_BlockPoolResetter.count + 1
 	-- print(debug.str..debug.MB_BlockPoolResetter.str..tostring(debug.MB_BlockPoolResetter.count))
 
-	local palette = _G["MacroBlocksPalette"..block.kind] or MBPalette
-
-	-- if not palette then return end
-
-	block:SetParent(palette)
-
-	print(palette[block])
-
-	if block.paletteID then
-
-		-- print(palette.blocks[block.paletteID])
-
-		if not palette.blocks[block.paletteID] then
-
-			palette.blocks[block.paletteID] = block
-
-			if block.kind == "User" then
-
-				if block.data.func == "USER_SOCKET" then
-
-					block.socket.icon:SetColorTexture(0, 0, 0, 0)
-					-- TODO: update to clear payload data
-
-				elseif block.data.func == "USER_EDIT" then
-
-					block.edit:SetText("")
-
-				end
-
-		 	-- else
-
-			end
-
-		else
-
-			block:ClearAllPoints()
-			block:Hide()
-
-		end
+	if not MBPalette.blocks[block.paletteID] == block then
+		block:ClearAllPoints()
+		block:Hide()
 	end
-	PaletteAdjust(palette)
-	StackAdjust()
 
-	-- print(collectgarbage("count"))
-	-- block:ClearAllPoints()
+
+
+	PaletteAdjust()
+	StackAdjust()
 end
 
 MacroBlockPool = CreateFramePool("Frame", MBPalette, "MacroBlockTemplate", MB_BlockPoolResetter)
@@ -180,8 +141,10 @@ mb.MakeBlock = function(kind, data, paletteID) -- function MakeBlock(kind, data,
 	b.kind = kind
 	b.payload = data.payload
 
-	b:SetParent(_G["MacroBlocksPalette"..kind])
-	b.paletteID = paletteID or #_G["MacroBlocksPalette"..kind].blocks + 1
+	b.palette = "MacroBlocksPalette"..kind
+	-- b:SetParent(_G[b.palette])
+	b.paletteID = paletteID or #_G[b.palette].blocks + 1
+	b.wasStacked = false
 	b.stacked = false
 
 	b.data = data
@@ -192,31 +155,31 @@ mb.MakeBlock = function(kind, data, paletteID) -- function MakeBlock(kind, data,
 
 	b:Show()
 
-	_G["MacroBlocksPalette"..kind][b] = true 
+	-- _G[b.palette][b] = true
 
 	return b
 end
 
-function PaletteAdjust(f, index, xOff, yOff)
+function PaletteAdjust(index, xOff, yOff)
 
 	index = index or 1
 	xOff = xOff or 6
-	yOff = yOff or -6
+	yOff = yOff or -10
 
-	if index <= #f.blocks then
+	if index <= #MBPalette.blocks then
 
-		if not f.blocks[index]:IsShown() then f.blocks[index]:Show() end
+		if not MBPalette.blocks[index]:IsShown() then MBPalette.blocks[index]:Show() end
 
-		if (xOff + f.blocks[index]:GetWidth()) >= (f:GetWidth() - 6) then
+		if (xOff + MBPalette.blocks[index]:GetWidth()) >= (MBPalette:GetWidth() - 6) then
 			xOff = 6
 			yOff = yOff - 32
 		end
 
-		f.blocks[index]:ClearAllPoints()
-		f.blocks[index]:SetPoint("TOPLEFT", f, "TOPLEFT", xOff, yOff)
-		xOff = xOff + f.blocks[index]:GetWidth()
+		MBPalette.blocks[index]:ClearAllPoints()
+		MBPalette.blocks[index]:SetPoint("TOPLEFT", MBPalette, "TOPLEFT", xOff, yOff)
+		xOff = xOff + MBPalette.blocks[index]:GetWidth()
 		
-		PaletteAdjust(f, index + 1, xOff, yOff)
+		PaletteAdjust(index + 1, xOff, yOff)
 	else
 		return
 	end
@@ -268,9 +231,7 @@ function StackAdjust(index, xOff, yOff)
 
 	index = index or 1
 	xOff = xOff or 6
-	yOff = yOff or -6
-
-	local wedge
+	yOff = yOff or -10
 
 	if index <= #MBStack.blocks then
 
@@ -326,16 +287,8 @@ function StackDisplaceCheck(self)
 end
 
 MBStack.addBlock = function(block)
-
-	if _G["MacroBlocksPalette"..block.kind][block] then
-		_G["MacroBlocksPalette"..block.kind].blocks[block.paletteID] = mb.MakeBlock(block.kind, block.data, block.paletteID)
-	end
-
-	PaletteAdjust(_G["MacroBlocksPalette"..block.kind])
-
 	block:SetParent(MBStack)
 	block.stacked = true
-	_G["MacroBlocksPalette"..block.kind][block] = false
 
 	if MBStack.displace then
 		table.insert(MBStack.blocks, MBStack.displaceID, block)
@@ -345,30 +298,33 @@ MBStack.addBlock = function(block)
 		table.insert(MBStack.blocks, block)
 	end
 
-	for id, block in pairs(MBStack.blocks) do block.stackID = id end
+	for id, b in pairs(MBStack.blocks) do b.stackID = id end
 
+	MBStack[block] = true
+	MBPalette[block] = false
 	StackAdjust()
 end
 
 MBStack.remBlock = function(block)
-	block:SetParent(_G["MacroBlocksPalette"..block.kind])
-	block.stacked = false
+	block:SetParent(MBPalette)
 
 	table.remove(MBStack.blocks, block.stackID)
 
-	for id, block in pairs(MBStack.blocks) do block.stackID = id end
+	for id, b in pairs(MBStack.blocks) do b.stackID = id end
 
+	MBStack[block] = false
+	MBPalette[block] = true
 	StackAdjust()
 end
 
 local blocks = {
 	["Utility"] = {
 		{	["name"] = "#show",
-			["payload"] = "#show|n",
+			["payload"] = "#show\n",
 			["func"] = "NEW_LINE",
 		},
 		{	["name"] = "#showtooltip",
-			["payload"] = "#showtooltip|n",
+			["payload"] = "#showtooltip\n",
 			["func"] = "NEW_LINE",
 		},
 		{	["name"] = "⮐",
@@ -424,15 +380,14 @@ local function MacroBlocks_Init()
 	if init then return end
 	init = true
 
-	local parent
+	local itr = 1
 
 	for kind, blockData in pairs(blocks) do
-		parent = _G["MacroBlocksPalette"..kind]
-		parent.blocks = {}
 		for i, data in pairs(blockData) do
-			parent.blocks[i] = mb.MakeBlock(kind, data, i) -- MakeBlock(kind, data)
+			MBPalette.blocks[itr] = mb.MakeBlock(kind, data, itr) -- MakeBlock(kind, data)
+			itr = itr + 1
 		end
-		PaletteAdjust(parent)
+		PaletteAdjust()
 	end
 end
 
@@ -480,13 +435,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			MBFrame:Show()
 
 			MacroBlocks_Init()
-
-			--[[
-			for i, data in pairs(blocks) do
-				MBPalette.blocks[i] = MakeBlock(data)
-			end
-
-			PaletteAdjust(MBPalette)]]
 
 		end)
 		MacroFrame:HookScript("OnHide", function()

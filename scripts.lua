@@ -9,7 +9,7 @@ UserBlockBackdrop = {
 	tile = true,
 	tileEdge = true,
 	tileSize = 24,
-	edgeSize = 11,
+	edgeSize = 12,
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
@@ -24,9 +24,12 @@ function MB_OnDragStart(self, button)
     self:StartMoving()
     self:SetFrameStrata("TOOLTIP")
 
-	if self.stacked then MBStack.remBlock(self) end
+    if self.stacked then
+		MBStack.remBlock(self)
+		self.stacked = false
+    end
 
-    self.stacked = false
+
     MBFrame.dragging = self
     MBStack:SetScript("OnUpdate", StackDisplaceCheck)
 
@@ -38,14 +41,10 @@ function MB_OnDragStop(self)
 	self:SetUserPlaced(false)
 
     if MouseIsOver(MBStack) then
-		MBStack.addBlock(self)
-        _G["MacroBlocksPalette"..self.kind][self] = false
-        -- _G["MacroBlocksPalette"..self.kind].blocks[self.paletteID] = mb.MakeBlock(self.kind, self.data, self.paletteID)
-	else
-        MBStack.remBlock(self)
-        _G["MacroBlocksPalette"..self.kind][self] = true
-		MacroBlockPool:Release(self)
-        MacroBlockPool:Acquire(self)
+        MBStack.addBlock(self)
+    else
+        MacroBlockPool:Release(self)
+        MacroBlockPool:Acquire()
 	end
 
     MBFrame.dragging = nil
@@ -56,9 +55,8 @@ end
 -- User input element handler
 function MB_USER_ELEMENT_OnShow(self)
     local p = self:GetParent()
-    print(p:GetName())
     self:SetBackdrop(UserBlockBackdrop)
-    self:SetBackdropColor(0.08, 0.08, 0.08, 0.6)
+    self:SetBackdropColor(0.325, 0.196, 0.043, 1)
     self:SetBackdropBorderColor(unpack(blockColors.User))
 end
 
