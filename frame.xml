@@ -1,0 +1,191 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+    <!--"🛈"-->
+    <!--"🯰🯱🯲🯳🯴🯵🯶🯷🯸🯹"-->
+
+    <!--Import frame elements from a new file to clean up MacroBlocks.lua a bit-->
+    <Script file="scripts.lua"/>
+
+    <!--Custom fonts used in the block templates w/ variations for special cases-->
+    <Font name="MacroBlockSymbolFont" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="16" virtual="true">
+        <Shadow x="1" y="-1" r="0" g="0" b="0" a="1"/>
+    </Font>
+    <Font name="MacroBlockFont" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="11" virtual="true">
+        <Shadow x="1" y="-1" r="0" g="0" b="0" a="1"/>
+    </Font>
+    <Font name="MacroBlockFontSmall" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="9" virtual="true">
+        <Shadow x="1" y="-1" r="0" g="0" b="0" a="1"/>
+    </Font>
+
+    <!--Generic block templates-->
+    <Frame name="MacroBlockTemplate" enableMouse="true" movable="true" inherits="BackdropTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="28" y="28"/>
+        </Size>
+        <KeyValues>
+            <KeyValue key="payload" value="nil" nillable="true" type="string"/>
+            <KeyValue key="kind" value="nil" nillable="true" type="string"/>
+        </KeyValues>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="text" text="BLOCK" justifyH="CENTER" justifyV="CENTER" inherits="MacroBlockFont"> 
+                    <Anchors>
+                        <Anchor point="CENTER" x="-0.5" y="-0.5"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnLoad function="MB_OnLoad"/>
+            <OnDragStart function="MB_OnDragStart"/>
+            <OnDragStop function="MB_OnDragStop"/>
+        </Scripts>
+    </Frame>
+    <!--User input block template for dragging and dropping spell/item icons onto-->
+    <Frame name="SocketBlockTemplate" inherits="MacroBlockTemplate" virtual="true">
+        <Size x="43" y="28"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="handle" text="⣿" justifyH="CENTER" justifyV="CENTER" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf">
+                    <Anchors>
+                        <Anchor point="RIGHT" relativePoint="RIGHT" x="-7" y="-2"/>
+                    </Anchors>
+                    <FontHeight val="16"/>
+                    <Shadow x="1" y="-1" r="0" g="0" b="0" a="1"/>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button name="$parentSocket" parentKey="socket" inherits="BackdropTemplate">
+                <!--<Size x="24" y="24"/>-->
+                <Anchors>
+		        	<Anchor point="TOPLEFT"/>
+                    <Anchor point="BOTTOMRIGHT" x="-16" y="0"/>
+		        </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="icon" setAllPoints="true"/>
+                        <MaskTexture parentKey="mask" atlas="UI-Frame-IconMask">
+                            <Size>
+                                <AbsDimension x="24" y="24"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="CENTER">
+                                    <Offset>
+                                        <AbsDimension x="0" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <MaskedTextures>
+                                <MaskedTexture childKey="icon"/>
+                            </MaskedTextures>
+		                </MaskTexture>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnShow function="MB_USER_ELEMENT_OnShow"/>
+                    <OnClick function="MB_SOCKET_OnClick"/>
+                </Scripts>
+            </Button>
+        </Frames>
+        <Scripts>
+            <OnShow>
+                self.text:Hide();
+            </OnShow>
+            <OnDragStart function="MB_SOCKET_OnDragStart"/>
+            <OnDragStop function="MB_SOCKET_OnDragStop"/>
+        </Scripts>
+    </Frame>
+    <!--User input block template for custom strings and arguments-->
+    <Frame name="EditBlockTemplate" inherits="MacroBlockTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="122" y="28"/>
+        </Size>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="handle" text="⣿" justifyH="CENTER" justifyV="CENTER" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf">
+                    <Anchors>
+                        <Anchor point="RIGHT" relativePoint="RIGHT" x="-7" y="-2"/>
+                    </Anchors>
+                    <FontHeight val="16"/>
+                    <Shadow x="1" y="-1" r="0" g="0" b="0" a="1"/>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <EditBox parentKey="edit" autoFocus="false" font="MacroBlockFontSmall" multiLine="false" letters="255" countInvisibleLetters="true" enableMouse="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="9" y="-3"/>
+                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-18" y="3"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+			     	    <FontString parentKey="instructions" text="Custom String" justifyH="LEFT" justifyV="MIDDLE" inherits="MacroBlockFontSmall"  setAllPoints="true">
+			     		    <Color r="0.55" g="0.55" b="0.55"/>
+			     	    </FontString>
+			        </Layer>
+                </Layers>
+                <Frames>
+                    <Button name="$parentClearButton" parentKey="clearButton">
+				        <Size x="15" y="15"/>
+				        <Anchors>
+				        	<Anchor point="RIGHT" x="-4" y="0"/>
+				        </Anchors>
+				        <Layers>
+				        	<Layer level="ARTWORK">
+				        		<Texture atlas="common-search-clearbutton" useAtlasSize="false" alpha="0.5" parentKey="texture">
+				        			<Size>
+				        				<AbsDimension x="8" y="8"/>
+				        			</Size>
+				        			<Anchors>
+				        				<Anchor point="CENTER" x="0" y="0"/>
+				        			</Anchors>
+				        		</Texture>
+				        	</Layer>
+				        </Layers>
+				        <Scripts>
+				        	<OnEnter>
+				        		self.texture:SetAlpha(1.0);
+				        	</OnEnter>
+				        	<OnLeave>
+				        		self.texture:SetAlpha(0.5);
+				        	</OnLeave>
+				        	<OnMouseDown>
+				        		if self:IsEnabled() then
+				        			self.texture:SetPoint("TOPLEFT", self, "TOPLEFT", 4, -4);
+				        		end
+				        	</OnMouseDown>
+				        	<OnMouseUp>
+				        		self.texture:SetPoint("TOPLEFT", self, "TOPLEFT", 3, -3);
+				        	</OnMouseUp>
+				        	<OnClick function="SearchBoxTemplateClearButton_OnClick"/>
+				        </Scripts>
+			        </Button>
+                </Frames>
+                <Scripts>
+                    <OnTextChanged function="MB_EDIT_OnTextChanged"/>
+                    <OnTabPressed function="EditBox_OnTabPressed"/>
+			        <OnEscapePressed function="EditBox_ClearFocus"/>
+			        <OnEditFocusLost function="EditBox_ClearHighlight"/>
+			        <OnEditFocusGained function="EditBox_HighlightText"/>
+                </Scripts>
+            </EditBox>
+            <Frame parentKey="backdropFrame" inherits="BackdropTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                    <Anchor point="BOTTOMRIGHT" x="-18" y="0"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow function="MB_USER_ELEMENT_OnShow"/>
+                </Scripts>
+            </Frame>
+        </Frames>
+        <Scripts>
+            <OnShow>
+                self.text:Hide();
+            </OnShow>
+            <OnDragStart function="MB_EDIT_OnDragStart"/>
+            <OnDragStop function="MB_EDIT_OnDragStop"/>
+        </Scripts>
+    </Frame>
+</Ui>

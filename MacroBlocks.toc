@@ -1,0 +1,10 @@
+## Interface: 90100
+## Title: MacroBlocks
+## Author: Siggy
+## Version: 9.1.0
+## Notes:
+
+## SavedVariables: SlashCommandList
+
+MacroBlocks.lua
+frame.xml
