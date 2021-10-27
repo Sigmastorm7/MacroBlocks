@@ -42,13 +42,15 @@ function MB_OnDragStop(self)
 	self:SetUserPlaced(false)
 
     if MouseIsOver(MBStack) then
+        if not self.stacked then
+            MBPalette.blocks[self.paletteID] = mb.MakeBlock(self.kind, self.data, self.paletteID)
+        end
         MBStack.addBlock(self)
-        MBPalette.blocks[self.paletteID] = mb.MakeBlock(self.kind, self.data, self.paletteID)
-        MBPalette.blocks[self.paletteID]:Show()
     elseif not MouseIsOver(MBStack) and self.stacked then
-        MacroBlockPool:Release(MBPalette.blocks[self.paletteID])
+        mb.BlockPoolCollection:Release(MBPalette.blocks[self.paletteID])
         MBPalette.blocks[self.paletteID] = self
-	end
+        self.stacked = false
+    end
 
     MBFrame.dragging = nil
     MBStack:SetScript("OnUpdate", nil)
@@ -64,38 +66,6 @@ function MB_USER_ELEMENT_OnShow(self)
 end
 
 -- User socket block handlers
-function MB_SOCKET_OnDragStart(self, button)
-
-    self:StartMoving()
-    self:SetFrameStrata("TOOLTIP")
-
-	if self.stacked then
-		MBStack.remBlock(self)
-		self.stacked = false
-    end
-
-    MBFrame.dragging = self
-    MBStack:SetScript("OnUpdate", StackDisplaceCheck)
-
-end
-
-function MB_SOCKET_OnDragStop(self)
-    
-    self:StopMovingOrSizing()
-	self:SetUserPlaced(false)
-
-    if MouseIsOver(MBStack) then
-		MBStack.addBlock(self)
-	else
-		SocketBlockPool:Release(self)
-        SocketBlockPool:Acquire(self)
-	end
-
-    MBFrame.dragging = nil
-    MBStack:SetScript("OnUpdate", nil)
-
-end
-
 function MB_SOCKET_OnClick(self, button, down)
     local parent = self:GetParent()
     local kind, name, spellID, itemID, mountID, iconID
@@ -126,38 +96,6 @@ function MB_SOCKET_OnClick(self, button, down)
 end
 
 -- User edit block handlers
-function MB_EDIT_OnDragStart(self, button)
-
-    self:StartMoving()
-    self:SetFrameStrata("TOOLTIP")
-
-	if self.stacked then
-		MBStack.remBlock(self)
-		self.stacked = false
-    end
-
-    MBFrame.dragging = self
-    MBStack:SetScript("OnUpdate", StackDisplaceCheck)
-
-end
-
-function MB_EDIT_OnDragStop(self)
-    
-    self:StopMovingOrSizing()
-	self:SetUserPlaced(false)
-
-    if MouseIsOver(MBStack) then
-		MBStack.addBlock(self)
-	else
-		EditBlockPool:Release(self)
-        EditBlockPool:Acquire(self)
-	end
-
-    MBFrame.dragging = nil
-    MBStack:SetScript("OnUpdate", nil)
-
-end
-
 function MB_EDIT_OnTextChanged(self, userInput)
 
     self.instructions:SetShown(self:GetText() == "")
