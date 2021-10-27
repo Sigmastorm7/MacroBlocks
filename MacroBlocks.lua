@@ -94,16 +94,23 @@ MacroBlockPool = CreateFramePool("Frame", MBPalette, "MacroBlockTemplate")
 SocketBlockPool = CreateFramePool("Frame", MBPalette, "SocketBlockTemplate")
 EditBlockPool = CreateFramePool("Frame", MBPalette, "EditBlockTemplate")
 
+mb.BlockPoolCollection = CreateFramePoolCollection()
+mb.BlockPoolCollection:CreatePool("Frame", MBPalette, "MacroBlockTemplate")
+mb.BlockPoolCollection:CreatePool("Frame", MBPalette, "SocketBlockTemplate")
+mb.BlockPoolCollection:CreatePool("Frame", MBPalette, "EditBlockTemplate")
+
 -- Acquires a new block from one of the block frame pools
 mb.MakeBlock = function(kind, data, paletteID) -- function MakeBlock(kind, data, paletteID)
-	local b
+	-- local template = data.template or "MacroBlockTemplate"
 
-	if data.func == "USER_SOCKET" then
-		b = SocketBlockPool:Acquire()
-	elseif data.func == "USER_EDIT" then
-		b = EditBlockPool:Acquire()
-	else
-		b = MacroBlockPool:Acquire()
+	local b = mb.BlockPoolCollection:Acquire(data.template or "MacroBlockTemplate")
+
+	if not data.func or (data.func ~= "USER_SOCKET" and data.func ~= "USER_EDIT") then
+		-- b = SocketBlockPool:Acquire()
+	-- elseif data.func == "USER_EDIT" then
+		-- b = EditBlockPool:Acquire()
+	-- else
+		-- b = MacroBlockPool:Acquire()
 
 		b.text:SetText(data.name)
 
@@ -334,13 +341,17 @@ local blocks = {
 		{	["name"] = "socket",
 			["payload"] = "",
 			["func"] = "USER_SOCKET",
+			["template"] = "SocketBlockTemplate"
 		},
 		{	["name"] = "custom input",
 			["payload"] = "",
 			["func"] = "USER_EDIT",
+			["template"] = "EditBlockTemplate"
 		},
 	},
 }
+
+local blockFamilies = {"Command", "Condition", "User", "Social", "Utility"}
 
 local init = false
 local function MacroBlocks_Init()

@@ -92,8 +92,8 @@
             <OnShow>
                 self.text:Hide();
             </OnShow>
-            <OnDragStart function="MB_SOCKET_OnDragStart"/>
-            <OnDragStop function="MB_SOCKET_OnDragStop"/>
+            <OnDragStart function="MB_OnDragStart"/>
+            <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
     <!--User input block template for custom strings and arguments-->
@@ -184,8 +184,8 @@
             <OnShow>
                 self.text:Hide();
             </OnShow>
-            <OnDragStart function="MB_EDIT_OnDragStart"/>
-            <OnDragStop function="MB_EDIT_OnDragStop"/>
+            <OnDragStart function="MB_OnDragStart"/>
+            <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
 </Ui>
