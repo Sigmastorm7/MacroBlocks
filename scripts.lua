@@ -26,9 +26,10 @@ function MB_OnDragStart(self, button)
 
     if self.stacked then
 		MBStack.remBlock(self)
-		self.stacked = false
+		-- self.stacked = false
+    else
+        -- MBPalette.blocks[self.paletteID] = nil
     end
-
 
     MBFrame.dragging = self
     MBStack:SetScript("OnUpdate", StackDisplaceCheck)
@@ -42,14 +43,16 @@ function MB_OnDragStop(self)
 
     if MouseIsOver(MBStack) then
         MBStack.addBlock(self)
-    else
-        MacroBlockPool:Release(self)
-        MacroBlockPool:Acquire()
+        MBPalette.blocks[self.paletteID] = mb.MakeBlock(self.kind, self.data, self.paletteID)
+        MBPalette.blocks[self.paletteID]:Show()
+    elseif not MouseIsOver(MBStack) and self.stacked then
+        MacroBlockPool:Release(MBPalette.blocks[self.paletteID])
+        MBPalette.blocks[self.paletteID] = self
 	end
 
     MBFrame.dragging = nil
     MBStack:SetScript("OnUpdate", nil)
-
+    PaletteAdjust()
 end
 
 -- User input element handler

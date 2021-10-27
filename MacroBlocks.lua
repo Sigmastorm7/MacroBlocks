@@ -1,8 +1,6 @@
 local addon, mb = ...
 local frame = CreateFrame("Frame", nil, UIParent)
 
-mb.MakeBlock = nil
-
 -- Math utility
 local function round(number, decimals)
     return tonumber((("%%.%df"):format(decimals)):format(number))
@@ -50,14 +48,14 @@ local function MBBackdropColorSetter(f, color)
 	f:SetBackdropBorderColor(ColorUnpack(mb.BlockColors[color], 1, 0.2))
 end
 
--- Palette frames
-do
-	MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
+MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
-	MBPalette = CreateFrame("Frame", "$parentPalette", MBFrame, "TooltipBackdropTemplate")
-	MBPalette:SetFrameStrata("HIGH")
-	MBPalette:SetBackdropColor(0.05, 0.05, 0.05)
-	MBPalette.blocks = {}
+MBPalette = CreateFrame("Frame", "$parentPalette", MBFrame, "TooltipBackdropTemplate")
+MBPalette:SetFrameStrata("HIGH")
+MBPalette:SetBackdropColor(0.05, 0.05, 0.05)
+MBPalette.blocks = {}
+
+-- Palette frames
 --[[
 	MBBasic = CreateFrame("Frame", "$parentBasic", MBPalette, "TooltipBackdropTemplate")
 
@@ -89,32 +87,12 @@ do
 	MBSocial:SetPoint("TOPLEFT", MBUser, "BOTTOMLEFT")
 	MBSocial:SetPoint("BOTTOMRIGHT", MBUser, "BOTTOMRIGHT", 0, -68)
 	MBBackdropColorSetter(MBSocial, "Social")
-	MBSocial.blocks = {}]]
-end
+	MBSocial.blocks = {}
+]]
 
-local debug = {
-	["str"] = "Debug: ",
-	["MB_BlockPoolResetter"] = { ["str"] = "resetterFunc x", ["count"] = 0 },
-}
-
-local function MB_BlockPoolResetter(self, block)
-	-- debug.MB_BlockPoolResetter.count = debug.MB_BlockPoolResetter.count + 1
-	-- print(debug.str..debug.MB_BlockPoolResetter.str..tostring(debug.MB_BlockPoolResetter.count))
-
-	if not MBPalette.blocks[block.paletteID] == block then
-		block:ClearAllPoints()
-		block:Hide()
-	end
-
-
-
-	PaletteAdjust()
-	StackAdjust()
-end
-
-MacroBlockPool = CreateFramePool("Frame", MBPalette, "MacroBlockTemplate", MB_BlockPoolResetter)
-SocketBlockPool = CreateFramePool("Frame", MBPalette, "SocketBlockTemplate", MB_BlockPoolResetter)
-EditBlockPool = CreateFramePool("Frame", MBPalette, "EditBlockTemplate", MB_BlockPoolResetter)
+MacroBlockPool = CreateFramePool("Frame", MBPalette, "MacroBlockTemplate")
+SocketBlockPool = CreateFramePool("Frame", MBPalette, "SocketBlockTemplate")
+EditBlockPool = CreateFramePool("Frame", MBPalette, "EditBlockTemplate")
 
 -- Acquires a new block from one of the block frame pools
 mb.MakeBlock = function(kind, data, paletteID) -- function MakeBlock(kind, data, paletteID)
@@ -139,15 +117,10 @@ mb.MakeBlock = function(kind, data, paletteID) -- function MakeBlock(kind, data,
 	end
 
 	b.kind = kind
-	b.payload = data.payload
-
-	b.palette = "MacroBlocksPalette"..kind
-	-- b:SetParent(_G[b.palette])
-	b.paletteID = paletteID or #_G[b.palette].blocks + 1
-	b.wasStacked = false
-	b.stacked = false
-
 	b.data = data
+
+	b.paletteID = paletteID or #MBPalette.blocks + 1
+	b.stacked = false
 
 	b:SetBackdrop(blockBackdrop)
 	b:SetBackdropColor(unpack(mb.BlockColors[kind]))
@@ -217,11 +190,11 @@ function UpdateMacroBlockText()
 	MBStack.sTable = {}
 
 	for i, block in pairs(MBStack.blocks) do
-		MBStack.sTable[block.stackID] = block.payload
+		MBStack.sTable[block.stackID] = block.data.payload
 
 		delim = delimSwitch(i, block)
 
-		MBStack.string = MBStack.string..delim..block.payload
+		MBStack.string = MBStack.string..delim..block.data.payload
 	end
 
 	MacroFrameText:SetText(MBStack.string)
@@ -299,9 +272,6 @@ MBStack.addBlock = function(block)
 	end
 
 	for id, b in pairs(MBStack.blocks) do b.stackID = id end
-
-	MBStack[block] = true
-	MBPalette[block] = false
 	StackAdjust()
 end
 
@@ -311,9 +281,6 @@ MBStack.remBlock = function(block)
 	table.remove(MBStack.blocks, block.stackID)
 
 	for id, b in pairs(MBStack.blocks) do b.stackID = id end
-
-	MBStack[block] = false
-	MBPalette[block] = true
 	StackAdjust()
 end
 
