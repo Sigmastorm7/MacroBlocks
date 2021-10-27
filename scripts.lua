@@ -59,35 +59,62 @@ end
 
 -- User input element handler
 function MB_USER_ELEMENT_OnShow(self)
-    local p = self:GetParent()
+    self.p = self:GetParent()
     self:SetBackdrop(UserBlockBackdrop)
     self:SetBackdropColor(0.325, 0.196, 0.043, 1)
     self:SetBackdropBorderColor(unpack(blockColors.User))
 end
 
+-- Smart block generator for specific instances
+--[[local sbData = {}
+local function SmartBlock()
+    local sb = mb.MakeBlock("Command", sbData, -1)
+
+    MBStack.displace = true
+    MBStack.displaceID = sb.data.sbIndex
+
+    return sb
+    -- MBStack.addBlock(sb)
+
+end]]
+
 -- User socket block handlers
 function MB_SOCKET_OnClick(self, button, down)
-    local parent = self:GetParent()
     local kind, name, spellID, itemID, mountID, iconID
+
+    -- sbData.make = false
 
     if GetCursorInfo() ~= nil then
         kind, itemID, mountID, spellID = GetCursorInfo()
         if kind == "spell" then
-
-            print(spellID)
             name, _, iconID = GetSpellInfo(spellID)
-
+            self:GetParent().data.payload = name
         elseif kind == "item" then
-
-            parent.payload = kind..":"..itemID
             iconID = C_Item.GetItemIconByID(itemID)
-
+            self:GetParent().data.payload = "item:"..itemID
         elseif kind == "mount" then
+            name, _, iconID = C_MountJournal.GetMountInfoByID(itemID)
+            self:GetParent().data.payload = name
+        elseif kind == "battlepet" then
+            local petGUID = itemID
+            local petInfo = C_PetJournal.GetPetInfoTableByPetID(petGUID)
 
-            print(itemID)
-            _, _, iconID = C_MountJournal.GetMountInfoByID(itemID)
+            iconID = petInfo.icon
+            self:GetParent().data.payload = petInfo.name
 
+            --[[sbData.name = "/sp"
+            sbData.payload = "/sp"
+            sbData.sbIndex = self:GetParent().stackID - 2
+            sbData.make = true]]
+
+        -- elseif kind == "" then
+        -- elseif kind == "" then
+        -- elseif kind == "" then
         end
+
+        --[[if sbData.make then
+            MBStack.addBlock(SmartBlock())
+        end]]
 
 	    self.icon:SetTexture(iconID)
         ClearCursor()
@@ -100,9 +127,9 @@ function MB_EDIT_OnTextChanged(self, userInput)
 
     self.instructions:SetShown(self:GetText() == "")
 
-    local parent = self:GetParent()
+    -- local parent = self:GetParent()
 
-    parent.payload = self:GetText()
+    self:GetParent().data.payload = self:GetText()
 
     UpdateMacroBlockText()
 end

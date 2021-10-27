@@ -55,62 +55,20 @@ MBPalette:SetFrameStrata("HIGH")
 MBPalette:SetBackdropColor(0.05, 0.05, 0.05)
 MBPalette.blocks = {}
 
--- Palette frames
---[[
-	MBBasic = CreateFrame("Frame", "$parentBasic", MBPalette, "TooltipBackdropTemplate")
-
-	MBCommand = CreateFrame("Frame", "$parentCommand", MBPalette, "TooltipBackdropTemplate")
-	MBCommand:SetPoint("TOPLEFT", MBPalette, "TOPLEFT")
-	MBCommand:SetPoint("BOTTOMRIGHT", MBPalette, "TOPRIGHT", 0, -68)
-	MBBackdropColorSetter(MBCommand, "Command")
-	MBCommand.blocks = {}
-
-	MBCondition = CreateFrame("Frame", "$parentCondition", MBPalette, "TooltipBackdropTemplate")
-	MBCondition:SetPoint("TOPLEFT", MBCommand, "BOTTOMLEFT")
-	MBCondition:SetPoint("BOTTOMRIGHT", MBCommand, "BOTTOMRIGHT", 0, -68)
-	MBBackdropColorSetter(MBCondition, "Condition")
-	MBCondition.blocks = {}
-
-	MBUtility = CreateFrame("Frame", "$parentUtility", MBPalette, "TooltipBackdropTemplate")
-	MBUtility:SetPoint("TOPLEFT", MBCondition, "BOTTOMLEFT")
-	MBUtility:SetPoint("BOTTOMRIGHT", MBCondition, "BOTTOMRIGHT", 0, -68)
-	MBBackdropColorSetter(MBUtility, "Utility")
-	MBUtility.blocks = {}
-
-	MBUser = CreateFrame("Frame", "$parentUser", MBPalette, "TooltipBackdropTemplate")
-	MBUser:SetPoint("TOPLEFT", MBUtility, "BOTTOMLEFT")
-	MBUser:SetPoint("BOTTOMRIGHT", MBUtility, "BOTTOMRIGHT", 0, -68)
-	MBBackdropColorSetter(MBUser, "User")
-	MBUser.blocks = {}
-
-	MBSocial = CreateFrame("Frame", "$parentSocial", MBPalette, "TooltipBackdropTemplate")
-	MBSocial:SetPoint("TOPLEFT", MBUser, "BOTTOMLEFT")
-	MBSocial:SetPoint("BOTTOMRIGHT", MBUser, "BOTTOMRIGHT", 0, -68)
-	MBBackdropColorSetter(MBSocial, "Social")
-	MBSocial.blocks = {}
-]]
-
-MacroBlockPool = CreateFramePool("Frame", MBPalette, "MacroBlockTemplate")
-SocketBlockPool = CreateFramePool("Frame", MBPalette, "SocketBlockTemplate")
-EditBlockPool = CreateFramePool("Frame", MBPalette, "EditBlockTemplate")
-
 mb.BlockPoolCollection = CreateFramePoolCollection()
-mb.BlockPoolCollection:CreatePool("Frame", MBPalette, "MacroBlockTemplate")
-mb.BlockPoolCollection:CreatePool("Frame", MBPalette, "SocketBlockTemplate")
-mb.BlockPoolCollection:CreatePool("Frame", MBPalette, "EditBlockTemplate")
+
+local templates = {"MacroBlockTemplate", "SocketBlockTemplate", "EditBlockTemplate", "ModBlockTemplate"}
+
+for i=1, #templates do
+	mb.BlockPoolCollection:CreatePool("Frame", MBPalette, templates[i])
+end
 
 -- Acquires a new block from one of the block frame pools
-mb.MakeBlock = function(kind, data, paletteID) -- function MakeBlock(kind, data, paletteID)
-	-- local template = data.template or "MacroBlockTemplate"
+mb.MakeBlock = function(kind, data, paletteID)
 
 	local b = mb.BlockPoolCollection:Acquire(data.template or "MacroBlockTemplate")
 
 	if not data.func or (data.func ~= "USER_SOCKET" and data.func ~= "USER_EDIT") then
-		-- b = SocketBlockPool:Acquire()
-	-- elseif data.func == "USER_EDIT" then
-		-- b = EditBlockPool:Acquire()
-	-- else
-		-- b = MacroBlockPool:Acquire()
 
 		b.text:SetText(data.name)
 
@@ -127,7 +85,6 @@ mb.MakeBlock = function(kind, data, paletteID) -- function MakeBlock(kind, data,
 	b.data = data
 
 	b.paletteID = paletteID or #MBPalette.blocks + 1
-	b.stacked = false
 
 	b:SetBackdrop(blockBackdrop)
 	b:SetBackdropColor(unpack(mb.BlockColors[kind]))
@@ -135,34 +92,14 @@ mb.MakeBlock = function(kind, data, paletteID) -- function MakeBlock(kind, data,
 
 	b:Show()
 
-	-- _G[b.palette][b] = true
+	if b.paletteID == -1 then
+		b.stacked = true
+		MBStack.addBlock(b)
+	else
+		b.stacked = false
+	end
 
 	return b
-end
-
-function PaletteAdjust(index, xOff, yOff)
-
-	index = index or 1
-	xOff = xOff or 6
-	yOff = yOff or -10
-
-	if index <= #MBPalette.blocks then
-
-		if not MBPalette.blocks[index]:IsShown() then MBPalette.blocks[index]:Show() end
-
-		if (xOff + MBPalette.blocks[index]:GetWidth()) >= (MBPalette:GetWidth() - 6) then
-			xOff = 6
-			yOff = yOff - 32
-		end
-
-		MBPalette.blocks[index]:ClearAllPoints()
-		MBPalette.blocks[index]:SetPoint("TOPLEFT", MBPalette, "TOPLEFT", xOff, yOff)
-		xOff = xOff + MBPalette.blocks[index]:GetWidth()
-		
-		PaletteAdjust(index + 1, xOff, yOff)
-	else
-		return
-	end
 end
 
 MBStack = CreateFrame("Frame", "$parentStack", MBFrame, "TooltipBackdropTemplate")
@@ -205,6 +142,31 @@ function UpdateMacroBlockText()
 	end
 
 	MacroFrameText:SetText(MBStack.string)
+end
+
+function PaletteAdjust(index, xOff, yOff)
+
+	index = index or 1
+	xOff = xOff or 6
+	yOff = yOff or -10
+
+	if index <= #MBPalette.blocks then
+
+		if not MBPalette.blocks[index]:IsShown() then MBPalette.blocks[index]:Show() end
+
+		if (xOff + MBPalette.blocks[index]:GetWidth()) >= (MBPalette:GetWidth() - 6) then
+			xOff = 6
+			yOff = yOff - 32
+		end
+
+		MBPalette.blocks[index]:ClearAllPoints()
+		MBPalette.blocks[index]:SetPoint("TOPLEFT", MBPalette, "TOPLEFT", xOff, yOff)
+		xOff = xOff + MBPalette.blocks[index]:GetWidth()
+
+		PaletteAdjust(index + 1, xOff, yOff)
+	else
+		return
+	end
 end
 
 function StackAdjust(index, xOff, yOff)
@@ -319,14 +281,9 @@ local blocks = {
 		},
 	},
 	["Condition"] = {
-		{	["name"] = "[ctrl]",
-			["payload"] = "[mod:ctrl]",
-		},
-		{	["name"] = "[shift]",
-			["payload"] = "[mod:shift]",
-		},
-		{	["name"] = "[alt]",
-			["payload"] = "[mod:alt]",
+		{	["name"] = "[mod]",
+			["payload"] = "[mod]",
+			-- ["template"] = "ModBlockTemplate"
 		},
 		{	["name"] = "[@mouseover]",
 			["payload"] = "[@mouseover]",
@@ -394,7 +351,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MBPalette:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
 		MBPalette:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
 
-		MacroCancelButton:HookScript("OnClick", function()
+		--[[MacroCancelButton:HookScript("OnClick", function()
 			for _, block in pairs(MBStack.blocks) do
 				if block.kind == "User" then
 					if block.data.func == "USER_SOCKET" then
@@ -406,7 +363,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 					EditBlockPool:Release(block)
 				end
 			end
-		end)
+		end)]]
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function()
