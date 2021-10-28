@@ -78,6 +78,8 @@ function MB_OnDragStop(self)
             self.smartHook = nil
         end
 
+        self.saved = false
+
         mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.paletteID])
         MBPaletteBasic.blocks[self.paletteID] = self
         self.stacked = false

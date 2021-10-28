@@ -278,6 +278,7 @@ end
 MBStack.addBlock = function(block)
 	block:SetParent(MBStack)
 	block.stacked = true
+	block.saved = false
 
 	if MBStack.displace then
 		table.insert(MBStack.blocks, MBStack.displaceID, block)
@@ -314,6 +315,10 @@ local function MacroBlocks_Init()
 	end
 end
 
+MBStack.saveBlocks = function()
+
+end
+
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, arg)
 	if event == "ADDON_LOADED" and arg == "Blizzard_MacroUI" then
@@ -342,17 +347,26 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MBPaletteBasic:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
 		MBPaletteBasic:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
 
+		MacroSaveButton:HookScript("OnClick", function()
+			for _, block in pairs(MBStack.blocks) do
+				block.saved = true
+			end
+		end)
+
 		MacroCancelButton:HookScript("OnClick", function()
 			local clearBlocks = {}
 			for _, block in pairs(MBStack.blocks) do
 				table.insert(clearBlocks, block)
 			end
 			for _, block in pairs(clearBlocks) do
-				if block.group == "Smart" then block.UNHOOK_PAYLOAD() end
-        		MBStack.remBlock(block)
+				if not block.saved then
+					if block.group == "Smart" then block.UNHOOK_PAYLOAD() end
+    	    		MBStack.remBlock(block)
 
-				MB_OnDragStop(block)
+					MB_OnDragStop(block)
+				end
 			end
+			clearBlocks = nil
 		end)
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
