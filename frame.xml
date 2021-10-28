@@ -295,4 +295,74 @@
             <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
+    <!--User selection block that allows user to select 1 or more different options-->
+    <Button name="SelectBlockOptionButtonTemplate" virtual="true">
+        <KeyValues>
+            <KeyValue key="val" value="0" type="number"/>
+        </KeyValues>
+        <Size x="24" y="24"/>
+        <Anchors>
+            <Anchor point="LEFT" relativeKey="$parent.backdropFrame" relativePoint="RIGHT" x="4" y="0"/>
+        </Anchors>
+        <ButtonText parentKey="text" text="option" setAllPoints="true" inherits="MacroBlockFont"/>
+        <Scripts>
+            <OnLoad function="MB_SELECT_OptionOnLoad"/>
+            <OnClick function="MB_SELECT_OptionOnClick"/>
+        </Scripts>
+    </Button>
+    <Frame name="SelectBlockTemplate" inherits="MacroBlockTemplate" virtual="true">
+        <Size x="57" y="28"/>
+        <Frames>
+            <Button parentKey="config" enableMouse="true">
+                <Size>
+                    <AbsDimension x="18" y="28"/>
+                </Size>
+                <KeyValues>
+                    <KeyValue key="open" value="false" type="boolean"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="RIGHT"/>
+                </Anchors>
+                <ButtonText parentKey="text" text="❭❭" inherits="MacroBlockSymbolFont_Small">
+                    <Anchors>
+                        <Anchor point="CENTER" x="-2" y="-2.5"/>
+                    </Anchors>
+                </ButtonText>
+                <Scripts>
+                    <OnClick function="MB_MOD_ConfigOnClick"/>
+                </Scripts>
+            </Button>
+            <Frame parentKey="backdropFrame" inherits="BackdropTemplate">
+                <Size x="32" y="28"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="text" text="mod" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlockFont"> 
+                            <Anchors>
+                                <Anchor point="CENTER" x="-0.5" y="-0.5"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnLoad>
+                        self:SetWidth(self.text:GetStringWidth() + 18);
+                        self:SetBackdrop(UserBlockBackdrop);
+                        self:SetBackdropColor(0, 0.9999977946281433, 0.5960771441459656);
+                        self:SetBackdropBorderColor(0, 0.9999977946281433, 0.5960771441459656);
+                    </OnLoad>
+                </Scripts>
+            </Frame>
+            <Button parentKey="opt1" hidden="true" enableMouse="true" inherits="SelectBlockOptionButtonTemplate"/>
+        </Frames>
+        <Scripts>
+            <OnLoad function="MB_SELECT_OnLoad"/>
+            <OnShow function="MB_SELECT_OnShow"/>
+            <OnDragStart function="MB_OnDragStart"/>
+            <OnDragStop function="MB_OnDragStop"/>
+        </Scripts>
+    </Frame>
+
 </Ui>
