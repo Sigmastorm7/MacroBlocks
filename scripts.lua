@@ -3,6 +3,11 @@ local addon, mb = ...
 local MakeBlock = mb.MakeBlock
 local classColors = mb.ClassColors
 
+-- Blizzard API
+local Item = C_Item
+local Mounts = C_MountJournal
+local Pets = C_PetJournal
+
 UserBlockBackdrop = {
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -119,36 +124,35 @@ end]]
 
 -- User socket block handlers
 function MB_SOCKET_OnClick(self, button, down)
-    local group, name, spellID, itemID, mountID, iconID
+    local itemType, name, spellID, itemID, mountID, iconID
 
     -- sbData.make = false
 
     if GetCursorInfo() ~= nil then
-        group, itemID, mountID, spellID = GetCursorInfo()
-        if group == "spell" then
+        itemType, itemID, mountID, spellID = GetCursorInfo()
+        if itemType == "spell" then
             name, _, iconID = GetSpellInfo(spellID)
             self:GetParent().data.payload = name
-        elseif group == "item" then
-            iconID = C_Item.GetItemIconByID(itemID)
+        elseif itemType == "item" then
+            iconID = Item.GetItemIconByID(itemID)
+
+            if ToyBox.GetToyInfo(itemID) then
+                itemType = "toy"
+            end
+
             self:GetParent().data.payload = "item:"..itemID
-        elseif group == "mount" then
-            name, _, iconID = C_MountJournal.GetMountInfoByID(itemID)
+        elseif itemType == "mount" then
+            name, _, iconID = Mounts.GetMountInfoByID(itemID)
             self:GetParent().data.payload = name
-        elseif group == "battlepet" then
-            local petGUID = itemID
-            local petInfo = C_PetJournal.GetPetInfoTableByPetID(petGUID)
+        elseif itemType == "battlepet" then
+            local petInfo = Pets.GetPetInfoTableByPetID(itemID)
 
             iconID = petInfo.icon
             self:GetParent().data.payload = petInfo.name
 
-            --[[sbData.name = "/sp"
-            sbData.payload = "/sp"
-            sbData.sbIndex = self:GetParent().stackID - 2
-            sbData.make = true]]
-
-        -- elseif group == "" then
-        -- elseif group == "" then
-        -- elseif group == "" then
+        -- elseif itemType == "" then
+        -- elseif itemType == "" then
+        -- elseif itemType == "" then
         end
 
         --[[if sbData.make then
@@ -163,11 +167,7 @@ end
 
 -- User edit block handlers
 function MB_EDIT_OnTextChanged(self, userInput)
-
     self.instructions:SetShown(self:GetText() == "")
-
-    -- local parent = self:GetParent()
-
     self:GetParent().data.payload = self:GetText()
 
     if userInput then UpdateMacroBlockText() end
