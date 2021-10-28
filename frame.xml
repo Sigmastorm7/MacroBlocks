@@ -195,7 +195,7 @@
             <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
-
+    <!--Condition block that allows user to select 1 or more different options-->
     <Frame name="ModBlockTemplate" inherits="MacroBlockTemplate" virtual="true">
         <Size x="57" y="28"/>
         <Frames>

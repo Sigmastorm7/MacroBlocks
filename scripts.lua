@@ -41,14 +41,14 @@ function MB_OnDragStop(self)
 
     if MouseIsOver(MBStack) then
         if not self.stacked then
-            MBPalette.blocks[self.paletteID] = mb.MakeBlock(self.group, self.data, self.paletteID)
+            MBPaletteBasic.blocks[self.paletteID] = mb.MakeBlock(self.group, self.data, self.paletteID)
         end
         if self.group == "Smart" then
             if self.ORPHAN() and self.PLACEMENT() then
                 self.STACK() -- MBStack.addBlock(self)
             else
-                mb.BlockPoolCollection:Release(MBPalette.blocks[self.paletteID])
-                MBPalette.blocks[self.paletteID] = self
+                mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.paletteID])
+                MBPaletteBasic.blocks[self.paletteID] = self
                 self.stacked = false
             end
         else
@@ -70,16 +70,16 @@ function MB_OnDragStop(self)
         if self.smartHook ~= nil then
             MBStack.remBlock(self.smartHook)
 
-            mb.BlockPoolCollection:Release(MBPalette.blocks[self.smartHook.paletteID])
-            MBPalette.blocks[self.smartHook.paletteID] = self.smartHook
+            mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.smartHook.paletteID])
+            MBPaletteBasic.blocks[self.smartHook.paletteID] = self.smartHook
             self.smartHook.stacked = false
 
             self.hooked = false
             self.smartHook = nil
         end
 
-        mb.BlockPoolCollection:Release(MBPalette.blocks[self.paletteID])
-        MBPalette.blocks[self.paletteID] = self
+        mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.paletteID])
+        MBPaletteBasic.blocks[self.paletteID] = self
         self.stacked = false
     end
 
@@ -220,16 +220,15 @@ function MB_MOD_ConfigOnClick(self, button, down)
 end
 
 local textColor = {
-    [-1] = { 1, 0, 0, },
-    [0] = { 1, 1, 1, },
-    [1] = { 0, 1, 0, },
+    [false] = { 0.55, 0.55, 0.55, },
+    [true] = { 1, 0.8, 0, },
 }
 
 function MB_MOD_OptionOnLoad(self)
-    self:RegisterForClicks("LeftButtonUp") -- , "RightButtonUp", "MiddleButtonUp")
+    self:RegisterForClicks("LeftButtonUp")
     self:SetWidth(self.text:GetStringWidth())
-    self.enabled = 0
-    self.text:SetTextColor(unpack(textColor[0]))
+    self.enabled = false
+    self.text:SetTextColor(unpack(textColor[self.enabled]))
 end
 
 
@@ -245,24 +244,13 @@ local modCase = {
 
 function MB_MOD_OptionOnClick(self, button, down)
     local p = self:GetParent()
-    -- if button == "LeftButton" then
-        if self.enabled == 0 then
-            self.enabled = 1
-            p.mods = p.mods + self.val
-        elseif self.enabled == 1 then
-            self.enabled = 0
-            p.mods = p.mods - self.val
-        end
-        print(p.mods)
-    -- elseif button == "RightButton" then
-    --     if self.enabled >= 0 then
-    --         self.enabled = -1
-    --     elseif self.enabled == -1 then
-    --         self.enabled = 0
-    --     end
-    -- elseif button == "MiddleButton" then
-    --     self.enabled = 0
-    -- end
+    if not self.enabled then
+        self.enabled = true
+        p.mods = p.mods + self.val
+    elseif self.enabled then
+        self.enabled = false
+        p.mods = p.mods - self.val
+    end
 
     p.data.payload = modCase[p.mods] or "[mod]"
     UpdateMacroBlockText()

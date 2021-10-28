@@ -67,12 +67,16 @@ local blockBackdrop = {
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
-MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame, "SimplePanelTemplate")
+MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
-MBPalette = CreateFrame("Frame", "$parentPalette", MBFrame, "TooltipBackdropTemplate")
-MBPalette:SetFrameStrata("HIGH")
-MBPalette:SetBackdropColor(0.05, 0.05, 0.05)
-MBPalette.blocks = {}
+MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", MBFrame, "TooltipBackdropTemplate")
+MBPaletteBasic:SetFrameStrata("HIGH")
+MBPaletteBasic:SetBackdropColor(0.05, 0.05, 0.05)
+MBPaletteBasic.blocks = {}
+
+MBPaletteAdvanced = CreateFrame("Frame", "$parentPaletteAdvanced", MBFrame, "SimplePanelTemplate")
+MBPaletteAdvanced:SetSize(200, 600)
+MBPaletteAdvanced:SetPoint("TOPLEFT", "$parent", "TOPRIGHT")
 
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
@@ -84,7 +88,7 @@ local templates = {
 }
 
 for i=1, #templates do
-	mb.BlockPoolCollection:CreatePool("Frame", MBPalette, templates[i])
+	mb.BlockPoolCollection:CreatePool("Frame", MBPaletteBasic, templates[i])
 end
 
 mb.SmartBlock = function(sBlock, smart)
@@ -160,7 +164,7 @@ mb.MakeBlock = function(group, data, paletteID)
 	b.group = group
 	b.data = data
 
-	b.paletteID = paletteID or #MBPalette.blocks + 1
+	b.paletteID = paletteID or #MBPaletteBasic.blocks + 1
 
 	b:SetBackdrop(blockBackdrop)
 	b:SetBackdropColor(unpack(mb.ClassColors[group].rgb))
@@ -196,6 +200,13 @@ local function delimSwitch(index, block)
 	-- bool = bool or index == #MBStack.blocks
 	bool = bool or #MBStack.blocks == 1
 	bool = bool or MBStack.blocks[index-1].group == "Smart"
+	bool = bool or block.group == "Condition"
+	-- bool = bool or 
+	-- bool = bool or 
+	-- bool = bool or 
+	-- bool = bool or 
+	-- bool = bool or 
+	-- bool = bool or 
 	-- bool = bool or 
 
 	if bool then return "" else return " " end
@@ -237,18 +248,18 @@ function PaletteAdjust(index, xOff, yOff)
 	xOff = xOff or 6
 	yOff = yOff or -10
 
-	if index <= #MBPalette.blocks then
+	if index <= #MBPaletteBasic.blocks then
 
-		if not MBPalette.blocks[index]:IsShown() then MBPalette.blocks[index]:Show() end
+		if not MBPaletteBasic.blocks[index]:IsShown() then MBPaletteBasic.blocks[index]:Show() end
 
-		if (xOff + MBPalette.blocks[index]:GetWidth()) >= (MBPalette:GetWidth() - 6) then
+		if (xOff + MBPaletteBasic.blocks[index]:GetWidth()) >= (MBPaletteBasic:GetWidth() - 6) then
 			xOff = 6
 			yOff = yOff - 32
 		end
 
-		MBPalette.blocks[index]:ClearAllPoints()
-		MBPalette.blocks[index]:SetPoint("TOPLEFT", MBPalette, "TOPLEFT", xOff, yOff)
-		xOff = xOff + MBPalette.blocks[index]:GetWidth()
+		MBPaletteBasic.blocks[index]:ClearAllPoints()
+		MBPaletteBasic.blocks[index]:SetPoint("TOPLEFT", MBPaletteBasic, "TOPLEFT", xOff, yOff)
+		xOff = xOff + MBPaletteBasic.blocks[index]:GetWidth()
 
 		PaletteAdjust(index + 1, xOff, yOff)
 	else
@@ -329,7 +340,7 @@ MBStack.addBlock = function(block)
 end
 
 MBStack.remBlock = function(block)
-	block:SetParent(MBPalette)
+	block:SetParent(MBPaletteBasic)
 
 	table.remove(MBStack.blocks, block.stackID)
 
@@ -467,7 +478,7 @@ local function MacroBlocks_Init()
 
 	for group, blockData in pairs(blocks) do
 		for i, data in pairs(blockData) do
-			MBPalette.blocks[itr] = mb.MakeBlock(group, data, itr)
+			MBPaletteBasic.blocks[itr] = mb.MakeBlock(group, data, itr)
 			itr = itr + 1
 		end
 		PaletteAdjust()
@@ -496,8 +507,8 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MBStack:SetPoint("TOPLEFT", MacroFrameTextBackground, "BOTTOMLEFT", -2, -20)
 		MBStack:SetPoint("BOTTOMRIGHT", MBFrame, "BOTTOMRIGHT", 0, 2)
 
-		MBPalette:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
-		MBPalette:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
+		MBPaletteBasic:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
+		MBPaletteBasic:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function()
