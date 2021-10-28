@@ -67,7 +67,7 @@ local blockBackdrop = {
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
-MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
+MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame, "SimplePanelTemplate")
 
 MBPalette = CreateFrame("Frame", "$parentPalette", MBFrame, "TooltipBackdropTemplate")
 MBPalette:SetFrameStrata("HIGH")
@@ -481,8 +481,8 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		-- Alter blizzard's macro frame
 		MacroFrame:SetHeight(603)
-		MacroFrame:SetWidth(MacroFrame:GetWidth() * 2)
-		MacroFrame.Inset:SetPoint("BOTTOMRIGHT", "$parent", "BOTTOM", -6, 200)
+		MacroFrame:SetWidth(MacroFrame:GetWidth() * 1.75)
+		-- MacroFrame.Inset:SetPoint("BOTTOMRIGHT", "$parent", "BOTTOM", -6, 200)
 		MacroFrame.TopTileStreaks:Hide()
 		MacroButtonScrollFrame:SetWidth(292)
 		MacroFrameTextBackground:SetPoint("TOPLEFT", MacroFrameSelectedMacroBackground, "BOTTOMLEFT", 2, -6)
@@ -511,6 +511,9 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		end)
 	end
 end)
+
+
+
 
 
 --[[ Export all available slash commands
