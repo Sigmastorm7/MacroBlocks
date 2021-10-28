@@ -181,14 +181,14 @@ local function ModOption_SetShown(block)
 end
 
 local MOD_OPEN = function(block, button)
-    button.text:SetText("❬")
+    button.text:SetText("❬❬")
     button.open = true
     block:SetWidth(156)
 
     ModOption_SetShown(block)
 end
 local MOD_CLOSE = function(block, button)
-    button.text:SetText("❭")
+    button.text:SetText("❭❭")
     button.open = false
     block:SetWidth(57)
 
@@ -221,7 +221,7 @@ end
 
 local textColor = {
     [false] = { 0.55, 0.55, 0.55, },
-    [true] = { 1, 0.8, 0, },
+    [true] = { 1, 150/255, 0, },
 }
 
 function MB_MOD_OptionOnLoad(self)

@@ -3,59 +3,8 @@ local frame = CreateFrame("Frame", nil, UIParent)
 
 -- Math utility
 local function round(number, decimals)
-  return tonumber((("%%.%df"):format(decimals)):format(number))
+	return tonumber((("%%.%df"):format(decimals)):format(number))
 end
-
-mb.ClassColors = {
-	["HUNTER"] = { -- HUNTER
-		["hex"] = "ffa9d271",
-		["rgb"] = { 0.6666651964187622, 0.8274491429328918, 0.447057843208313 },
-	},
-	["WARRIOR"] = { -- WARRIOR
-		["hex"] = "ffc59a6c",
-		["rgb"] = { 0.7764688730239868, 0.6078417897224426, 0.427450031042099 },
-	},
-	["SHAMAN"] = { -- SHAMAN
-		["hex"] = "ff006fdc",
-		["rgb"] = { 0,  0.4392147064208984, 0.8666647672653198 },
-	},
-	["Social"] = { -- MAGE
-		["hex"] = "ff3ec6ea",
-		["rgb"] = { 0.2470582872629166,  0.7803904414176941, 0.9215666055679321 },
-	},
-	["PRIEST"] = { -- PRIEST
-		["hex"] = "fffefefe",
-		["rgb"] = { 0.9999977946281433,  0.9999977946281433, 0.9999977946281433 },
-	},
-	["PALADIN"] = { -- PALADIN
-		["hex"] = "fff38bb9",
-		["rgb"] = { 0.9568606615066528,  0.549018383026123, 0.7294101715087891 },
-	},
-	["Command"] = { -- WARLOCK
-		["hex"] = "ff8687ed",
-		["rgb"] = { 0.5294106006622314, 0.5333321690559387, 0.933331310749054 },
-	},
-	["DEMONHUNTER"] = { -- DEMONHUNTER
-		["hex"] = "ffa22fc8",
-		["rgb"] = { 0.639214277267456,  0.188234880566597, 0.7882335782051086 },
-	},
-	["Smart"] = { -- DEATHKNIGHT
-		["hex"] = "ffc31d39",
-		["rgb"] = { 0.7686257362365723,  0.117646798491478, 0.2274504750967026 },
-	},
-	["User"] = { -- DRUID
-		["hex"] = "fffe7b09",
-		["rgb"] = { 0.9999977946281433, 0.4862734377384186, 0.03921560198068619 },
-	},
-	["Condition"] = { -- MONK
-		["hex"] = "ff00fe97",
-		["rgb"] = { 0, 0.9999977946281433, 0.5960771441459656 },
-	},
-	["Utility"] = { -- ROGUE
-		["hex"] = "fffef367",
-		["rgb"] = { 0.9999977946281433, 0.9568606615066528, 0.4078422486782074 },
-	},
-}
 
 local blockBackdrop = {
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -67,16 +16,16 @@ local blockBackdrop = {
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
-MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
+MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame, "SimplePanelTemplate")
 
 MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", MBFrame, "TooltipBackdropTemplate")
 MBPaletteBasic:SetFrameStrata("HIGH")
 MBPaletteBasic:SetBackdropColor(0.05, 0.05, 0.05)
 MBPaletteBasic.blocks = {}
 
-MBPaletteAdvanced = CreateFrame("Frame", "$parentPaletteAdvanced", MBFrame, "SimplePanelTemplate")
-MBPaletteAdvanced:SetSize(200, 600)
-MBPaletteAdvanced:SetPoint("TOPLEFT", "$parent", "TOPRIGHT")
+-- MBPaletteAdvanced = CreateFrame("Frame", "$parentPaletteAdvanced", MBFrame, "SimplePanelTemplate")
+-- MBPaletteAdvanced:SetSize(200, 600)
+-- MBPaletteAdvanced:SetPoint("TOPLEFT", "$parent", "TOPRIGHT")
 
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
@@ -216,6 +165,7 @@ end
 function UpdateMacroBlockText()
 
 	local delim, str
+	local preDelim, postDelim
 
 	MBStack.string = ""
 	MBStack.sTable = {}
@@ -271,12 +221,12 @@ function StackAdjust(index, xOff, yOff)
 
 	index = index or 1
 	xOff = xOff or 6
-	yOff = yOff or -10
+	yOff = yOff or -6
 
 	if index <= #MBStack.blocks then
 
 		if (xOff + MBStack.blocks[index]:GetWidth()) >= (MBStack:GetWidth() - 6) then
-			xOff = 6
+			xOff = 4
 			yOff = yOff - 32
 		end
 
@@ -348,127 +298,6 @@ MBStack.remBlock = function(block)
 	StackAdjust()
 end
 
-local blocks = {
-	["Utility"] = {
-		{	["name"] = "#showtooltip",
-			["payload"] = "#showtooltip\n",
-			["func"] = "NEW_LINE",
-		},
-		{	["name"] = "#show",
-			["payload"] = "#show\n",
-			["func"] = "NEW_LINE",
-		},
-		{	["name"] = "⮐",
-			["payload"] = "\n",
-			["symbol"] = true,
-			["func"] = "NEW_LINE",
-		},
-		{	["name"] = ";",
-			["payload"] = ";",
-		},
-	},
-	["Command"] = {
-		{	["name"] = "/use",
-			["payload"] = "/use",
-		},
-		{	["name"] = "/cast",
-			["payload"] = "/cast",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/target",
-			["payload"] = "/tar",
-		},
-		{	["name"] = "/summonpet",
-			["payload"] = "/sp"
-		},
-	},
-	["Condition"] = {
-		{	["name"] = "mod",
-			["payload"] = "[mod]",
-			["func"] = "MOD_CONDITION",
-			["template"] = "ModBlockTemplate"
-		},
-		{	["name"] = "combat",
-			["payload"] = "[combat]",
-		},
-		{	["name"] = "exists",
-			["payload"] = "[exists]",
-		},
-		{	["name"] = "help",
-			["payload"] = "[help]",
-		},
-		{	["name"] = "harm",
-			["payload"] = "[harm]",
-		},
-		{	["name"] = "dead",
-			["payload"] = "[dead]",
-		},
-		{	["name"] = "@mouseover",
-			["payload"] = "[@mouseover]",
-		},
-	},
-	["Social"] = {
-		{	["name"] = "AaBbCc",
-			["payload"] = "AaBbCc",
-		},
-	},
-	["User"] = {
-		{	["name"] = "socket",
-			["payload"] = "",
-			["func"] = "USER_SOCKET",
-			["template"] = "SocketBlockTemplate"
-		},
-		{	["name"] = "custom input",
-			["payload"] = "",
-			["func"] = "USER_EDIT",
-			["template"] = "EditBlockTemplate"
-		},
-	},
-	["Smart"] = {
-		{	["name"] = "no",
-			-- ["payload"] = "no",
-			["func"] = "NO_CONDITION",
-			["smart"] = {
-				["palette"] = true,
-				["group"] = "Condition",
-				["hookPayload"] = { 2, "no" },
-				["orphan"] = false,
-			}
-		}
-	}
-}
-
-local blockFamilies = {"Command", "Condition", "User", "Social", "Utility"}
-
 local init = false
 local function MacroBlocks_Init()
 	if init then return end
@@ -476,7 +305,7 @@ local function MacroBlocks_Init()
 
 	local itr = 1
 
-	for group, blockData in pairs(blocks) do
+	for group, blockData in pairs(mb.Blocks) do
 		for i, data in pairs(blockData) do
 			MBPaletteBasic.blocks[itr] = mb.MakeBlock(group, data, itr)
 			itr = itr + 1
@@ -491,8 +320,8 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		if not MacroFrame then return end
 
 		-- Alter blizzard's macro frame
-		MacroFrame:SetHeight(603)
-		MacroFrame:SetWidth(MacroFrame:GetWidth() * 1.75)
+		-- MacroFrame:SetHeight(603)
+		-- MacroFrame:SetWidth(560)
 		-- MacroFrame.Inset:SetPoint("BOTTOMRIGHT", "$parent", "BOTTOM", -6, 200)
 		MacroFrame.TopTileStreaks:Hide()
 		MacroButtonScrollFrame:SetWidth(292)
@@ -501,14 +330,30 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameCharLimitText:SetPoint("TOP", MacroFrameTextBackground, "BOTTOM", 0, -2)
 
 		MBFrame:SetScale(MacroFrame:GetEffectiveScale())
-		MBFrame:SetPoint("TOPLEFT", MacroFrame.Inset, "TOPRIGHT")
-		MBFrame:SetPoint("BOTTOMRIGHT", MacroFrame, "BOTTOMRIGHT", -6, 26)
+		-- MBFrame:SetPoint("TOPLEFT", MacroFrame.Inset, "TOPRIGHT")
+		MBFrame:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT", 0, -18)
+		MBFrame:SetPoint("BOTTOMRIGHT", MacroFrame, "BOTTOMRIGHT", 240, -120)
+		--MBFrame:SetPoint("BOTTOMRIGHT", MacroFrame, "BOTTOMRIGHT", -6, 26)
 
 		MBStack:SetPoint("TOPLEFT", MacroFrameTextBackground, "BOTTOMLEFT", -2, -20)
 		MBStack:SetPoint("BOTTOMRIGHT", MBFrame, "BOTTOMRIGHT", 0, 2)
 
 		MBPaletteBasic:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
 		MBPaletteBasic:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
+
+		--[[MacroCancelButton:HookScript("OnClick", function()
+			for _, block in pairs(MBStack.blocks) do
+				MBStack.remBlock(block)
+				mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[block.paletteID])
+        		MBPaletteBasic.blocks[block.paletteID] = block
+        		block.stacked = false
+
+				MBStack.displace = false
+    			MBStack.displaceID = 0
+    			StackAdjust()
+    			PaletteAdjust()
+			end
+		end)]]
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function()

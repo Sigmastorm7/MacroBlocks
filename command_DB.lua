@@ -569,18 +569,18 @@ mb.SlashCommandList = {
 			["/a"] = true,
 			["/assist"] = true,
 		},
-		["/clearfocus"] = {
-			["/clearfocus"] = true,
-		},
-		["/cleartarget"] = {
-			["/cleartarget"] = true,
-		},
 		["/focus"] = {
 			["/focus"] = true,
+		},
+		["/clearfocus"] = {
+			["/clearfocus"] = true,
 		},
 		["/target"] = {
 			["/target"] = true,
 			["/tar"] = true,
+		},
+		["/cleartarget"] = {
+			["/cleartarget"] = true,
 		},
 		["/targetenemy"] = {
 			["/targetenemy"] = true,
