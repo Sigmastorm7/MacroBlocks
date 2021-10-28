@@ -329,7 +329,27 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		if not MacroFrame then return end
 
 		-- Alter blizzard's macro frame
+		MacroFrame:SetMovable(true)
+		MacroFrame:RegisterForDrag()
 		MacroFrame:SetClampedToScreen(true)
+
+		-- Title bar 'handle' that lets the user move the macro frame around the screen
+		local dragBar = CreateFrame("Frame", "MBDragBar", MacroFrame)
+		dragBar:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT")
+		dragBar:SetPoint("BOTTOMRIGHT", MacroFrame, "TOPRIGHT", -24, -24)
+
+		dragBar:EnableMouse(true)
+		dragBar:SetScript("OnMouseDown", function(_self, button)
+			if button == "LeftButton" then
+				MacroFrame:StartMoving()
+			end
+		end)
+		dragBar:SetScript("OnMouseUp", function(_self, button)
+			if button == "LeftButton" then
+				MacroFrame:StopMovingOrSizing()
+			end
+		end)
+
 		-- MacroFrame:SetHeight(603)
 		-- MacroFrame:SetWidth(560)
 		-- MacroFrame.Inset:SetPoint("BOTTOMRIGHT", "$parent", "BOTTOM", -6, 200)
@@ -376,6 +396,14 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function()
 			MBFrame:Show()
+
+			--[[MacroSaveButton.Left:SetTexture("Interface/Buttons/128RedButton")
+			MacroSaveButton.Middle:SetTexture("Interface/Buttons/128RedButton")
+			MacroSaveButton.Right:SetTexture("Interface/Buttons/128RedButton")
+
+			MacroSaveButton.Left:SetTexCoord(0.763671875, 0.986328125, 0.44482421875, 0.50732421875)
+			MacroSaveButton.Middle:SetTexCoord(0, 0.125, 0.00048828125, 0.06298828125)
+			MacroSaveButton.Right:SetTexCoord(0.001953125, 0.572265625, 0.25439453125, 0.31689453125)]]
 
 			MacroBlocks_mb_Init()
 
