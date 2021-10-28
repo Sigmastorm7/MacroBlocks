@@ -1,6 +1,9 @@
 local addon, mb = ...
 local frame = CreateFrame("Frame", nil, UIParent)
 
+local mb_init = false
+
+
 -- Math utility
 local function round(number, decimals)
 	return tonumber((("%%.%df"):format(decimals)):format(number))
@@ -164,6 +167,8 @@ end
 
 function UpdateMacroBlockText()
 
+	if not mb_init then return end
+
 	local delim, str
 	local preDelim, postDelim
 
@@ -299,10 +304,9 @@ MBStack.remBlock = function(block)
 	StackAdjust()
 end
 
-local init = false
-local function MacroBlocks_Init()
-	if init then return end
-	init = true
+local function MacroBlocks_mb_Init()
+	if mb_init then return end
+	mb_init = true
 
 	local itr = 1
 
@@ -373,7 +377,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame:HookScript("OnShow", function()
 			MBFrame:Show()
 
-			MacroBlocks_Init()
+			MacroBlocks_mb_Init()
 
 		end)
 		MacroFrame:HookScript("OnHide", function()

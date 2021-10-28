@@ -170,7 +170,7 @@ function MB_EDIT_OnTextChanged(self, userInput)
 
     self:GetParent().data.payload = self:GetText()
 
-    UpdateMacroBlockText()
+    if userInput then UpdateMacroBlockText() end
 end
 
 -- Conditional modifier block handlers
@@ -179,7 +179,7 @@ local function ModOption_SetShown(block)
     block.ctrl:SetShown(block.config.open)
     block.alt:SetShown(block.config.open)
 
-    StackAdjust()
+    -- StackAdjust()
 end
 
 local MOD_OPEN = function(block, button)
