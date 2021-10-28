@@ -1,7 +1,7 @@
 local addon, mb = ...
 
 local MakeBlock = mb.MakeBlock
-local blockColors = mb.BlockColors
+local classColors = mb.ClassColors
 
 UserBlockBackdrop = {
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -47,6 +47,17 @@ function MB_OnDragStop(self)
         end
         MBStack.addBlock(self)
     elseif not MouseIsOver(MBStack) and self.stacked then
+        if self.data.func ~= nil then
+            if self.data.func == "USER_SOCKET" then
+                self.data.payload = ""
+                self.socket.icon:SetColorTexture(0, 0, 0, 0)
+            elseif self.data.func == "USER_EDIT" then
+                self.data.payload = ""
+                self.edit:SetText("")
+            elseif self.data.func == "MOD_CONDITION" then
+                self.config.closeFunc(self, self.config)
+            end
+        end
         mb.BlockPoolCollection:Release(MBPalette.blocks[self.paletteID])
         MBPalette.blocks[self.paletteID] = self
         self.stacked = false
@@ -59,10 +70,10 @@ end
 
 -- User input element handler
 function MB_USER_ELEMENT_OnShow(self)
-    self.p = self:GetParent()
+    -- self.p = self:GetParent()
     self:SetBackdrop(UserBlockBackdrop)
-    self:SetBackdropColor(0.325, 0.196, 0.043, 1)
-    self:SetBackdropBorderColor(unpack(blockColors.User))
+    self:SetBackdropColor(128/255, 62/255, 5/255)
+    self:SetBackdropBorderColor(unpack(classColors.User.rgb))
 end
 
 -- Smart block generator for specific instances
@@ -132,4 +143,102 @@ function MB_EDIT_OnTextChanged(self, userInput)
     self:GetParent().data.payload = self:GetText()
 
     UpdateMacroBlockText()
+end
+
+-- Conditional modifier block handlers
+local function ModOption_SetShown(block)
+    block.shift:SetShown(block.config.open)
+    block.ctrl:SetShown(block.config.open)
+    block.alt:SetShown(block.config.open)
+
+    StackAdjust()
+end
+
+local MOD_OPEN = function(block, button)
+    button.text:SetText("❬")
+    button.open = true
+    block:SetWidth(156)
+
+    ModOption_SetShown(block)
+end
+local MOD_CLOSE = function(block, button)
+    button.text:SetText("❭")
+    button.open = false
+    block:SetWidth(57)
+
+    ModOption_SetShown(block)
+end
+
+function MB_MOD_OnLoad(self)
+    MB_OnLoad(self)
+    self.config.openFunc = MOD_OPEN
+    self.config.closeFunc = MOD_CLOSE
+
+    self.mods = 0
+end
+
+function MB_MOD_OnShow(self)
+    self:SetBackdropColor(0, 128/255, 77/255)
+    self.text:Hide()
+    self.shift:SetShown(self.config.open)
+    self.ctrl:SetShown(self.config.open)
+    self.alt:SetShown(self.config.open)
+end
+
+function MB_MOD_ConfigOnClick(self, button, down)
+    local p = self:GetParent()
+
+    if not p.stacked then return end
+
+    if not self.open then self.openFunc(p, self) elseif self.open then self.closeFunc(p, self) end
+end
+
+local textColor = {
+    [-1] = { 1, 0, 0, },
+    [0] = { 1, 1, 1, },
+    [1] = { 0, 1, 0, },
+}
+
+function MB_MOD_OptionOnLoad(self)
+    self:RegisterForClicks("LeftButtonUp") -- , "RightButtonUp", "MiddleButtonUp")
+    self:SetWidth(self.text:GetStringWidth())
+    self.enabled = 0
+    self.text:SetTextColor(unpack(textColor[0]))
+end
+
+
+local modCase = {
+    "[mod:shift]",
+    "[mod:ctrl]",
+    "[mod:shiftctrl]",
+    "[mod:alt]",
+    "[mod:shiftalt]",
+    "[mod:ctrlalt]",
+    "[mod:shiftctrlalt]",
+}
+
+function MB_MOD_OptionOnClick(self, button, down)
+    local p = self:GetParent()
+    -- if button == "LeftButton" then
+        if self.enabled == 0 then
+            self.enabled = 1
+            p.mods = p.mods + self.val
+        elseif self.enabled == 1 then
+            self.enabled = 0
+            p.mods = p.mods - self.val
+        end
+        print(p.mods)
+    -- elseif button == "RightButton" then
+    --     if self.enabled >= 0 then
+    --         self.enabled = -1
+    --     elseif self.enabled == -1 then
+    --         self.enabled = 0
+    --     end
+    -- elseif button == "MiddleButton" then
+    --     self.enabled = 0
+    -- end
+
+    p.data.payload = modCase[p.mods] or "[mod]"
+    UpdateMacroBlockText()
+    self.text:SetTextColor(unpack(textColor[self.enabled]))
 end

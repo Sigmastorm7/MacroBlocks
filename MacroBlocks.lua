@@ -3,22 +3,58 @@ local frame = CreateFrame("Frame", nil, UIParent)
 
 -- Math utility
 local function round(number, decimals)
-    return tonumber((("%%.%df"):format(decimals)):format(number))
+  return tonumber((("%%.%df"):format(decimals)):format(number))
 end
 
-mb.BlockColors = {
-	["Command"] = {0.78431, 0.27059, 0.98039}, 						
-	["Social"] = {0.0, 0.8, 1},
-	["item"] = {0.0, 0.56863, 0.94902},
-	["spell"] = nil,
-	["emote"] = {0.65882, 0.65882, 0.65882},
-	["User"] = {1.0, 0.50196, 0.0},
-	["Utility"] = {0.90196, 0.8, 0.50196},
-	["Condition"] = {0.0902, 0.7843, 0.3922},
-	["horde"] = {0.90, 0.05, 0.07},
-	["alliance"] = {0.29, 0.33, 0.91},
-	["mawBG"] = {0.114, 0.153, 0.149},
-	["mawEdge"] = {0.31, 0.459, 0.463},
+mb.ClassColors = {
+	["HUNTER"] = { -- HUNTER
+		["hex"] = "ffa9d271",
+		["rgb"] = { 0.6666651964187622, 0.8274491429328918, 0.447057843208313 },
+	},
+	["WARRIOR"] = { -- WARRIOR
+		["hex"] = "ffc59a6c",
+		["rgb"] = { 0.7764688730239868, 0.6078417897224426, 0.427450031042099 },
+	},
+	["SHAMAN"] = { -- SHAMAN
+		["hex"] = "ff006fdc",
+		["rgb"] = { 0,  0.4392147064208984, 0.8666647672653198 },
+	},
+	["Social"] = { -- MAGE
+		["hex"] = "ff3ec6ea",
+		["rgb"] = { 0.2470582872629166,  0.7803904414176941, 0.9215666055679321 },
+	},
+	["Utility"] = { -- PRIEST
+		["hex"] = "fffefefe",
+		["rgb"] = { 0.9999977946281433,  0.9999977946281433, 0.9999977946281433 },
+	},
+	["PALADIN"] = { -- PALADIN
+		["hex"] = "fff38bb9",
+		["rgb"] = { 0.9568606615066528,  0.549018383026123, 0.7294101715087891 },
+	},
+	["Command"] = { -- WARLOCK
+		["hex"] = "ff8687ed",
+		["rgb"] = { 0.5294106006622314, 0.5333321690559387, 0.933331310749054 },
+	},
+	["DEMONHUNTER"] = { -- DEMONHUNTER
+		["hex"] = "ffa22fc8",
+		["rgb"] = { 0.639214277267456,  0.188234880566597, 0.7882335782051086 },
+	},
+	["Smart"] = { -- DEATHKNIGHT
+		["hex"] = "ffc31d39",
+		["rgb"] = { 0.7686257362365723,  0.117646798491478, 0.2274504750967026 },
+	},
+	["User"] = { -- DRUID
+		["hex"] = "fffe7b09",
+		["rgb"] = { 0.9999977946281433, 0.4862734377384186, 0.03921560198068619 },
+	},
+	["Condition"] = { -- MONK
+		["hex"] = "ff00fe97",
+		["rgb"] = { 0, 0.9999977946281433, 0.5960771441459656 },
+	},
+	["ROGUE"] = { -- ROGUE
+		["hex"] = "fffef367",
+		["rgb"] = { 0.9999977946281433, 0.9568606615066528, 0.4078422486782074 },
+	},
 }
 
 local blockBackdrop = {
@@ -31,23 +67,6 @@ local blockBackdrop = {
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
-local nullBlock = {
-	["name"] = "null",
-	["payload"] = "",
-}
-
-local function ColorUnpack(rgb, a, mod)
-	a = a or 1
-	mod = mod or 0
-	local r, g, b = rgb[1] + mod, rgb[2] + mod, rgb[3] + mod
-	return r, g, b, a	
-end
-
-local function MBBackdropColorSetter(f, color)
-	f:SetBackdropColor(ColorUnpack(mb.BlockColors[color], 0.3))
-	f:SetBackdropBorderColor(ColorUnpack(mb.BlockColors[color], 1, 0.2))
-end
-
 MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
 MBPalette = CreateFrame("Frame", "$parentPalette", MBFrame, "TooltipBackdropTemplate")
@@ -57,7 +76,12 @@ MBPalette.blocks = {}
 
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
-local templates = {"MacroBlockTemplate", "SocketBlockTemplate", "EditBlockTemplate", "ModBlockTemplate"}
+local templates = {
+	"MacroBlockTemplate",
+	"SocketBlockTemplate",
+	"EditBlockTemplate",
+	"ModBlockTemplate",
+}
 
 for i=1, #templates do
 	mb.BlockPoolCollection:CreatePool("Frame", MBPalette, templates[i])
@@ -72,8 +96,10 @@ mb.MakeBlock = function(kind, data, paletteID)
 
 		b.text:SetText(data.name)
 
-		local bw = b.text:GetStringWidth() + 18
-		if bw >= 28 then b:SetWidth(bw) else b:SetWidth(28) end
+		if data.func ~= "MOD_CONDITION" then
+			local bw = b.text:GetStringWidth() + 18
+			if bw >= 28 then b:SetWidth(bw) else b:SetWidth(28) end
+		end
 
 		if data.symbol then
 			b.text:SetFontObject(MacroBlockSymbolFont)
@@ -87,8 +113,8 @@ mb.MakeBlock = function(kind, data, paletteID)
 	b.paletteID = paletteID or #MBPalette.blocks + 1
 
 	b:SetBackdrop(blockBackdrop)
-	b:SetBackdropColor(unpack(mb.BlockColors[kind]))
-	b:SetBackdropBorderColor(unpack(mb.BlockColors[kind]))
+	b:SetBackdropColor(unpack(mb.ClassColors[kind].rgb))
+	b:SetBackdropBorderColor(unpack(mb.ClassColors[kind].rgb))
 
 	b:Show()
 
@@ -281,9 +307,10 @@ local blocks = {
 		},
 	},
 	["Condition"] = {
-		{	["name"] = "[mod]",
-			["payload"] = "[mod]",
-			-- ["template"] = "ModBlockTemplate"
+		{	["name"] = "mod",
+			["payload"] = "",
+			["func"] = "MOD_CONDITION",
+			["template"] = "ModBlockTemplate"
 		},
 		{	["name"] = "[@mouseover]",
 			["payload"] = "[@mouseover]",
@@ -306,6 +333,12 @@ local blocks = {
 			["template"] = "EditBlockTemplate"
 		},
 	},
+	["Smart"] = {
+		{	["name"] = "no",
+			["payload"] = "no",
+			["func"] = "NO_CONDITION"
+		}
+	}
 }
 
 local blockFamilies = {"Command", "Condition", "User", "Social", "Utility"}
@@ -319,7 +352,7 @@ local function MacroBlocks_Init()
 
 	for kind, blockData in pairs(blocks) do
 		for i, data in pairs(blockData) do
-			MBPalette.blocks[itr] = mb.MakeBlock(kind, data, itr) -- MakeBlock(kind, data)
+			MBPalette.blocks[itr] = mb.MakeBlock(kind, data, itr)
 			itr = itr + 1
 		end
 		PaletteAdjust()
@@ -380,36 +413,35 @@ end)
 
 
 --[[ Export all available slash commands
-	function CommandList()
-		local HT = {}
-		HT.Commands = {}
-		HT.NormalizedCommands = {}
+function CommandList()
+	local HT = {}
+	HT.Commands = {}
+	HT.NormalizedCommands = {}
 	
-		for key, value in pairs(_G) do
-		  if strsub(key, 1, 6) == "SLASH_" then
+	for key, value in pairs(_G) do
+		if strsub(key, 1, 6) == "SLASH_" then
 			local cTypeKey = gsub(key, "%d+$", "")
 			for cSeq = 1, 20 do
-			  local cPrime = cTypeKey.."1"
-			  local cKey = cTypeKey..tostring(cSeq)
-			  if _G[cPrime] and _G[cKey] then
-				if strsub(_G[cPrime], 1, 1) == "/" and 
-				   strsub(_G[cKey], 1, 1) == "/" then
-				  HT.Commands[_G[cKey]%] = _G[cPrime]
-				  if HT.NormalizedCommands[_G[cPrime]%] then
-				  -- skip it
-				  else
-				  -- make it
-					HT.NormalizedCommands[_G[cPrime]%] = {}
-				  end
-				  HT.NormalizedCommands[_G[cPrime]%][_G[cKey]%] = true
-				end
-			  else
-				break
-			  end
+			  	local cPrime = cTypeKey.."1"
+			  	local cKey = cTypeKey..tostring(cSeq)
+			  	if _G[cPrime] and _G[cKey] then
+					if strsub(_G[cPrime], 1, 1) == "/" and strsub(_G[cKey], 1, 1) == "/" then
+					  	HT.Commands[_G[cKey]%] = _G[cPrime]
+					  	if HT.NormalizedCommands[_G[cPrime]%] then
+					  		-- skip it
+					  	else
+					  		-- make it
+							HT.NormalizedCommands[_G[cPrime]%] = {}
+					  	end
+					  	HT.NormalizedCommands[_G[cPrime]%][_G[cKey]%] = true
+					end
+			  	else
+					break
+			  	end
 			end
-		  end
 		end
-		return CopyTable(HT)
 	end
-	SlashCommandList = CommandList()
+	return CopyTable(HT)
+end
+SlashCommandList = CommandList()
 ]]
