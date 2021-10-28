@@ -320,6 +320,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		if not MacroFrame then return end
 
 		-- Alter blizzard's macro frame
+		MacroFrame:SetClampedToScreen(true)
 		-- MacroFrame:SetHeight(603)
 		-- MacroFrame:SetWidth(560)
 		-- MacroFrame.Inset:SetPoint("BOTTOMRIGHT", "$parent", "BOTTOM", -6, 200)
@@ -341,19 +342,18 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MBPaletteBasic:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
 		MBPaletteBasic:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
 
-		--[[MacroCancelButton:HookScript("OnClick", function()
+		MacroCancelButton:HookScript("OnClick", function()
+			local clearBlocks = {}
 			for _, block in pairs(MBStack.blocks) do
-				MBStack.remBlock(block)
-				mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[block.paletteID])
-        		MBPaletteBasic.blocks[block.paletteID] = block
-        		block.stacked = false
-
-				MBStack.displace = false
-    			MBStack.displaceID = 0
-    			StackAdjust()
-    			PaletteAdjust()
+				table.insert(clearBlocks, block)
 			end
-		end)]]
+			for _, block in pairs(clearBlocks) do
+				if block.group == "Smart" then block.UNHOOK_PAYLOAD() end
+        		MBStack.remBlock(block)
+
+				MB_OnDragStop(block)
+			end
+		end)
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function()
