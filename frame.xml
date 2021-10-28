@@ -25,7 +25,7 @@
         </Size>
         <KeyValues>
             <KeyValue key="payload" value="nil" nillable="true" type="string"/>
-            <KeyValue key="kind" value="nil" nillable="true" type="string"/>
+            <KeyValue key="group" value="nil" nillable="true" type="string"/>
         </KeyValues>
         <Layers>
             <Layer level="ARTWORK">
@@ -222,7 +222,6 @@
                 <Size x="32" y="28"/>
                 <Anchors>
                     <Anchor point="TOPLEFT"/>
-                    <!--<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" x="32"/>-->
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
@@ -242,21 +241,6 @@
                     </OnLoad>
                 </Scripts>
             </Frame>
-            <!--<Frame parentKey="slideFrame" inherits="BackdropTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT"/>
-                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" x="32"/>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>
-                        self:SetWidth(self.text:GetStringWidth() + 18);
-                        self:SetBackdrop(UserBlockBackdrop);
-                        self:SetBackdropColor(0.1, 0.1, 0.1, 0.3);
-                        self:SetBackdropColor(0, 0.9999977946281433, 0.5960771441459656);
-                        self:SetBackdropBorderColor(0, 0.9999977946281433, 0.5960771441459656);
-                    </OnLoad>
-                </Scripts>
-            </Frame>-->
             <Button parentKey="shift" hidden="true" enableMouse="true">
                 <KeyValues>
                     <KeyValue key="val" value="1" type="number"/>

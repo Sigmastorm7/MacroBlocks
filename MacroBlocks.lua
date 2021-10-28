@@ -23,7 +23,7 @@ mb.ClassColors = {
 		["hex"] = "ff3ec6ea",
 		["rgb"] = { 0.2470582872629166,  0.7803904414176941, 0.9215666055679321 },
 	},
-	["Utility"] = { -- PRIEST
+	["PRIEST"] = { -- PRIEST
 		["hex"] = "fffefefe",
 		["rgb"] = { 0.9999977946281433,  0.9999977946281433, 0.9999977946281433 },
 	},
@@ -51,7 +51,7 @@ mb.ClassColors = {
 		["hex"] = "ff00fe97",
 		["rgb"] = { 0, 0.9999977946281433, 0.5960771441459656 },
 	},
-	["ROGUE"] = { -- ROGUE
+	["Utility"] = { -- ROGUE
 		["hex"] = "fffef367",
 		["rgb"] = { 0.9999977946281433, 0.9568606615066528, 0.4078422486782074 },
 	},
@@ -87,8 +87,54 @@ for i=1, #templates do
 	mb.BlockPoolCollection:CreatePool("Frame", MBPalette, templates[i])
 end
 
+mb.SmartBlock = function(sBlock, smart)
+
+	local funcTable = {}
+
+	if not smart.orphan then
+		funcTable.ORPHAN = function()
+			local bool = false
+			for _, block in pairs(MBStack.blocks) do
+				bool = bool or block.group == smart.group
+			end
+			return bool
+		end
+	end
+
+	funcTable.PLACEMENT = function()
+		if not MBStack.displace then return false end
+		return MBStack.blocks[MBStack.displaceID].group == smart.group
+	end
+
+	if smart.hookPayload ~= nil then
+		local index = smart.hookPayload[1]
+		local str = smart.hookPayload[2]
+
+		funcTable.HOOK_PAYLOAD = function(payload)
+			return string.sub(payload, index-1, index-1)..str..string.sub(payload, index)
+		end
+
+		funcTable.UNHOOK_PAYLOAD = function()
+			MBStack.blocks[sBlock.stackID+1].hooked = false
+			UpdateMacroBlockText()
+		end
+	end
+
+	funcTable.STACK = function()
+		MBStack.addBlock(sBlock)
+		MBStack.blocks[sBlock.stackID+1].hooked = true
+		MBStack.blocks[sBlock.stackID+1].smartHook = sBlock
+		UpdateMacroBlockText()
+	end
+
+	for k, v in pairs(funcTable) do
+		sBlock[k] = v
+	end
+
+end
+
 -- Acquires a new block from one of the block frame pools
-mb.MakeBlock = function(kind, data, paletteID)
+mb.MakeBlock = function(group, data, paletteID)
 
 	local b = mb.BlockPoolCollection:Acquire(data.template or "MacroBlockTemplate")
 
@@ -107,14 +153,18 @@ mb.MakeBlock = function(kind, data, paletteID)
 		end
 	end
 
-	b.kind = kind
+	if group == "Smart" then
+		b.smartFunc = mb.SmartBlock(b, data.smart)
+	end
+
+	b.group = group
 	b.data = data
 
 	b.paletteID = paletteID or #MBPalette.blocks + 1
 
 	b:SetBackdrop(blockBackdrop)
-	b:SetBackdropColor(unpack(mb.ClassColors[kind].rgb))
-	b:SetBackdropBorderColor(unpack(mb.ClassColors[kind].rgb))
+	b:SetBackdropColor(unpack(mb.ClassColors[group].rgb))
+	b:SetBackdropBorderColor(unpack(mb.ClassColors[group].rgb))
 
 	b:Show()
 
@@ -145,7 +195,7 @@ local function delimSwitch(index, block)
 	bool = bool or index == 1
 	-- bool = bool or index == #MBStack.blocks
 	bool = bool or #MBStack.blocks == 1
-	-- bool = bool or 
+	bool = bool or MBStack.blocks[index-1].group == "Smart"
 	-- bool = bool or 
 
 	if bool then return "" else return " " end
@@ -154,19 +204,30 @@ end
 
 function UpdateMacroBlockText()
 
-	local delim
+	local delim, str
 
 	MBStack.string = ""
 	MBStack.sTable = {}
 
 	for i, block in pairs(MBStack.blocks) do
-		MBStack.sTable[block.stackID] = block.data.payload
 
-		delim = delimSwitch(i, block)
+		if block.group ~= "Smart" then
 
-		MBStack.string = MBStack.string..delim..block.data.payload
+			MBStack.sTable[block.stackID] = block.data.payload
+
+			delim = delimSwitch(i, block)
+
+			if block.hooked then
+				str = MBStack.blocks[i-1].HOOK_PAYLOAD(block.data.payload)
+			else
+				str = block.data.payload
+			end
+
+			MBStack.string = MBStack.string..delim..str
+
+		end
+
 	end
-
 	MacroFrameText:SetText(MBStack.string)
 end
 
@@ -233,7 +294,6 @@ end
 function StackDisplaceCheck(self)
 	local bool = false
 	local dis = 0
-	local tempID = 0
 
 	if not MouseIsOver(MBStack) then return end
 
@@ -260,8 +320,6 @@ MBStack.addBlock = function(block)
 
 	if MBStack.displace then
 		table.insert(MBStack.blocks, MBStack.displaceID, block)
-		MBStack.displace = false
-		MBStack.displaceID = 0
 	else
 		table.insert(MBStack.blocks, block)
 	end
@@ -281,12 +339,12 @@ end
 
 local blocks = {
 	["Utility"] = {
-		{	["name"] = "#show",
-			["payload"] = "#show\n",
-			["func"] = "NEW_LINE",
-		},
 		{	["name"] = "#showtooltip",
 			["payload"] = "#showtooltip\n",
+			["func"] = "NEW_LINE",
+		},
+		{	["name"] = "#show",
+			["payload"] = "#show\n",
 			["func"] = "NEW_LINE",
 		},
 		{	["name"] = "⮐",
@@ -305,14 +363,65 @@ local blocks = {
 		{	["name"] = "/cast",
 			["payload"] = "/cast",
 		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/target",
+			["payload"] = "/tar",
+		},
+		{	["name"] = "/summonpet",
+			["payload"] = "/sp"
+		},
 	},
 	["Condition"] = {
 		{	["name"] = "mod",
-			["payload"] = "",
+			["payload"] = "[mod]",
 			["func"] = "MOD_CONDITION",
 			["template"] = "ModBlockTemplate"
 		},
-		{	["name"] = "[@mouseover]",
+		{	["name"] = "combat",
+			["payload"] = "[combat]",
+		},
+		{	["name"] = "exists",
+			["payload"] = "[exists]",
+		},
+		{	["name"] = "help",
+			["payload"] = "[help]",
+		},
+		{	["name"] = "harm",
+			["payload"] = "[harm]",
+		},
+		{	["name"] = "dead",
+			["payload"] = "[dead]",
+		},
+		{	["name"] = "@mouseover",
 			["payload"] = "[@mouseover]",
 		},
 	},
@@ -335,8 +444,14 @@ local blocks = {
 	},
 	["Smart"] = {
 		{	["name"] = "no",
-			["payload"] = "no",
-			["func"] = "NO_CONDITION"
+			-- ["payload"] = "no",
+			["func"] = "NO_CONDITION",
+			["smart"] = {
+				["palette"] = true,
+				["group"] = "Condition",
+				["hookPayload"] = { 2, "no" },
+				["orphan"] = false,
+			}
 		}
 	}
 }
@@ -350,9 +465,9 @@ local function MacroBlocks_Init()
 
 	local itr = 1
 
-	for kind, blockData in pairs(blocks) do
+	for group, blockData in pairs(blocks) do
 		for i, data in pairs(blockData) do
-			MBPalette.blocks[itr] = mb.MakeBlock(kind, data, itr)
+			MBPalette.blocks[itr] = mb.MakeBlock(group, data, itr)
 			itr = itr + 1
 		end
 		PaletteAdjust()
@@ -383,20 +498,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		MBPalette:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
 		MBPalette:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
-
-		--[[MacroCancelButton:HookScript("OnClick", function()
-			for _, block in pairs(MBStack.blocks) do
-				if block.kind == "User" then
-					if block.data.func == "USER_SOCKET" then
-						MacroBlockPool:Release(block)
-					elseif block.data.func == "USER_EDIT" then
-						SocketBlockPool:Release(block)
-					end
-				else
-					EditBlockPool:Release(block)
-				end
-			end
-		end)]]
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function()
@@ -444,4 +545,4 @@ function CommandList()
 	return CopyTable(HT)
 end
 SlashCommandList = CommandList()
-]]
+--]]

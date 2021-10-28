@@ -7,4 +7,5 @@
 ## SavedVariables: SlashCommandList
 
 MacroBlocks.lua
+command_DB.lua
 frame.xml

@@ -25,10 +25,8 @@ function MB_OnDragStart(self, button)
     self:SetFrameStrata("TOOLTIP")
 
     if self.stacked then
-		MBStack.remBlock(self)
-		-- self.stacked = false
-    else
-        -- MBPalette.blocks[self.paletteID] = nil
+        if self.group == "Smart" then self.UNHOOK_PAYLOAD() end
+        MBStack.remBlock(self)
     end
 
     MBFrame.dragging = self
@@ -43,9 +41,19 @@ function MB_OnDragStop(self)
 
     if MouseIsOver(MBStack) then
         if not self.stacked then
-            MBPalette.blocks[self.paletteID] = mb.MakeBlock(self.kind, self.data, self.paletteID)
+            MBPalette.blocks[self.paletteID] = mb.MakeBlock(self.group, self.data, self.paletteID)
         end
-        MBStack.addBlock(self)
+        if self.group == "Smart" then
+            if self.ORPHAN() and self.PLACEMENT() then
+                self.STACK() -- MBStack.addBlock(self)
+            else
+                mb.BlockPoolCollection:Release(MBPalette.blocks[self.paletteID])
+                MBPalette.blocks[self.paletteID] = self
+                self.stacked = false
+            end
+        else
+            MBStack.addBlock(self)
+        end
     elseif not MouseIsOver(MBStack) and self.stacked then
         if self.data.func ~= nil then
             if self.data.func == "USER_SOCKET" then
@@ -58,6 +66,18 @@ function MB_OnDragStop(self)
                 self.config.closeFunc(self, self.config)
             end
         end
+
+        if self.smartHook ~= nil then
+            MBStack.remBlock(self.smartHook)
+
+            mb.BlockPoolCollection:Release(MBPalette.blocks[self.smartHook.paletteID])
+            MBPalette.blocks[self.smartHook.paletteID] = self.smartHook
+            self.smartHook.stacked = false
+
+            self.hooked = false
+            self.smartHook = nil
+        end
+
         mb.BlockPoolCollection:Release(MBPalette.blocks[self.paletteID])
         MBPalette.blocks[self.paletteID] = self
         self.stacked = false
@@ -65,6 +85,12 @@ function MB_OnDragStop(self)
 
     MBFrame.dragging = nil
     MBStack:SetScript("OnUpdate", nil)
+
+    -- Make sure to update displace arguments to prevent any frames from getting stuck in their displaced position
+    MBStack.displace = false
+    MBStack.displaceID = 0
+
+    StackAdjust()
     PaletteAdjust()
 end
 
@@ -91,22 +117,22 @@ end]]
 
 -- User socket block handlers
 function MB_SOCKET_OnClick(self, button, down)
-    local kind, name, spellID, itemID, mountID, iconID
+    local group, name, spellID, itemID, mountID, iconID
 
     -- sbData.make = false
 
     if GetCursorInfo() ~= nil then
-        kind, itemID, mountID, spellID = GetCursorInfo()
-        if kind == "spell" then
+        group, itemID, mountID, spellID = GetCursorInfo()
+        if group == "spell" then
             name, _, iconID = GetSpellInfo(spellID)
             self:GetParent().data.payload = name
-        elseif kind == "item" then
+        elseif group == "item" then
             iconID = C_Item.GetItemIconByID(itemID)
             self:GetParent().data.payload = "item:"..itemID
-        elseif kind == "mount" then
+        elseif group == "mount" then
             name, _, iconID = C_MountJournal.GetMountInfoByID(itemID)
             self:GetParent().data.payload = name
-        elseif kind == "battlepet" then
+        elseif group == "battlepet" then
             local petGUID = itemID
             local petInfo = C_PetJournal.GetPetInfoTableByPetID(petGUID)
 
@@ -118,9 +144,9 @@ function MB_SOCKET_OnClick(self, button, down)
             sbData.sbIndex = self:GetParent().stackID - 2
             sbData.make = true]]
 
-        -- elseif kind == "" then
-        -- elseif kind == "" then
-        -- elseif kind == "" then
+        -- elseif group == "" then
+        -- elseif group == "" then
+        -- elseif group == "" then
         end
 
         --[[if sbData.make then
