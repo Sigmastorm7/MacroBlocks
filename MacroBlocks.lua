@@ -305,7 +305,7 @@ local function MacroBlocks_Init()
 
 	local itr = 1
 
-	for group, blockData in pairs(mb.Blocks) do
+	for group, blockData in pairs(mb.BasicBlocks) do
 		for i, data in pairs(blockData) do
 			MBPaletteBasic.blocks[itr] = mb.MakeBlock(group, data, itr)
 			itr = itr + 1

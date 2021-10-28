@@ -51,7 +51,7 @@ mb.ClassColors = {
 	},
 }
 
-mb.Blocks = {
+mb.BasicBlocks = {
 	["Utility"] = {
 		{	["name"] = "#showtooltip",
 			["payload"] = "#showtooltip\n",
@@ -174,4 +174,8 @@ mb.Blocks = {
 			}
 		}
 	}
+}
+
+mb.AdvancedBlocks = {
+    
 }
