@@ -97,7 +97,7 @@ function MB_OnDragStop(self)
     mb.Stack.displace = false
     mb.Stack.displaceID = 0
 
-    StackAdjust()
+    if self.stacked then StackAdjust() end
     PaletteAdjust()
 end
 
