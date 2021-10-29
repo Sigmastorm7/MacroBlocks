@@ -1,8 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 
-    <!--"🛈"-->
-    <!--"🯰🯱🯲🯳🯴🯵🯶🯷🯸🯹"-->
-    <!--"🖰"-->
+    <!--🛈-->
+    <!--🯰🯱🯲🯳🯴🯵🯶🯷🯸🯹-->
+    <!--🖰  🖉  ⛓  -->
     <!--Arrows: ❬❬ ❭❭ ❮ ❯ ⮈ ⮊ 🢔 🢖 ⮜ ⮞ ⮄⮆-->
 
     <!--Import frame elements from a new file to clean up MacroBlocks.lua a bit-->

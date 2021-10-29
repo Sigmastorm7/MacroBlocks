@@ -1,0 +1,21 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+    <!--🛈-->
+    <!--🯰🯱🯲🯳🯴🯵🯶🯷🯸🯹-->
+    <!--🖰  🖉  ⛓  🪶  🖍-->
+    <!--Arrows: ❬❬ ❭❭ ❮ ❯ ⮈ ⮊ 🢔 🢖 ⮜ ⮞ ⮄⮆ -->
+
+    <Font name="MacroBlockSymbolFont_Normal" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
+        <Color r="1" g="1" b="1" a="1"/>
+        <Shadow x="2" y="-2" r="1" g="1" b="1" a="1"/>
+    </Font>
+    <Font name="MacroBlockSymbolFont_Highlight" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
+        <Color r="1" g="1" b="0" a="1"/>
+        <Shadow x="2" y="-2" r="1" g="1" b="1" a="1"/>
+    </Font>
+    <Font name="MacroBlockSymbolFont_Disabled" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
+        <Color r="0.55" g="0.55" b="0.55" a="0.55"/>
+        <Shadow x="1" y="-2" r="0" g="0" b="0" a="1"/>
+    </Font>
+
+</Ui>

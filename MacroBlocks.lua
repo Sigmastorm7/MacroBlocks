@@ -19,16 +19,18 @@ local blockBackdrop = {
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
-MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame, "SimplePanelTemplate")
+MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
-MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", MBFrame, "TooltipBackdropTemplate")
-MBPaletteBasic:SetFrameStrata("HIGH")
-MBPaletteBasic:SetBackdropColor(0.05, 0.05, 0.05)
+MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", MBFrame, "InsetFrameTemplate")
 MBPaletteBasic.blocks = {}
 
--- MBPaletteAdvanced = CreateFrame("Frame", "$parentPaletteAdvanced", MBFrame, "SimplePanelTemplate")
--- MBPaletteAdvanced:SetSize(200, 600)
--- MBPaletteAdvanced:SetPoint("TOPLEFT", "$parent", "TOPRIGHT")
+MBStack = CreateFrame("Frame", "$parentStack", MBFrame, "InsetFrameTemplate")
+
+MBStack.blocks = {}
+MBStack.sTable = {}
+MBStack.string = ""
+MBStack.displace = false
+MBStack.displaceID = 0
 
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
@@ -134,16 +136,6 @@ mb.MakeBlock = function(group, data, paletteID)
 	return b
 end
 
-MBStack = CreateFrame("Frame", "$parentStack", MBFrame, "TooltipBackdropTemplate")
-MBStack:SetFrameStrata("HIGH")
-MBStack:SetBackdropColor(0.114, 0.153, 0.149)
-
-MBStack.blocks = {}
-MBStack.sTable = {}
-MBStack.string = ""
-MBStack.displace = false
-MBStack.displaceID = 0
-
 local function delimSwitch(index, block)
 	local bool = false
 
@@ -225,8 +217,8 @@ end
 function StackAdjust(index, xOff, yOff)
 
 	index = index or 1
-	xOff = xOff or 6
-	yOff = yOff or -6
+	xOff = xOff or 4
+	yOff = yOff or -5
 
 	if index <= #MBStack.blocks then
 
@@ -328,48 +320,108 @@ frame:SetScript("OnEvent", function(self, event, arg)
 	if event == "ADDON_LOADED" and arg == "Blizzard_MacroUI" then
 		if not MacroFrame then return end
 
-		-- Alter blizzard's macro frame
+		-- Resize the macro frame and change it's UIPanel attributes to correct repositioning interactions
+		MacroFrame:SetSize(600, 560)
+		UIPanelWindows["MacroFrame"] = { area = "left", pushable = 1, whileDead = 1, width = 600 }
+
+		-- Make the macro frame moveable by the user
 		MacroFrame:SetMovable(true)
 		MacroFrame:RegisterForDrag()
 		MacroFrame:SetClampedToScreen(true)
 
+		-- MacroFrameTextBackground:SetPoint("TOPLEFT", MacroFrameSelectedMacroBackground, "BOTTOMLEFT", 2, -6)
+
+		-- Attach the character count to the text box for easier adjustment of frames
+		MacroFrameCharLimitText:ClearAllPoints()
+		MacroFrameCharLimitText:SetPoint("TOPLEFT", MacroFrameTextBackground, "BOTTOMLEFT", 6, -2)
+
+		-- Parent our addon's parent frame to the macro frame
+		MBFrame:SetParent(MacroFrame)
+		MBFrame:SetAllPoints()
+
+		-- Reposition buttons croll frame
+		MacroButtonScrollFrame:SetPoint("TOPLEFT", 12, -64)
+
+		-- Reposition scroll bar
+		MacroButtonScrollFrameScrollBar:SetPoint("TOPLEFT", MacroButtonScrollFrame, "TOPRIGHT", 3, -16)
+		MacroButtonScrollFrameScrollBar:SetPoint("BOTTOMLEFT", MacroButtonScrollFrame, "BOTTOMRIGHT", 3, 16)
+
+		-- Hide all the stupid ugly shit
+		MacroButtonScrollFrameTop:Hide()
+		MacroButtonScrollFrameBottom:Hide()
+		MacroButtonScrollFrameMiddle:Hide()
+		MacroFrame.TopTileStreaks:Hide()
+		MacroFrameSelectedMacroBackground:SetColorTexture(0, 0, 0, 0) -- Can't hide this texture before it's shown
+		MacroFrameEnterMacroText:SetText("")
+
+		-- YEET this stupid bar outta here
+		MacroHorizontalBarLeft:SetPoint("TOPLEFT", UIParent, "TOPLEFT", -1000, 1000)
+
+		-- Macro frame inset adjustment
+		MacroFrame.Inset:SetPoint("BOTTOMRIGHT", -12 - 256, 26 + 128 + 193)
+
+		-- Move selected macro button + its related assets
+		MacroFrameSelectedMacroButton:SetPoint("TOPLEFT", MacroButtonScrollFrame, "BOTTOMLEFT", 6, -12)
+		MFSM_Edit = CreateFrame("Button", "EditMacroIcon", MacroFrameSelectedMacroButton)
+		MFSM_Edit:SetPoint("BOTTOMRIGHT", 0, -3)
+		MFSM_Edit:SetSize(16, 16)
+		MFSM_Edit:SetNormalFontObject(MacroBlockSymbolFont_Normal)
+		MFSM_Edit:SetHighlightFontObject(MacroBlockSymbolFont_Highlight)
+		MFSM_Edit:SetDisabledFontObject(MacroBlockSymbolFont_Disabled)
+		MFSM_Edit:SetPushedTextOffset(1, -1)
+		MFSM_Edit:SetText("🖍")
+		MFSM_Edit:SetScript("OnLeave", function(_self) _self:SetButtonState("NORMAL") end)
+		MFSM_Edit:SetScript("OnClick", function(_self, button)
+			MacroFrame_SaveMacro();	MacroPopupFrame.mode = "edit"; MacroPopupFrame:Show();
+		end)
+
+		MacroFrameSelectedMacroName = CreateFrame("EditBox", "SelectedMacroName", MacroFrame, "InputBoxTemplate")
+		MacroFrameSelectedMacroName:SetAutoFocus(false)
+		MacroFrameSelectedMacroName:SetSize(128, 18)
+		MacroFrameSelectedMacroName:SetPoint("TOPLEFT", MacroFrameSelectedMacroButton, "TOPRIGHT", 16, 0)
+		MFSM_Accept = CreateFrame("Button", "AcceptMacroName", MacroFrameSelectedMacroName, "SquareIconButtonTemplate")
+		MFSM_Accept.iconAtlas = "common-icon-checkmark"
+		MFSM_Accept:SetSize(26, 26)
+		MFSM_Accept:SetPoint("LEFT", MacroFrameSelectedMacroName, "RIGHT", -2, 0)
+		MFSM_Reject = CreateFrame("Button", "RejectMacroName", MacroFrameSelectedMacroName, "SquareIconButtonTemplate")
+		MFSM_Reject.iconAtlas = "common-icon-redx"
+		MFSM_Reject:SetSize(26, 26)
+		MFSM_Reject:SetPoint("LEFT", MFSM_Accept, "RIGHT", -6, 0)
+		MacroFrameSelectedMacroName:SetMaxLetters(16)
+		MacroFrameSelectedMacroName:SetScript("OnEnterPressed", function(_self)
+			_self:ClearFocus()
+			local index = 1
+			local iconTexture = MacroFrameSelectedMacroButtonIcon:GetTexture()
+			local text = _self:GetText()
+			text = string.gsub(text, "\"", "")
+			index = EditMacro(MacroFrame.selectedMacro, text, iconTexture)
+			MacroFrame_SelectMacro(index)
+			MacroFrame_Update()
+		end)
+		MacroFrameSelectedMacroName:SetScript("OnEscapePressed", function(_self)
+			_self:ClearFocus()
+			MacroFrame_Update()
+			MacroPopupFrame.selectedIcon = nil
+		end)
+
+		-- :SetFont("Interface\\AddOns\\MacroBlocks\\media\\NotoSansMono\\NotoSansMono-ExtraBold.ttf", 18)
+		MacroFrameSelectedMacroButtonIcon:SetSize(38, 38)
+
+		-- Palette frame positioning
+		MBPaletteBasic:SetPoint("TOPLEFT", MBFrame, "TOPRIGHT", -256 - 10, -60)
+		MBPaletteBasic:SetPoint("BOTTOMRIGHT", MBFrame, "BOTTOMRIGHT", -6, 128)
+
+		-- Stack frame positioning
+		MBStack:SetPoint("TOPLEFT", MBFrame, "BOTTOMLEFT", 4, 128 - 3)
+		MBStack:SetPoint("BOTTOMRIGHT", MBFrame, "BOTTOMRIGHT", -6, 8)
+
 		-- Title bar 'handle' that lets the user move the macro frame around the screen
 		local dragBar = CreateFrame("Frame", "MBDragBar", MacroFrame)
 		dragBar:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT")
-		dragBar:SetPoint("BOTTOMRIGHT", MacroFrame, "TOPRIGHT", -24, -24)
-
+		dragBar:SetPoint("BOTTOMRIGHT", MBFrame, "TOPRIGHT", -24, -24)
 		dragBar:EnableMouse(true)
-		dragBar:SetScript("OnMouseDown", function(_self, button)
-			if button == "LeftButton" then
-				MacroFrame:StartMoving()
-			end
-		end)
-		dragBar:SetScript("OnMouseUp", function(_self, button)
-			if button == "LeftButton" then
-				MacroFrame:StopMovingOrSizing()
-			end
-		end)
-
-		-- MacroFrame:SetHeight(603)
-		-- MacroFrame:SetWidth(560)
-		-- MacroFrame.Inset:SetPoint("BOTTOMRIGHT", "$parent", "BOTTOM", -6, 200)
-		MacroFrame.TopTileStreaks:Hide()
-		MacroButtonScrollFrame:SetWidth(292)
-		MacroFrameTextBackground:SetPoint("TOPLEFT", MacroFrameSelectedMacroBackground, "BOTTOMLEFT", 2, -6)
-		MacroFrameCharLimitText:ClearAllPoints()
-		MacroFrameCharLimitText:SetPoint("TOP", MacroFrameTextBackground, "BOTTOM", 0, -2)
-
-		MBFrame:SetScale(MacroFrame:GetEffectiveScale())
-		-- MBFrame:SetPoint("TOPLEFT", MacroFrame.Inset, "TOPRIGHT")
-		MBFrame:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT", 0, -18)
-		MBFrame:SetPoint("BOTTOMRIGHT", MacroFrame, "BOTTOMRIGHT", 240, -120)
-		--MBFrame:SetPoint("BOTTOMRIGHT", MacroFrame, "BOTTOMRIGHT", -6, 26)
-
-		MBStack:SetPoint("TOPLEFT", MacroFrameTextBackground, "BOTTOMLEFT", -2, -20)
-		MBStack:SetPoint("BOTTOMRIGHT", MBFrame, "BOTTOMRIGHT", 0, 2)
-
-		MBPaletteBasic:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
-		MBPaletteBasic:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
+		dragBar:SetScript("OnMouseDown", function(_self, button) if button == "LeftButton" then MacroFrame:StartMoving() end end)
+		dragBar:SetScript("OnMouseUp", function(_self, button) if button == "LeftButton" then MacroFrame:StopMovingOrSizing() end end)
 
 		MacroSaveButton:HookScript("OnClick", function()
 			for _, block in pairs(MBStack.blocks) do
@@ -397,6 +449,8 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame:HookScript("OnShow", function()
 			MBFrame:Show()
 
+			-- MacroFrameSelectedMacroBackground:Hide()
+
 			--[[MacroSaveButton.Left:SetTexture("Interface/Buttons/128RedButton")
 			MacroSaveButton.Middle:SetTexture("Interface/Buttons/128RedButton")
 			MacroSaveButton.Right:SetTexture("Interface/Buttons/128RedButton")
@@ -413,10 +467,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		end)
 	end
 end)
-
-
-
-
 
 --[[ Export all available slash commands
 function CommandList()
