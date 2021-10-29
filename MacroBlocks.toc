@@ -4,8 +4,5 @@
 ## Version: 9.1.0
 ## Notes:
 
-font.xml
+embeds.xml
 MacroBlocks.lua
-blocks.lua
-command_DB.lua
-frame.xml

@@ -17,5 +17,8 @@
         <Color r="0.55" g="0.55" b="0.55" a="0.55"/>
         <Shadow x="1" y="-2" r="0" g="0" b="0" a="1"/>
     </Font>
+    <Font name="MacroBlockMonoFont" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="10" virtual="true">
+        <Color r="1" g="1" b="1" a="1"/>
+    </Font>
 
 </Ui>
