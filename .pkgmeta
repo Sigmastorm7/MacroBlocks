@@ -1,0 +1,8 @@
+package-as: MacroBlocks
+
+
+ignore:
+    Blizzard_MacroUI
+    command_DB.lua
+    command_list_backup.lua
+    macroblocks.code-workspace
