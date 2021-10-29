@@ -98,6 +98,13 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameEnterMacroText:SetText("")
         MacroEditButton:ClearAllPoints()
 		MacroEditButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, 0)
+
+		local dump = MacroEditButton
+		dump:Disable()
+		dump:ClearAllPoints()
+		dump:Hide()
+		MacroEditButton = CreateFrame("Frame", nil, UIParent)
+
 		MacroSaveButton:ClearAllPoints()
 		MacroSaveButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, -20)
 		MacroCancelButton:ClearAllPoints()
@@ -168,6 +175,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameSelectedMacroButtonName = MFSM.Button.Name
 		MacroFrameSelectedMacroButton = MFSM.Button
 		MacroFrameSelectedMacroName = MFSM.Name
+		MacroEditButton = MFSM.Button.Config
 
 		-- Palette frame positioning
 		MBPaletteBasic:SetPoint("TOPLEFT", MacroFrame.Inset, "TOPRIGHT", 2, 0)

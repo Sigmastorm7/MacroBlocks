@@ -157,10 +157,10 @@ local function delimSwitch(index, block)
 
 	bool = bool or block.data.func == "NEW_LINE"
 	bool = bool or index == 1
-	-- bool = bool or index == #mb.Stack.blocks
 	bool = bool or #mb.Stack.blocks == 1
 	bool = bool or mb.Stack.blocks[index-1].group == "Smart"
 	bool = bool or block.group == "Condition"
+	-- bool = bool or index == #mb.Stack.blocks
 	-- bool = bool or 
 	-- bool = bool or 
 	-- bool = bool or 
