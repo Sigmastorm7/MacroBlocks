@@ -1,5 +1,11 @@
 local addon, mb = ...
 
+mb.textureLoadGroup=CreateFromMixins(TextureLoadingGroupMixin)
+mb.textureLoadGroup:AddTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_normal.tga")
+mb.textureLoadGroup:AddTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_pushed.tga")
+-- mb.textureLoadGroup:AddTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_highlight.tga")
+mb.textureLoadGroup:AddTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_disabled.tga")
+
 local MACRO_NAME_ONENTERPRESSED = function(self)
     self:ClearFocus()
 	local index = 1
@@ -44,6 +50,15 @@ local MACRO_CANCEL_ONCLICK = function()
 	end
 	clearBlocks = nil
 end
+local MACRO_NEW_ONCLICK = function()
+	MacroFrame_SaveMacro()
+	MacroPopupFrame.mode = "new"
+	MacroPopupFrame:Show()
+end
+local MACRO_DELETE_ONCLICK = function()
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+	StaticPopup_Show("CONFIRM_DELETE_SELECTED_MACRO")
+end
 
 local frame = CreateFrame("Frame", nil, UIParenet)
 frame:RegisterEvent("ADDON_LOADED")
@@ -60,7 +75,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame:RegisterForDrag()
 		MacroFrame:SetClampedToScreen(true)
 
-		local bin = { MacroEditButton, MacroExitButton, MacroSaveButton, MacroCancelButton, MacroDeleteButton, MacroNewButton, MacroFrameEnterMacroText, MacroButtonScrollFrameTop, MacroButtonScrollFrameBottom, MacroButtonScrollFrameMiddle, MacroFrameSelectedMacroBackground, MacroHorizontalBarLeft }
+		local bin = { MacroEditButton, MacroExitButton, MacroSaveButton, MacroCancelButton, MacroDeleteButton, MacroNewButton, MacroFrameEnterMacroText, MacroButtonScrollFrameTop, MacroButtonScrollFrameBottom, MacroButtonScrollFrameMiddle, MacroFrameSelectedMacroBackground, MacroHorizontalBarLeft, MacroPopupFrame }
 
 		for _, trash in pairs(bin) do
 			trash:SetParent(UIParent)
@@ -100,8 +115,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameCharLimitText:SetJustifyH("LEFT")
 		MacroFrameCharLimitText:SetFontObject(MacroBlockMonoFont)
 
-		
-
 		-- Hide all the stupid ugly shit
 		MacroButtonScrollFrameTop:Hide()
 		MacroButtonScrollFrameBottom:Hide()
@@ -131,13 +144,11 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		MFSM.Button.Config=CreateFrame("Button", "$parentConfig", MFSM.Button)
 		MFSM.Button.Config:SetSize(18, 18)
-		MFSM.Button.Config:SetPoint("BOTTOMRIGHT", 1, -1)
-		-- MFSM.Button.Config.tex = MFSM.Button.Config:CreateTexture(nil, "ARTWORK")
-		-- MFSM.Button.Config.tex:SetPoint("CENTER", -2, 2)
-		-- MFSM.Button.Config.tex:SetSize(16, 16)
-		MFSM.Button.Config:SetNormalTexture("Interface\\AddOns\\MacroBlock\\media\\gear_normal.tga")
-		-- MFSM.Button.Config.tex:SetAlpha(0.6)
-		MFSM.Button.Config:SetPushedTexture("Interface\\AddOns\\MacroBlock\\media\\gear_pushed.tga")
+		MFSM.Button.Config:SetPoint("BOTTOMRIGHT", 2, -1)
+		MFSM.Button.Config:SetNormalTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_normal.tga")
+		MFSM.Button.Config:SetPushedTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_pushed.tga")
+		-- MFSM.Button.Config:SetHighlightTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_highlight.tga")
+		MFSM.Button.Config:SetDisabledTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_disabled.tga")
 
 		MFSM.Button.Icon=MacroFrameSelectedMacroButtonIcon
 		MFSM.Button.Icon:SetAllPoints()
@@ -221,8 +232,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		dragBar:SetPoint("BOTTOMRIGHT", mb.Frame, "TOPRIGHT", -24, -24)
 		dragBar:EnableMouse(true)
 
-        MFSM.Button.Config:SetScript("OnEnter", function(_self) _self.tex:SetAlpha(1) end)
-		MFSM.Button.Config:SetScript("OnLeave", function(_self) _self.tex:SetAlpha(0.6) end)
 		MFSM.Button.Config:SetScript("OnClick", function() MacroFrame_SaveMacro(); MacroPopupFrame.mode = "edit"; MacroPopupFrame:Show(); end)
 
 		dragBar:SetScript("OnMouseDown", function(_self, button) if button == "LeftButton" then MacroFrame:StartMoving() end end)
@@ -231,10 +240,16 @@ frame:SetScript("OnEvent", function(self, event, arg)
         MFSM.Name:SetScript("OnEnterPressed", MACRO_NAME_ONENTERPRESSED)
         MFSM.Name:SetScript("OnEscapePressed", MACRO_NAME_ONESCAPEPRESSED)
 
+		-- MFSM.Save:SetScript()
+		-- MFSM.Cancel:SetScript()
+		MFSM.New:SetScript("OnClick", MACRO_NEW_ONCLICK)
+		MFSM.Delete:SetScript("OnClick", MACRO_DELETE_ONCLICK)
+
         MacroFrameText:SetScript("OnTextChanged", MACRO_TEXT_ONTEXTCHANGED)
 
 		MacroSaveButton:HookScript("OnClick", MACRO_SAVE_ONCLICK)
 		MacroCancelButton:HookScript("OnClick", MACRO_CANCEL_ONCLICK)
+
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function() mb.Frame:Show() mb.Init() end)
