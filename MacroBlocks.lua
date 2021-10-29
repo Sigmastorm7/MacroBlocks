@@ -209,7 +209,7 @@ function PaletteAdjust(index, xOff, yOff)
 
 	index = index or 1
 	xOff = xOff or 6
-	yOff = yOff or -10
+	yOff = yOff or -5
 
 	if index <= #MBPaletteBasic.blocks then
 
