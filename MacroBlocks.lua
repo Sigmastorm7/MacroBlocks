@@ -1,8 +1,12 @@
 local addon, mb = ...
 local frame = CreateFrame("Frame", nil, UIParent)
 
-local mb_init = false
+SLASH_PRINT1 = "/print"
+SlashCmdList["PRINT"] = function(msg, editBox)
+	SlashCmdList.SCRIPT("print("..msg..")")
+end
 
+local mb_init = false
 
 -- Math utility
 local function round(number, decimals)
@@ -10,8 +14,8 @@ local function round(number, decimals)
 end
 
 local blockBackdrop = {
-	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true,
 	tileEdge = true,
 	tileSize = 24,
@@ -19,16 +23,30 @@ local blockBackdrop = {
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
-MBFrame = CreateFrame("Frame", "MacroBlocks", MacroFrame, "SimplePanelTemplate")
+local stackBackdrop = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background-Maw",
+	edgeFile = "Interface\\FriendsFrame\\UI-Toast-Border",
+	tile = true,
+	tileEdge = true,
+	tileSize = 12,
+	edgeSize = 12,
+	insets = { left = 5, right = 5, top = 5, bottom = 5 },
+}
 
-MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", MBFrame, "TooltipBackdropTemplate")
-MBPaletteBasic:SetFrameStrata("HIGH")
-MBPaletteBasic:SetBackdropColor(0.05, 0.05, 0.05)
+mb.Frame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
+
+MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", mb.Frame, "InsetFrameTemplate")
 MBPaletteBasic.blocks = {}
 
--- MBPaletteAdvanced = CreateFrame("Frame", "$parentPaletteAdvanced", MBFrame, "SimplePanelTemplate")
--- MBPaletteAdvanced:SetSize(200, 600)
--- MBPaletteAdvanced:SetPoint("TOPLEFT", "$parent", "TOPRIGHT")
+mb.Stack = CreateFrame("Frame", "$parentStack", mb.Frame, "BackdropTemplate")
+mb.Stack:SetBackdrop(stackBackdrop) -- BACKDROP_TOAST_12_12)
+-- mb.Stack:SetBackdropColor(1, 1, 1)
+
+mb.Stack.blocks = {}
+mb.Stack.sTable = {}
+mb.Stack.string = ""
+mb.Stack.displace = false
+mb.Stack.displaceID = 0
 
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
@@ -50,7 +68,7 @@ mb.SmartBlock = function(sBlock, smart)
 	if not smart.orphan then
 		funcTable.ORPHAN = function()
 			local bool = false
-			for _, block in pairs(MBStack.blocks) do
+			for _, block in pairs(mb.Stack.blocks) do
 				bool = bool or block.group == smart.group
 			end
 			return bool
@@ -58,8 +76,8 @@ mb.SmartBlock = function(sBlock, smart)
 	end
 
 	funcTable.PLACEMENT = function()
-		if not MBStack.displace then return false end
-		return MBStack.blocks[MBStack.displaceID].group == smart.group
+		if not mb.Stack.displace then return false end
+		return mb.Stack.blocks[mb.Stack.displaceID].group == smart.group
 	end
 
 	if smart.hookPayload ~= nil then
@@ -71,15 +89,15 @@ mb.SmartBlock = function(sBlock, smart)
 		end
 
 		funcTable.UNHOOK_PAYLOAD = function()
-			MBStack.blocks[sBlock.stackID+1].hooked = false
+			mb.Stack.blocks[sBlock.stackID+1].hooked = false
 			UpdateMacroBlockText()
 		end
 	end
 
 	funcTable.STACK = function()
-		MBStack.addBlock(sBlock)
-		MBStack.blocks[sBlock.stackID+1].hooked = true
-		MBStack.blocks[sBlock.stackID+1].smartHook = sBlock
+		mb.Stack.addBlock(sBlock)
+		mb.Stack.blocks[sBlock.stackID+1].hooked = true
+		mb.Stack.blocks[sBlock.stackID+1].smartHook = sBlock
 		UpdateMacroBlockText()
 	end
 
@@ -126,7 +144,7 @@ mb.MakeBlock = function(group, data, paletteID)
 
 	if b.paletteID == -1 then
 		b.stacked = true
-		MBStack.addBlock(b)
+		mb.Stack.addBlock(b)
 	else
 		b.stacked = false
 	end
@@ -134,25 +152,15 @@ mb.MakeBlock = function(group, data, paletteID)
 	return b
 end
 
-MBStack = CreateFrame("Frame", "$parentStack", MBFrame, "TooltipBackdropTemplate")
-MBStack:SetFrameStrata("HIGH")
-MBStack:SetBackdropColor(0.114, 0.153, 0.149)
-
-MBStack.blocks = {}
-MBStack.sTable = {}
-MBStack.string = ""
-MBStack.displace = false
-MBStack.displaceID = 0
-
 local function delimSwitch(index, block)
 	local bool = false
 
 	bool = bool or block.data.func == "NEW_LINE"
 	bool = bool or index == 1
-	-- bool = bool or index == #MBStack.blocks
-	bool = bool or #MBStack.blocks == 1
-	bool = bool or MBStack.blocks[index-1].group == "Smart"
+	bool = bool or #mb.Stack.blocks == 1
+	bool = bool or mb.Stack.blocks[index-1].group == "Smart"
 	bool = bool or block.group == "Condition"
+	-- bool = bool or index == #mb.Stack.blocks
 	-- bool = bool or 
 	-- bool = bool or 
 	-- bool = bool or 
@@ -172,36 +180,36 @@ function UpdateMacroBlockText()
 	local delim, str
 	local preDelim, postDelim
 
-	MBStack.string = ""
-	MBStack.sTable = {}
+	mb.Stack.string = ""
+	mb.Stack.sTable = {}
 
-	for i, block in pairs(MBStack.blocks) do
+	for i, block in pairs(mb.Stack.blocks) do
 
 		if block.group ~= "Smart" then
 
-			MBStack.sTable[block.stackID] = block.data.payload
+			mb.Stack.sTable[block.stackID] = block.data.payload
 
 			delim = delimSwitch(i, block)
 
 			if block.hooked then
-				str = MBStack.blocks[i-1].HOOK_PAYLOAD(block.data.payload)
+				str = mb.Stack.blocks[i-1].HOOK_PAYLOAD(block.data.payload)
 			else
 				str = block.data.payload
 			end
 
-			MBStack.string = MBStack.string..delim..str
+			mb.Stack.string = mb.Stack.string..delim..str
 
 		end
 
 	end
-	MacroFrameText:SetText(MBStack.string)
+	MacroFrameText:SetText(mb.Stack.string)
 end
 
 function PaletteAdjust(index, xOff, yOff)
 
 	index = index or 1
 	xOff = xOff or 6
-	yOff = yOff or -10
+	yOff = yOff or -5
 
 	if index <= #MBPaletteBasic.blocks then
 
@@ -225,28 +233,30 @@ end
 function StackAdjust(index, xOff, yOff)
 
 	index = index or 1
-	xOff = xOff or 6
+	xOff = xOff or 7
 	yOff = yOff or -6
 
-	if index <= #MBStack.blocks then
+	if index <= #mb.Stack.blocks then
 
-		if (xOff + MBStack.blocks[index]:GetWidth()) >= (MBStack:GetWidth() - 6) then
+		if (xOff + mb.Stack.blocks[index]:GetWidth()) >= (mb.Stack:GetWidth() - 6) then
 			xOff = 4
 			yOff = yOff - 32
 		end
 
-		if index == MBStack.displaceID and MBStack.displace then
+		if index == mb.Stack.displaceID and mb.Stack.displace then
 			xOff = xOff + 32
 		end
 
-		MBStack.blocks[index]:ClearAllPoints()
-		MBStack.blocks[index]:SetPoint("TOPLEFT", MBStack, "TOPLEFT", xOff, yOff)
-		xOff = xOff + MBStack.blocks[index]:GetWidth()
+		if mb.Stack.blocks[index].socket then xOff = xOff + 2 end
+
+		mb.Stack.blocks[index]:ClearAllPoints()
+		mb.Stack.blocks[index]:SetPoint("TOPLEFT", mb.Stack, "TOPLEFT", xOff, yOff)
+		xOff = xOff + mb.Stack.blocks[index]:GetWidth()
 
 		-- Creates a new line if the updated block is utility block with the NEW_LINE flag
-		if MBStack.blocks[index].data.func then
-			if MBStack.blocks[index].data.func == "NEW_LINE" then
-				xOff = MBStack:GetWidth() - 6
+		if mb.Stack.blocks[index].data.func then
+			if mb.Stack.blocks[index].data.func == "NEW_LINE" then
+				xOff = mb.Stack:GetWidth() - 6
 			end
 		end
 		
@@ -261,12 +271,12 @@ function StackDisplaceCheck(self)
 	local bool = false
 	local dis = 0
 
-	if not MouseIsOver(MBStack) then return end
+	if not MouseIsOver(mb.Stack) then return end
 
-	for index, block in pairs(MBStack.blocks) do
+	for index, block in pairs(mb.Stack.blocks) do
 		if block.displaced then dis = 32 end
 		if MouseIsOver(block, 0, 0, -(16+dis), -block:GetWidth()+16) then
-			MBStack.displaceID = index
+			mb.Stack.displaceID = index
 			block.displaced = true
 			bool = bool or true
 		else
@@ -275,36 +285,36 @@ function StackDisplaceCheck(self)
 		end
 	end
 
-	MBStack.displace = bool
+	mb.Stack.displace = bool
 
 	StackAdjust()
 end
 
-MBStack.addBlock = function(block)
-	block:SetParent(MBStack)
+mb.Stack.addBlock = function(block)
+	block:SetParent(mb.Stack)
 	block.stacked = true
 	block.saved = false
 
-	if MBStack.displace then
-		table.insert(MBStack.blocks, MBStack.displaceID, block)
+	if mb.Stack.displace then
+		table.insert(mb.Stack.blocks, mb.Stack.displaceID, block)
 	else
-		table.insert(MBStack.blocks, block)
+		table.insert(mb.Stack.blocks, block)
 	end
 
-	for id, b in pairs(MBStack.blocks) do b.stackID = id end
+	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
 	StackAdjust()
 end
 
-MBStack.remBlock = function(block)
+mb.Stack.remBlock = function(block)
 	block:SetParent(MBPaletteBasic)
 
-	table.remove(MBStack.blocks, block.stackID)
+	table.remove(mb.Stack.blocks, block.stackID)
 
-	for id, b in pairs(MBStack.blocks) do b.stackID = id end
+	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
 	StackAdjust()
 end
 
-local function MacroBlocks_mb_Init()
+mb.Init = function()
 	if mb_init then return end
 	mb_init = true
 
@@ -319,135 +329,41 @@ local function MacroBlocks_mb_Init()
 	end
 end
 
-MBStack.saveBlocks = function()
+mb.Stack.saveBlocks = function()
 
 end
 
-frame:RegisterEvent("ADDON_LOADED")
-frame:SetScript("OnEvent", function(self, event, arg)
-	if event == "ADDON_LOADED" and arg == "Blizzard_MacroUI" then
-		if not MacroFrame then return end
-
-		-- Alter blizzard's macro frame
-		MacroFrame:SetMovable(true)
-		MacroFrame:RegisterForDrag()
-		MacroFrame:SetClampedToScreen(true)
-
-		-- Title bar 'handle' that lets the user move the macro frame around the screen
-		local dragBar = CreateFrame("Frame", "MBDragBar", MacroFrame)
-		dragBar:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT")
-		dragBar:SetPoint("BOTTOMRIGHT", MacroFrame, "TOPRIGHT", -24, -24)
-
-		dragBar:EnableMouse(true)
-		dragBar:SetScript("OnMouseDown", function(_self, button)
-			if button == "LeftButton" then
-				MacroFrame:StartMoving()
-			end
-		end)
-		dragBar:SetScript("OnMouseUp", function(_self, button)
-			if button == "LeftButton" then
-				MacroFrame:StopMovingOrSizing()
-			end
-		end)
-
-		-- MacroFrame:SetHeight(603)
-		-- MacroFrame:SetWidth(560)
-		-- MacroFrame.Inset:SetPoint("BOTTOMRIGHT", "$parent", "BOTTOM", -6, 200)
-		MacroFrame.TopTileStreaks:Hide()
-		MacroButtonScrollFrame:SetWidth(292)
-		MacroFrameTextBackground:SetPoint("TOPLEFT", MacroFrameSelectedMacroBackground, "BOTTOMLEFT", 2, -6)
-		MacroFrameCharLimitText:ClearAllPoints()
-		MacroFrameCharLimitText:SetPoint("TOP", MacroFrameTextBackground, "BOTTOM", 0, -2)
-
-		MBFrame:SetScale(MacroFrame:GetEffectiveScale())
-		-- MBFrame:SetPoint("TOPLEFT", MacroFrame.Inset, "TOPRIGHT")
-		MBFrame:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT", 0, -18)
-		MBFrame:SetPoint("BOTTOMRIGHT", MacroFrame, "BOTTOMRIGHT", 240, -120)
-		--MBFrame:SetPoint("BOTTOMRIGHT", MacroFrame, "BOTTOMRIGHT", -6, 26)
-
-		MBStack:SetPoint("TOPLEFT", MacroFrameTextBackground, "BOTTOMLEFT", -2, -20)
-		MBStack:SetPoint("BOTTOMRIGHT", MBFrame, "BOTTOMRIGHT", 0, 2)
-
-		MBPaletteBasic:SetPoint("TOPLEFT", MacroButtonScrollFrameTop, "TOPRIGHT")
-		MBPaletteBasic:SetPoint("BOTTOMRIGHT", MBFrame, "RIGHT", 0, -84)
-
-		MacroSaveButton:HookScript("OnClick", function()
-			for _, block in pairs(MBStack.blocks) do
-				block.saved = true
-			end
-		end)
-
-		MacroCancelButton:HookScript("OnClick", function()
-			local clearBlocks = {}
-			for _, block in pairs(MBStack.blocks) do
-				table.insert(clearBlocks, block)
-			end
-			for _, block in pairs(clearBlocks) do
-				if not block.saved then
-					if block.group == "Smart" then block.UNHOOK_PAYLOAD() end
-    	    		MBStack.remBlock(block)
-
-					MB_OnDragStop(block)
+--@do-not-package@
+	--[[ Export all available slash commands
+	function CommandList()
+		local HT = {}
+		HT.Commands = {}
+		HT.NormalizedCommands = {}
+		for key, value in pairs(_G) do
+			if strsub(key, 1, 6) == "SLASH_" then
+				local cTypeKey = gsub(key, "%d+$", "")
+				for cSeq = 1, 20 do
+				  	local cPrime = cTypeKey.."1"
+				  	local cKey = cTypeKey..tostring(cSeq)
+				  	if _G[cPrime] and _G[cKey] then
+						if strsub(_G[cPrime], 1, 1) == "/" and strsub(_G[cKey], 1, 1) == "/" then
+						  	HT.Commands[_G[cKey]%] = _G[cPrime]
+						  	if HT.NormalizedCommands[_G[cPrime]%] then
+						  		-- skip it
+						  	else
+						  		-- make it
+								HT.NormalizedCommands[_G[cPrime]%] = {}
+						  	end
+						  	HT.NormalizedCommands[_G[cPrime]%][_G[cKey]%] = true
+						end
+				  	else
+						break
+				  	end
 				end
 			end
-			clearBlocks = nil
-		end)
-
-		-- Attach addon's visibility to blizzard's macro frame visibility
-		MacroFrame:HookScript("OnShow", function()
-			MBFrame:Show()
-
-			--[[MacroSaveButton.Left:SetTexture("Interface/Buttons/128RedButton")
-			MacroSaveButton.Middle:SetTexture("Interface/Buttons/128RedButton")
-			MacroSaveButton.Right:SetTexture("Interface/Buttons/128RedButton")
-
-			MacroSaveButton.Left:SetTexCoord(0.763671875, 0.986328125, 0.44482421875, 0.50732421875)
-			MacroSaveButton.Middle:SetTexCoord(0, 0.125, 0.00048828125, 0.06298828125)
-			MacroSaveButton.Right:SetTexCoord(0.001953125, 0.572265625, 0.25439453125, 0.31689453125)]]
-
-			MacroBlocks_mb_Init()
-
-		end)
-		MacroFrame:HookScript("OnHide", function()
-			MBFrame:Hide()
-		end)
-	end
-end)
-
-
-
-
-
---[[ Export all available slash commands
-function CommandList()
-	local HT = {}
-	HT.Commands = {}
-	HT.NormalizedCommands = {}
-	
-	for key, value in pairs(_G) do
-		if strsub(key, 1, 6) == "SLASH_" then
-			local cTypeKey = gsub(key, "%d+$", "")
-			for cSeq = 1, 20 do
-			  	local cPrime = cTypeKey.."1"
-			  	local cKey = cTypeKey..tostring(cSeq)
-			  	if _G[cPrime] and _G[cKey] then
-					if strsub(_G[cPrime], 1, 1) == "/" and strsub(_G[cKey], 1, 1) == "/" then
-					  	HT.Commands[_G[cKey]%] = _G[cPrime]
-					  	if HT.NormalizedCommands[_G[cPrime]%] then
-					  		-- skip it
-					  	else
-					  		-- make it
-							HT.NormalizedCommands[_G[cPrime]%] = {}
-					  	end
-					  	HT.NormalizedCommands[_G[cPrime]%][_G[cKey]%] = true
-					end
-			  	else
-					break
-			  	end
-			end
 		end
+		return CopyTable(HT)
 	end
-	return CopyTable(HT)
-end
-SlashCommandList = CommandList()
---]]
+	SlashCommandList = CommandList()
+	--]]
+--@end-do-not-package@

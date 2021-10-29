@@ -31,11 +31,11 @@ function MB_OnDragStart(self, button)
 
     if self.stacked then
         if self.group == "Smart" then self.UNHOOK_PAYLOAD() end
-        MBStack.remBlock(self)
+        mb.Stack.remBlock(self)
     end
 
-    MBFrame.dragging = self
-    MBStack:SetScript("OnUpdate", StackDisplaceCheck)
+    mb.Frame.dragging = self
+    mb.Stack:SetScript("OnUpdate", StackDisplaceCheck)
 
 end
 
@@ -44,22 +44,22 @@ function MB_OnDragStop(self)
     self:StopMovingOrSizing()
 	self:SetUserPlaced(false)
 
-    if MouseIsOver(MBStack) then
+    if MouseIsOver(mb.Stack) then
         if not self.stacked then
             MBPaletteBasic.blocks[self.paletteID] = mb.MakeBlock(self.group, self.data, self.paletteID)
         end
         if self.group == "Smart" then
             if self.ORPHAN() and self.PLACEMENT() then
-                self.STACK() -- MBStack.addBlock(self)
+                self.STACK() -- mb.Stack.addBlock(self)
             else
                 mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.paletteID])
                 MBPaletteBasic.blocks[self.paletteID] = self
                 self.stacked = false
             end
         else
-            MBStack.addBlock(self)
+            mb.Stack.addBlock(self)
         end
-    elseif not MouseIsOver(MBStack) and self.stacked then
+    elseif not MouseIsOver(mb.Stack) and self.stacked then
         if self.data.func ~= nil then
             if self.data.func == "USER_SOCKET" then
                 self.data.payload = ""
@@ -73,7 +73,7 @@ function MB_OnDragStop(self)
         end
 
         if self.smartHook ~= nil then
-            MBStack.remBlock(self.smartHook)
+            mb.Stack.remBlock(self.smartHook)
 
             mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.smartHook.paletteID])
             MBPaletteBasic.blocks[self.smartHook.paletteID] = self.smartHook
@@ -90,14 +90,14 @@ function MB_OnDragStop(self)
         self.stacked = false
     end
 
-    MBFrame.dragging = nil
-    MBStack:SetScript("OnUpdate", nil)
+    mb.Frame.dragging = nil
+    mb.Stack:SetScript("OnUpdate", nil)
 
     -- Make sure to update displace arguments to prevent any frames from getting stuck in their displaced position
-    MBStack.displace = false
-    MBStack.displaceID = 0
+    mb.Stack.displace = false
+    mb.Stack.displaceID = 0
 
-    StackAdjust()
+    if self.stacked then StackAdjust() end
     PaletteAdjust()
 end
 
@@ -114,11 +114,11 @@ end
 local function SmartBlock()
     local sb = mb.MakeBlock("Command", sbData, -1)
 
-    MBStack.displace = true
-    MBStack.displaceID = sb.data.sbIndex
+    mb.Stack.displace = true
+    mb.Stack.displaceID = sb.data.sbIndex
 
     return sb
-    -- MBStack.addBlock(sb)
+    -- mb.Stack.addBlock(sb)
 
 end]]
 
@@ -156,7 +156,7 @@ function MB_SOCKET_OnClick(self, button, down)
         end
 
         --[[if sbData.make then
-            MBStack.addBlock(SmartBlock())
+            mb.Stack.addBlock(SmartBlock())
         end]]
 
 	    self.icon:SetTexture(iconID)
