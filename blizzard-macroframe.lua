@@ -129,27 +129,32 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.Button:SetPoint("TOPLEFT", MFSM, "TOPLEFT")
 		MFSM.Button:SetSize(56, 56)
 
-		MFSM.Button.Highlight = MFSM.Button:CreateTexture()
-		MFSM.Button:SetHighlightAtlas("Forge-ColorSwatchHighlight", "ADD")
-
 		MFSM.Button.Config=CreateFrame("Button", "$parentConfig", MFSM.Button)
 		MFSM.Button.Config:SetSize(18, 18)
 		MFSM.Button.Config:SetPoint("BOTTOMRIGHT", 1, -1)
-		MFSM.Button.Config.tex = MFSM.Button.Config:CreateTexture(nil, "ARTWORK")
-		MFSM.Button.Config.tex:SetPoint("CENTER", -2, 2)
-		MFSM.Button.Config.tex:SetSize(14, 14)
-		MFSM.Button.Config.tex:SetTexture("Interface\\Worldmap\\Gear_64Grey")
-		MFSM.Button.Config.tex:SetAlpha(0.6)
-
+		-- MFSM.Button.Config.tex = MFSM.Button.Config:CreateTexture(nil, "ARTWORK")
+		-- MFSM.Button.Config.tex:SetPoint("CENTER", -2, 2)
+		-- MFSM.Button.Config.tex:SetSize(16, 16)
+		MFSM.Button.Config:SetNormalTexture("Interface\\AddOns\\MacroBlock\\media\\gear_normal.tga")
+		-- MFSM.Button.Config.tex:SetAlpha(0.6)
+		MFSM.Button.Config:SetPushedTexture("Interface\\AddOns\\MacroBlock\\media\\gear_pushed.tga")
 
 		MFSM.Button.Icon=MacroFrameSelectedMacroButtonIcon
 		MFSM.Button.Icon:SetAllPoints()
 
-		MFSM.Button.Mask=MFSM.Button:CreateMaskTexture(nil, "BACKGROUND")
-		MFSM.Button.Mask:SetAllPoints(MFSM.Button.Icon)
-		MFSM.Button.Mask:SetAtlas("UI-Frame-IconMask")
+		MFSM.Button.mask=MFSM.Button:CreateMaskTexture(nil, "BACKGROUND")
+		MFSM.Button.mask:SetAllPoints(MFSM.Button.Icon)
+		MFSM.Button.mask:SetAtlas("UI-Frame-IconMask")
 
-		MFSM.Button.Icon:AddMaskTexture(MFSM.Button.Mask)
+		MFSM.Button.Icon:AddMaskTexture(MFSM.Button.mask)
+
+		MFSM.Button.highlight = MFSM.Button:CreateTexture(nil, "HIGHLIGHT")
+		MFSM.Button.highlight:SetSize(68, 68)
+		MFSM.Button.highlight:SetPoint("CENTER")
+		MFSM.Button.highlight:SetAtlas("bags-newitem")
+		MFSM.Button.highlight:AddMaskTexture(MFSM.Button.mask)
+
+		MFSM.Button:SetHighlightTexture(MFSM.Button.highlight, "ADD")
 
 		MFSM.Button.Border=MFSM.Button:CreateTexture(nil, "OVERLAY")
 		MFSM.Button.Border:SetAtlas("adventures-spell-border")
