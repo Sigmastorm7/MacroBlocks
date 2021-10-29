@@ -60,6 +60,17 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame:RegisterForDrag()
 		MacroFrame:SetClampedToScreen(true)
 
+		local bin = { MacroEditButton, MacroExitButton, MacroSaveButton, MacroCancelButton, MacroDeleteButton, MacroNewButton, MacroFrameEnterMacroText, MacroButtonScrollFrameTop, MacroButtonScrollFrameBottom, MacroButtonScrollFrameMiddle, MacroFrameSelectedMacroBackground, MacroHorizontalBarLeft }
+
+		for _, trash in pairs(bin) do
+			trash:SetParent(UIParent)
+			trash:ClearAllPoints()
+			trash:Hide()
+		end
+
+		-- Hide the things we can't put in the bin neatly
+		MacroFrame.TopTileStreaks:Hide()
+
 		-- MacroFrameTextBackground:SetPoint("TOPLEFT", MacroFrameSelectedMacroBackground, "BOTTOMLEFT", 2, -6)
 
 		-- Attach the character count to the text box for easier adjustment of frames
@@ -89,6 +100,8 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameCharLimitText:SetJustifyH("LEFT")
 		MacroFrameCharLimitText:SetFontObject(MacroBlockMonoFont)
 
+		
+
 		-- Hide all the stupid ugly shit
 		MacroButtonScrollFrameTop:Hide()
 		MacroButtonScrollFrameBottom:Hide()
@@ -96,25 +109,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame.TopTileStreaks:Hide()
 		MacroFrameSelectedMacroBackground:SetColorTexture(0, 0, 0, 0) -- Can't hide this texture before it's shown
 		MacroFrameEnterMacroText:SetText("")
-        MacroEditButton:ClearAllPoints()
-		MacroEditButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, 0)
 
-		local dump = MacroEditButton
-		dump:Disable()
-		dump:ClearAllPoints()
-		dump:Hide()
-		MacroEditButton = CreateFrame("Frame", nil, UIParent)
-
-		MacroSaveButton:ClearAllPoints()
-		MacroSaveButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, -20)
-		MacroCancelButton:ClearAllPoints()
-		MacroCancelButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, -40)
-		MacroDeleteButton:ClearAllPoints()
-		MacroDeleteButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, -60)
-		MacroNewButton:ClearAllPoints()
-		MacroNewButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, -80)
-		MacroExitButton:ClearAllPoints()
-		MacroExitButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, -100)
 		-- YEEEEET this fuckin' dumb bar outta here cos the right half
 		-- can't be accessed and we want both halves GONE (Blizzard pls name your frames...)
 		MacroHorizontalBarLeft:SetPoint("TOPLEFT", UIParent, "TOPLEFT", -1000, 1000)
@@ -123,18 +118,21 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame.Inset:SetPoint("BOTTOMRIGHT", -12 - 256, 26 + 128 + 193)
 
 		-- Redfine selected macro frames
-		MFSM = CreateFrame("Frame", "MacroFrameSelectedMacro", MacroFrame)
+		MFSM=CreateFrame("Frame", "MBSelectedMacro", MacroFrame)
 		MFSM:SetSize(324, 56)
 		MFSM:SetPoint("TOP", MacroFrame.Inset, "BOTTOM", 0, -4)
 
 		MacroFrameTextBackground:SetPoint("TOPLEFT", MFSM, "BOTTOMLEFT", 0, -2)
 		MacroFrameScrollFrame:SetPoint("TOPLEFT", MFSM, "BOTTOMLEFT", 11, -8)
 
-		MFSM.Button = MacroFrameSelectedMacroButton
+		MFSM.Button=MacroFrameSelectedMacroButton
 		MFSM.Button:SetPoint("TOPLEFT", MFSM, "TOPLEFT")
 		MFSM.Button:SetSize(56, 56)
 
-		MFSM.Button.Config = CreateFrame("Button", "$parentConfig", MFSM.Button)
+		MFSM.Button.Highlight = MFSM.Button:CreateTexture()
+		MFSM.Button:SetHighlightAtlas("Forge-ColorSwatchHighlight", "ADD")
+
+		MFSM.Button.Config=CreateFrame("Button", "$parentConfig", MFSM.Button)
 		MFSM.Button.Config:SetSize(18, 18)
 		MFSM.Button.Config:SetPoint("BOTTOMRIGHT", 1, -1)
 		MFSM.Button.Config.tex = MFSM.Button.Config:CreateTexture(nil, "ARTWORK")
@@ -143,30 +141,53 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.Button.Config.tex:SetTexture("Interface\\Worldmap\\Gear_64Grey")
 		MFSM.Button.Config.tex:SetAlpha(0.6)
 
-		MFSM.Button.Icon = MacroFrameSelectedMacroButtonIcon
+
+		MFSM.Button.Icon=MacroFrameSelectedMacroButtonIcon
 		MFSM.Button.Icon:SetAllPoints()
 
-		MFSM.Button.Mask = MFSM.Button:CreateMaskTexture(nil, "BACKGROUND")
+		MFSM.Button.Mask=MFSM.Button:CreateMaskTexture(nil, "BACKGROUND")
 		MFSM.Button.Mask:SetAllPoints(MFSM.Button.Icon)
 		MFSM.Button.Mask:SetAtlas("UI-Frame-IconMask")
 
 		MFSM.Button.Icon:AddMaskTexture(MFSM.Button.Mask)
 
-		MFSM.Button.Border = MFSM.Button:CreateTexture(nil, "OVERLAY")
+		MFSM.Button.Border=MFSM.Button:CreateTexture(nil, "OVERLAY")
 		MFSM.Button.Border:SetAtlas("adventures-spell-border")
 		MFSM.Button.Border:SetPoint("CENTER")
 		MFSM.Button.Border:SetSize(62, 62)
 
-		MFSM.Button.bg = MFSM.Button:CreateTexture("$parentBackground", "BACKGROUND")
+		MFSM.Button.bg=MFSM.Button:CreateTexture("$parentBackground", "BACKGROUND")
 		MFSM.Button.bg:SetAtlas("auctionhouse-itemicon-empty")
 		MFSM.Button.bg:SetAllPoints()
 
-		MFSM.Name=CreateFrame("EditBox", "MacroFrameSelectedMacroName", MacroFrame, "InputBoxTemplate")
+		MFSM.Name=CreateFrame("EditBox", "$parentName", MacroFrame, "InputBoxTemplate")
 		MFSM.Name:SetAutoFocus(false)
 		MFSM.Name:SetSize(164, 24)
 		MFSM.Name:SetPoint("TOPLEFT", MFSM.Button, "TOPRIGHT", 10, -1)
 		MFSM.Name:SetMaxLetters(16)
-        
+
+		MFSM.Save=CreateFrame("Button", "$parentSave", MFSM, "SharedButtonSmallTemplate")
+		MFSM.Save:SetPoint("TOPLEFT", MFSM.Name, "BOTTOMLEFT", -8, -4)
+		MFSM.Save:SetSize(86, 28)
+		MFSM.Save:SetText("Save")
+
+		MFSM.Cancel=CreateFrame("Button", "$parentCancel", MFSM, "SharedButtonSmallTemplate")
+		MFSM.Cancel:SetPoint("TOPLEFT", MFSM.Save, "TOPRIGHT", 2, 0)
+		MFSM.Cancel:SetSize(86, 28)
+		MFSM.Cancel:SetText("Cancel")
+
+		MFSM.Delete=CreateFrame("Button", "$parentDelete", MFSM, "SharedButtonSmallTemplate")
+		MFSM.Delete:SetPoint("TOPLEFT", MFSM.Cancel, "TOPRIGHT", 2, 0)
+		MFSM.Delete:SetSize(86, 28)
+		MFSM.Delete:SetText("Delete")
+
+		MFSM.New=CreateFrame("Button", "$parentNew", MFSM, "SharedButtonSmallTemplate")
+		MFSM.New:SetPoint("BOTTOM", MFSM.Delete, "TOP", 0, 2)
+		MFSM.New:SetSize(86, 28)
+		MFSM.New:SetText("New")
+
+		MFSM.Copy=CreateFrame("Button", "$parentCopy", MFSM, "SharedButtonTemplate")
+
 		MFSM.Name.Left:SetAtlas("auctionhouse-ui-inputfield-left"); MFSM.Name.Left:SetSize(8, 28); MFSM.Name.Left:SetPoint("LEFT", -8, -2)
 		MFSM.Name.Right:SetAtlas("auctionhouse-ui-inputfield-right"); MFSM.Name.Right:SetSize(8, 28); MFSM.Name.Right:SetPoint("RIGHT", 0, -2)
 		MFSM.Name.Middle:SetAtlas("auctionhouse-ui-inputfield-middle"); MFSM.Name.Middle:SetSize(179, 28)
@@ -176,6 +197,10 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameSelectedMacroButton = MFSM.Button
 		MacroFrameSelectedMacroName = MFSM.Name
 		MacroEditButton = MFSM.Button.Config
+		MacroSaveButton = MFSM.Save
+		MacroCancelButton = MFSM.Cancel
+		MacroDeleteButton = MFSM.Delete
+		MacroNewButton = MFSM.New
 
 		-- Palette frame positioning
 		MBPaletteBasic:SetPoint("TOPLEFT", MacroFrame.Inset, "TOPRIGHT", 2, 0)
