@@ -60,7 +60,7 @@ local MACRO_DELETE_ONCLICK = function()
 	StaticPopup_Show("CONFIRM_DELETE_SELECTED_MACRO")
 end
 
-local frame = CreateFrame("Frame", nil, UIParenet)
+local frame = CreateFrame("Frame", nil, UIParent)
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, arg)
     if event == "ADDON_LOADED" and arg == "Blizzard_MacroUI" then
@@ -75,7 +75,8 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame:RegisterForDrag()
 		MacroFrame:SetClampedToScreen(true)
 
-		local bin = { MacroEditButton, MacroExitButton, MacroSaveButton, MacroCancelButton, MacroDeleteButton, MacroNewButton, MacroFrameEnterMacroText, MacroButtonScrollFrameTop, MacroButtonScrollFrameBottom, MacroButtonScrollFrameMiddle, MacroFrameSelectedMacroBackground, MacroHorizontalBarLeft, MacroPopupFrame }
+		-- Trash all the original MacroFrame elements in favor of replacing them with our own
+		local bin = { MacroEditButton, MacroExitButton, MacroSaveButton, MacroCancelButton, MacroDeleteButton, MacroNewButton, MacroFrameEnterMacroText, MacroButtonScrollFrameTop, MacroButtonScrollFrameBottom, MacroButtonScrollFrameMiddle, MacroFrameSelectedMacroBackground, MacroHorizontalBarLeft, MacroPopupFrame, MacroButtonScrollFrameTop, MacroButtonScrollFrameBottom, MacroButtonScrollFrameMiddle }
 
 		for _, trash in pairs(bin) do
 			trash:SetParent(UIParent)
@@ -86,7 +87,9 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		-- Hide the things we can't put in the bin neatly
 		MacroFrame.TopTileStreaks:Hide()
 
-		-- MacroFrameTextBackground:SetPoint("TOPLEFT", MacroFrameSelectedMacroBackground, "BOTTOMLEFT", 2, -6)
+		-- YEEEEET this fuckin' dumb bar outta here cos the right half
+		-- can't be accessed and we want both halves GONE
+		MacroHorizontalBarLeft:SetPoint("TOPLEFT", UIParent, "TOPLEFT", -1000, 1000)
 
 		-- Attach the character count to the text box for easier adjustment of frames
 		MacroFrameCharLimitText:ClearAllPoints()
@@ -115,23 +118,11 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameCharLimitText:SetJustifyH("LEFT")
 		MacroFrameCharLimitText:SetFontObject(MacroBlockMonoFont)
 
-		-- Hide all the stupid ugly shit
-		MacroButtonScrollFrameTop:Hide()
-		MacroButtonScrollFrameBottom:Hide()
-		MacroButtonScrollFrameMiddle:Hide()
-		MacroFrame.TopTileStreaks:Hide()
-		MacroFrameSelectedMacroBackground:SetColorTexture(0, 0, 0, 0) -- Can't hide this texture before it's shown
-		MacroFrameEnterMacroText:SetText("")
-
-		-- YEEEEET this fuckin' dumb bar outta here cos the right half
-		-- can't be accessed and we want both halves GONE (Blizzard pls name your frames...)
-		MacroHorizontalBarLeft:SetPoint("TOPLEFT", UIParent, "TOPLEFT", -1000, 1000)
-
 		-- Macro frame inset adjustment
 		MacroFrame.Inset:SetPoint("BOTTOMRIGHT", -12 - 256, 26 + 128 + 193)
 
 		-- Redfine selected macro frames
-		MFSM=CreateFrame("Frame", "MBSelectedMacro", MacroFrame)
+		MFSM=CreateFrame("Frame", "MBSelectedMacro", mb.Frame)
 		MFSM:SetSize(324, 56)
 		MFSM:SetPoint("TOP", MacroFrame.Inset, "BOTTOM", 0, -4)
 
@@ -176,33 +167,33 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.Button.bg:SetAtlas("auctionhouse-itemicon-empty")
 		MFSM.Button.bg:SetAllPoints()
 
-		MFSM.Name=CreateFrame("EditBox", "$parentName", MacroFrame, "InputBoxTemplate")
+		MFSM.Name=CreateFrame("EditBox", "$parentName", mb.Frame, "InputBoxTemplate")
 		MFSM.Name:SetAutoFocus(false)
 		MFSM.Name:SetSize(164, 24)
 		MFSM.Name:SetPoint("TOPLEFT", MFSM.Button, "TOPRIGHT", 10, -1)
 		MFSM.Name:SetMaxLetters(16)
 
-		MFSM.Save=CreateFrame("Button", "$parentSave", MFSM, "SharedButtonSmallTemplate")
+		MFSM.Save=CreateFrame("Button", "$parentSave", mb.Frame, "SharedButtonSmallTemplate")
 		MFSM.Save:SetPoint("TOPLEFT", MFSM.Name, "BOTTOMLEFT", -8, -4)
 		MFSM.Save:SetSize(86, 28)
 		MFSM.Save:SetText("Save")
 
-		MFSM.Cancel=CreateFrame("Button", "$parentCancel", MFSM, "SharedButtonSmallTemplate")
+		MFSM.Cancel=CreateFrame("Button", "$parentCancel", mb.Frame, "SharedButtonSmallTemplate")
 		MFSM.Cancel:SetPoint("TOPLEFT", MFSM.Save, "TOPRIGHT", 2, 0)
 		MFSM.Cancel:SetSize(86, 28)
 		MFSM.Cancel:SetText("Cancel")
 
-		MFSM.Delete=CreateFrame("Button", "$parentDelete", MFSM, "SharedButtonSmallTemplate")
+		MFSM.Delete=CreateFrame("Button", "$parentDelete", mb.Frame, "SharedButtonSmallTemplate")
 		MFSM.Delete:SetPoint("TOPLEFT", MFSM.Cancel, "TOPRIGHT", 2, 0)
 		MFSM.Delete:SetSize(86, 28)
 		MFSM.Delete:SetText("Delete")
 
-		MFSM.New=CreateFrame("Button", "$parentNew", MFSM, "SharedButtonSmallTemplate")
+		MFSM.New=CreateFrame("Button", "$parentNew", mb.Frame, "SharedButtonSmallTemplate")
 		MFSM.New:SetPoint("BOTTOM", MFSM.Delete, "TOP", 0, 2)
 		MFSM.New:SetSize(86, 28)
 		MFSM.New:SetText("New")
 
-		MFSM.Copy=CreateFrame("Button", "$parentCopy", MFSM, "SharedButtonTemplate")
+		MFSM.Copy=CreateFrame("Button", "$parentCopy", mb.Frame, "SharedButtonTemplate")
 
 		MFSM.Name.Left:SetAtlas("auctionhouse-ui-inputfield-left"); MFSM.Name.Left:SetSize(8, 28); MFSM.Name.Left:SetPoint("LEFT", -8, -2)
 		MFSM.Name.Right:SetAtlas("auctionhouse-ui-inputfield-right"); MFSM.Name.Right:SetSize(8, 28); MFSM.Name.Right:SetPoint("RIGHT", 0, -2)
@@ -227,7 +218,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		mb.Stack:SetPoint("BOTTOMLEFT", mb.Frame, "BOTTOMLEFT", 6, 7)
 
 		-- Title bar 'handle' that lets the user move the macro frame around the screen
-		local dragBar = CreateFrame("Frame", "MBDragBar", MacroFrame)
+		local dragBar = CreateFrame("Frame", "$parentDragBar", mb.Frame)
 		dragBar:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT")
 		dragBar:SetPoint("BOTTOMRIGHT", mb.Frame, "TOPRIGHT", -24, -24)
 		dragBar:EnableMouse(true)

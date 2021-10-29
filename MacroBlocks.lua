@@ -8,11 +8,6 @@ end
 
 local mb_init = false
 
--- Math utility
-local function round(number, decimals)
-	return tonumber((("%%.%df"):format(decimals)):format(number))
-end
-
 local blockBackdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -272,6 +267,8 @@ function StackDisplaceCheck(self)
 	local dis = 0
 
 	if not MouseIsOver(mb.Stack) then return end
+
+	if #mb.Stack.blocks == 0 then return end
 
 	for index, block in pairs(mb.Stack.blocks) do
 		if block.displaced then dis = 32 end
