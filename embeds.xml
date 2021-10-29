@@ -2,7 +2,7 @@
 
     <Include file="media\font.xml"/>
     <Include file="blocks.lua"/>
-    <Include file="frame.xml"/>
+    <Include file="block-templates.xml"/>
     <Include file="blizzard-macroframe.lua"/>
     <!--@do-not-package@-->
     <Include file="command_DB.lua"/>
