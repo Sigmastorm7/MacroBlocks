@@ -1,5 +1,50 @@
 local addon, mb = ...
 
+local MACRO_NAME_ONENTERPRESSED = function(self)
+    self:ClearFocus()
+	local index = 1
+	local iconTexture = MFSM.Button.Icon:GetTexture()
+	local text = self:GetText()
+	text = string.gsub(text, "\"", "")
+	index = EditMacro(MacroFrame.selectedMacro, text, iconTexture)
+	MacroFrame_SelectMacro(index)
+	MacroFrame_Update()
+end
+local MACRO_NAME_ONESCAPEPRESSED = function(self) self:ClearFocus() MacroFrame_Update() MacroPopupFrame.selectedIcon = nil end
+
+local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
+    local cCount = MacroFrameText:GetNumLetters()
+	MacroFrame.textChanged = 1;
+
+	if ( MacroPopupFrame.mode == "new" ) then MacroPopupFrame:Hide(); end
+
+	MacroFrameCharLimitText:SetText("["..cCount.."/255]")
+
+	if cCount >= 170 and cCount < 210 then
+		MacroFrameCharLimitText:SetTextColor(1, 1, 0, 0.4)
+	elseif cCount >= 210 then
+		MacroFrameCharLimitText:SetTextColor(1, 0, 0, 0.5)
+	else
+		MacroFrameCharLimitText:SetTextColor(1, 1, 1, 0.3)
+	end
+
+	ScrollingEdit_OnTextChanged(self, self:GetParent());
+end
+
+local MACRO_SAVE_ONCLICK = function() for _, block in pairs(mb.Stack.blocks) do block.saved = true end end
+local MACRO_CANCEL_ONCLICK = function()
+    local clearBlocks = {}
+	for _, block in pairs(mb.Stack.blocks) do table.insert(clearBlocks, block) end
+    for _, block in pairs(clearBlocks) do
+		if not block.saved then
+			if block.group == "Smart" then block.UNHOOK_PAYLOAD() end
+  			mb.Stack.remBlock(block)
+		    MB_OnDragStop(block)
+	    end
+	end
+	clearBlocks = nil
+end
+
 local frame = CreateFrame("Frame", nil, UIParenet)
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, arg)
@@ -44,25 +89,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameCharLimitText:SetJustifyH("LEFT")
 		MacroFrameCharLimitText:SetFontObject(MacroBlockMonoFont)
 
-		MacroFrameText:SetScript("OnTextChanged", function(_self, userInput)
-			local cCount = MacroFrameText:GetNumLetters()
-			MacroFrame.textChanged = 1;
-
-			if ( MacroPopupFrame.mode == "new" ) then MacroPopupFrame:Hide(); end
-
-			MacroFrameCharLimitText:SetText("["..cCount.."/255]")
-
-			if cCount >= 170 and cCount < 210 then
-				MacroFrameCharLimitText:SetTextColor(1, 1, 0, 0.4)
-			elseif cCount >= 210 then
-				MacroFrameCharLimitText:SetTextColor(1, 0, 0, 0.5)
-			else
-				MacroFrameCharLimitText:SetTextColor(1, 1, 1, 0.3)
-			end
-
-			ScrollingEdit_OnTextChanged(_self, _self:GetParent());
-		end)
-
 		-- Hide all the stupid ugly shit
 		MacroButtonScrollFrameTop:Hide()
 		MacroButtonScrollFrameBottom:Hide()
@@ -70,10 +96,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame.TopTileStreaks:Hide()
 		MacroFrameSelectedMacroBackground:SetColorTexture(0, 0, 0, 0) -- Can't hide this texture before it's shown
 		MacroFrameEnterMacroText:SetText("")
-		MacroEditButton:SetParent(UIParent)
-		MacroEditButton:ClearAllPoints()
-		MacroEditButton:Hide()
-		MacroEditButton:Disable()
+        MacroEditButton:ClearAllPoints()
 		MacroEditButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, 0)
 		MacroSaveButton:ClearAllPoints()
 		MacroSaveButton:SetPoint("TOPLEFT", MacroFrame, "TOPRIGHT", 20, -20)
@@ -100,13 +123,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameTextBackground:SetPoint("TOPLEFT", MFSM, "BOTTOMLEFT", 0, -2)
 		MacroFrameScrollFrame:SetPoint("TOPLEFT", MFSM, "BOTTOMLEFT", 11, -8)
 
-		-- MFSM.bg = MFSM:CreateTexture("$parentBackground", "BACKGROUND")
-		-- MFSM.bg:SetAtlas("auctionhouse-itemheaderframe")
-		-- MFSM.bg:SetPoint("TOPLEFT", 58, -1)
-		-- MFSM.bg:SetPoint("BOTTOMRIGHT", 0, 1)
-
 		MFSM.Button = MacroFrameSelectedMacroButton
-
 		MFSM.Button:SetPoint("TOPLEFT", MFSM, "TOPLEFT")
 		MFSM.Button:SetSize(56, 56)
 
@@ -119,16 +136,13 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.Button.Config.tex:SetTexture("Interface\\Worldmap\\Gear_64Grey")
 		MFSM.Button.Config.tex:SetAlpha(0.6)
 
-		MFSM.Button.Config:SetScript("OnEnter", function(_self) _self.tex:SetAlpha(1) end)
-		MFSM.Button.Config:SetScript("OnLeave", function(_self) _self.tex:SetAlpha(0.6) end)
-		MFSM.Button.Config:SetScript("OnClick", function() MacroFrame_SaveMacro(); MacroPopupFrame.mode = "edit"; MacroPopupFrame:Show(); end)
-		-- MFSM.Button.Name = MacroFrameSelectedMacroButtonName
-
 		MFSM.Button.Icon = MacroFrameSelectedMacroButtonIcon
 		MFSM.Button.Icon:SetAllPoints()
+
 		MFSM.Button.Mask = MFSM.Button:CreateMaskTexture(nil, "BACKGROUND")
 		MFSM.Button.Mask:SetAllPoints(MFSM.Button.Icon)
 		MFSM.Button.Mask:SetAtlas("UI-Frame-IconMask")
+
 		MFSM.Button.Icon:AddMaskTexture(MFSM.Button.Mask)
 
 		MFSM.Button.Border = MFSM.Button:CreateTexture(nil, "OVERLAY")
@@ -145,24 +159,10 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.Name:SetSize(164, 24)
 		MFSM.Name:SetPoint("TOPLEFT", MFSM.Button, "TOPRIGHT", 10, -1)
 		MFSM.Name:SetMaxLetters(16)
+        
 		MFSM.Name.Left:SetAtlas("auctionhouse-ui-inputfield-left"); MFSM.Name.Left:SetSize(8, 28); MFSM.Name.Left:SetPoint("LEFT", -8, -2)
 		MFSM.Name.Right:SetAtlas("auctionhouse-ui-inputfield-right"); MFSM.Name.Right:SetSize(8, 28); MFSM.Name.Right:SetPoint("RIGHT", 0, -2)
 		MFSM.Name.Middle:SetAtlas("auctionhouse-ui-inputfield-middle"); MFSM.Name.Middle:SetSize(179, 28)
-		MFSM.Name:SetScript("OnEnterPressed", function(_self)
-			_self:ClearFocus()
-			local index = 1
-			local iconTexture = MFSM.Button.Icon:GetTexture()
-			local text = _self:GetText()
-			text = string.gsub(text, "\"", "")
-			index = EditMacro(MacroFrame.selectedMacro, text, iconTexture)
-			MacroFrame_SelectMacro(index)
-			MacroFrame_Update()
-		end)
-		MFSM.Name:SetScript("OnEscapePressed", function(_self)
-			_self:ClearFocus()
-			MacroFrame_Update()
-			MacroPopupFrame.selectedIcon = nil
-		end)
 
 		MacroFrameSelectedMacroButtonIcon = MFSM.Button.Icon
 		MacroFrameSelectedMacroButtonName = MFSM.Button.Name
@@ -182,50 +182,24 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		dragBar:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT")
 		dragBar:SetPoint("BOTTOMRIGHT", mb.Frame, "TOPRIGHT", -24, -24)
 		dragBar:EnableMouse(true)
+
+        MFSM.Button.Config:SetScript("OnEnter", function(_self) _self.tex:SetAlpha(1) end)
+		MFSM.Button.Config:SetScript("OnLeave", function(_self) _self.tex:SetAlpha(0.6) end)
+		MFSM.Button.Config:SetScript("OnClick", function() MacroFrame_SaveMacro(); MacroPopupFrame.mode = "edit"; MacroPopupFrame:Show(); end)
+
 		dragBar:SetScript("OnMouseDown", function(_self, button) if button == "LeftButton" then MacroFrame:StartMoving() end end)
 		dragBar:SetScript("OnMouseUp", function(_self, button) if button == "LeftButton" then MacroFrame:StopMovingOrSizing() end end)
 
-		MacroSaveButton:HookScript("OnClick", function()
-			for _, block in pairs(mb.Stack.blocks) do
-				block.saved = true
-			end
-		end)
+        MFSM.Name:SetScript("OnEnterPressed", MACRO_NAME_ONENTERPRESSED)
+        MFSM.Name:SetScript("OnEscapePressed", MACRO_NAME_ONESCAPEPRESSED)
 
-		MacroCancelButton:HookScript("OnClick", function()
-			local clearBlocks = {}
-			for _, block in pairs(mb.Stack.blocks) do
-				table.insert(clearBlocks, block)
-			end
-			for _, block in pairs(clearBlocks) do
-				if not block.saved then
-					if block.group == "Smart" then block.UNHOOK_PAYLOAD() end
-    	    		mb.Stack.remBlock(block)
+        MacroFrameText:SetScript("OnTextChanged", MACRO_TEXT_ONTEXTCHANGED)
 
-					MB_OnDragStop(block)
-				end
-			end
-			clearBlocks = nil
-		end)
+		MacroSaveButton:HookScript("OnClick", MACRO_SAVE_ONCLICK)
+		MacroCancelButton:HookScript("OnClick", MACRO_CANCEL_ONCLICK)
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
-		MacroFrame:HookScript("OnShow", function()
-			mb.Frame:Show()
-
-			-- MacroFrameSelectedMacroBackground:Hide()
-
-			--[[MacroSaveButton.Left:SetTexture("Interface/Buttons/128RedButton")
-			MacroSaveButton.Middle:SetTexture("Interface/Buttons/128RedButton")
-			MacroSaveButton.Right:SetTexture("Interface/Buttons/128RedButton")
-
-			MacroSaveButton.Left:SetTexCoord(0.763671875, 0.986328125, 0.44482421875, 0.50732421875)
-			MacroSaveButton.Middle:SetTexCoord(0, 0.125, 0.00048828125, 0.06298828125)
-			MacroSaveButton.Right:SetTexCoord(0.001953125, 0.572265625, 0.25439453125, 0.31689453125)]]
-
-			mb.Init()
-
-		end)
-		MacroFrame:HookScript("OnHide", function()
-			mb.Frame:Hide()
-		end)
+		MacroFrame:HookScript("OnShow", function() mb.Frame:Show() mb.Init() end)
+		MacroFrame:HookScript("OnHide", function() mb.Frame:Hide() end)
 	end
 end)
