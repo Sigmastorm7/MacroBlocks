@@ -4,6 +4,7 @@
     <Include file="blocks.lua"/>
     <Include file="frame.xml"/>
     <Include file="frame.lua"/>
+    <!--@do-not-package@-->
     <Include file="command_DB.lua"/>
-
+    <!--@end-do-not-package@-->
 </Ui>

@@ -295,6 +295,7 @@
             <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
+    <!--@do-not-package@-->
     <!--User selection block that allows user to select 1 or more different options-->
     <Button name="SelectBlockOptionButtonTemplate" virtual="true">
         <KeyValues>
@@ -364,5 +365,5 @@
             <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
-
+    <!--@end-do-not-package@-->
 </Ui>

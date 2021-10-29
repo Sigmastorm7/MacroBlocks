@@ -23,10 +23,6 @@ mb.SlashCommandList = {
 		["/announce"] = "/ann",
 		["/ban"] = "/ban",
 		["/chathelp"] = "/chat",
-	--[[["/c"] = { -- is this some kind of escape sequence for chat commands?
-			"/c",
-			"/csay",
-		},]]
 		["/chatlist"] = "/chatwho",
 		["/chatlog"] = "/chatlog",
 		["/chatinvite"] = "/cinvite",
@@ -200,6 +196,9 @@ mb.SlashCommandList = {
 	}
 }
 
+--@do-not-package@
+-- is this some kind of escape sequence for chat commands?
+-- ["/c"] = { "/c", "/csay", },
 --[[commands = { -- obselete or for classic
 	["/saveguildroster"] = "/saveguildroster",
 	["/guildhelp"] = "/ghelp",
@@ -222,3 +221,4 @@ mb.SlashCommandList = {
 	["/raidbrowser"] = "/rb",
 	["/nameteam"] = "/nt",
 }]]
+--@end-do-not-package@
