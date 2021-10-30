@@ -47,6 +47,7 @@
         </Shadow>-->
     </Font>
     <Font name="MacroBlocksFont_Large" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="16" virtual="true">
+        <Color r="1" g="1" b="1" a="0.2"/>
         <Shadow x="1" y="-2">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>
