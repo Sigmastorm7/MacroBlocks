@@ -36,8 +36,11 @@ MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", mb.Frame, "InsetFra
 MBPaletteBasic.blocks = {}
 
 mb.Stack = CreateFrame("Frame", "$parentStack", mb.Frame, "BackdropTemplate")
-mb.Stack:SetBackdrop(stackBackdrop) -- BACKDROP_TOAST_12_12)
--- mb.Stack:SetBackdropColor(1, 1, 1)
+mb.Stack:SetBackdrop(stackBackdrop)
+mb.Stack.Instructions = mb.Stack:CreateFontString("$parentInstructions", "ARTWORK")
+mb.Stack.Instructions:SetPoint("CENTER")
+mb.Stack.Instructions:SetFontObject("MacroBlocksFont_Large")
+mb.Stack.Instructions:SetText("Drag & Drop Blocks Here")
 
 mb.Stack.blocks = {}
 mb.Stack.sTable = {}
@@ -326,6 +329,8 @@ mb.Stack.addBlock = function(block)
 
 	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
 	StackAdjust()
+
+	mb.Stack.Instructions:Hide()
 end
 
 mb.Stack.remBlock = function(block)
@@ -335,6 +340,10 @@ mb.Stack.remBlock = function(block)
 
 	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
 	StackAdjust()
+
+	if #mb.Stack.blocks == 0 then
+		mb.Stack.Instructions:Show()
+	end
 end
 
 mb.Init = function()
