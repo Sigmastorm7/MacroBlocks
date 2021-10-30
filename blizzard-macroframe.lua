@@ -311,7 +311,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.Cancel=CreateFrame("Button", "$parentCancel", mb.Frame, "SharedButtonSmallTemplate")
 		MFSM.Cancel:SetPoint("TOPLEFT", MFSM.Save, "TOPRIGHT", 2, 0)
 		MFSM.Cancel:SetSize(86, 28)
-		MFSM.Cancel:SetText("Undo")
+		MFSM.Cancel:SetText("Cancel")
 
 		MFSM.Delete=CreateFrame("Button", "$parentDelete", mb.Frame, "SharedButtonSmallTemplate")
 		MFSM.Delete:SetPoint("TOPLEFT", MFSM.Cancel, "TOPRIGHT", 2, 0)
