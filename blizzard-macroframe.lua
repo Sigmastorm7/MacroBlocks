@@ -50,10 +50,16 @@ local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
 end
 
 local MACRO_SAVE_ONCLICK = function()
-	mb.LogEditHistory(MacroFrame.selectedMacro, date("%y-%m-%d_%X"))
+	-- mb.LogEditHistory(MacroFrame.selectedMacro, date("%y-%m-%d_%X"))
 
 	for _, block in pairs(mb.Stack.blocks) do
 		block.saved = true
+	end
+
+	if MacroFrame.selectedMacro > 120 then
+		mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
+	else
+		mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
 	end
 
 	MACRO_FRAME_BUTTONS_SETENABLED(false)
@@ -74,14 +80,18 @@ local MACRO_CANCEL_ONCLICK = function()
 	    end
 	end
 
-	MacroFrameText:SetText(mb.UserMacros[mb.CharacterID][MacroFrame.selectedMacro]["body"])
+
+	if MacroFrame.selectedMacro > 120 then
+		MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"])
+	else
+		MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro]["body"])
+	end
 	MacroFrame.changes = false
-	-- MacroCancelButton:Disable()
 
 	clearBlocks = nil
-
-	MACRO_FRAME_BUTTONS_SETENABLED(false)
+	
 	mb.Stack.preserve = false
+	MACRO_FRAME_BUTTONS_SETENABLED(false)
 end
 
 local MACRO_NEW_ONCLICK = function()

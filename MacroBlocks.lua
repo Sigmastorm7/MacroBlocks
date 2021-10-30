@@ -358,33 +358,29 @@ mb.Stack.saveBlocks = function()
 end
 ]]
 
-mb.LogEditHistory = function(index, timestamp)
-
+--[[
+mb.Changelog = MacroChangelog or {}
+mb.LogEditHistory = function(index, time)
 	local name, texture, body = GetMacroInfo(index)
-
-	-- if name == User
-
-	local t = { ["time"] = timestamp, ["name"] = name, ["texture"] = texture, ["body"] = body }
+	if mb.Changelog[index] == nil then mb.Changelog[index] = {} end
 
 	if index <= 120 then
-		table.insert(mb.GeneralMacros[index]["changelog"], t)
+		mb.Changelog[index][time] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
 	elseif index > 120 then
-		table.insert(mb.CharacterMacros[index]["changelog"], t)
+		if mb.Changelog[index][mb.CharacterID] == nil then mb.Changelog[index][mb.CharacterID] = {} end
+		mb.Changelog[index][mb.CharacterID][time] = t
 	end
-
 end
+]]
 
 frame:SetScript("OnEvent", function(self, event, arg)
 	if event == "PLAYER_ENTERING_WORLD" then
 
-		if UserMacros == nil then UserMacros = {} end
-
 		mb.CharacterID = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
 
-		mb.UserMacros = {
-			["general"] = UserMacros.general or {},
-			[mb.CharacterID] = UserMacros[mb.CharacterID] or {},
-		}
+		if UserMacros == nil then UserMacros = {} end
+
+		mb.UserMacros = UserMacros or {}
 
 		local numGen, numChar = GetNumMacros()
 		local name, texture, body
@@ -393,11 +389,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			for i=1, numGen do
 				name, texture, body = GetMacroInfo(i)
 				if name ~= nil then
-					mb.UserMacros["general"][i] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
-
-					if mb.UserMacros["general"][i]["changelog"] == nil then
-						mb.UserMacros["general"][i]["changelog"] = {}
-					end
+					mb.UserMacros[i] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
 				end
 			end
 		end
@@ -405,24 +397,40 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		if numChar > 0 then
 			for i=1+120, numChar+120 do
 				name, texture, body = GetMacroInfo(i)
+				if mb.UserMacros[i] == nil then mb.UserMacros[i] = {} end
 				if name ~= nil then
-					mb.UserMacros[mb.CharacterID][i] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
-				
-					if mb.UserMacros[mb.CharacterID][i]["changelog"] == nil then
-						mb.UserMacros[mb.CharacterID][i]["changelog"] = {}
-					end
+					mb.UserMacros[i][mb.CharacterID] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
 				end
 			end
 		end
-
-		
-
 	end
 
 	if event == "PLAYER_LEAVING_WORLD" then
-		UserMacros = mb.UserMacros
-	end
+		if UserMacros == nil then UserMacros = {} end
+		-- if MacroChangelog == nil then MacroChangelog = {} end
+	
+		for index, data in pairs(mb.UserMacros) do
+			if index <=120 then
+				UserMacros[index] = mb.UserMacros[index]
+			else
+				UserMacros[index][mb.CharacterID] = mb.UserMacros[index][mb.CharacterID]
+			end
+		end
 
+		--[[
+		for index, data in pairs(mb.Changelog) do
+			if index <=120 then
+				for time, changes in pairs(data) do
+					if MacroChangelog[index][time] == nil then MacroChangelog[index][time] = changes end
+				end
+			else
+				for time, changes in pairs(data) do
+					if MacroChangelog[index][mb.CharacterID][time] == nil then MacroChangelog[index][mb.CharacterID][time] = changes end
+				end
+			end
+		end
+		]]
+	end
 end)
 
 --@do-not-package@
