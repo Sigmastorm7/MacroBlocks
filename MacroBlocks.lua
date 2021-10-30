@@ -46,14 +46,14 @@ mb.Stack.displaceID = 0
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
 local templates = {
-	"MacroBlockTemplate",
-	"SocketBlockTemplate",
-	"EditBlockTemplate",
-	"ModBlockTemplate",
+	{ ["name"] = "MacroBlockTemplate", ["type"] = "Frame" },
+	{ ["name"] = "SocketBlockTemplate", ["type"] = "Frame" },
+	{ ["name"] = "EditBlockTemplate", ["type"] = "Frame" },
+	{ ["name"] = "ChoiceBlockTemplate", ["type"] = "Frame" },
 }
 
 for i=1, #templates do
-	mb.BlockPoolCollection:CreatePool("Frame", MBPaletteBasic, templates[i])
+	mb.BlockPoolCollection:CreatePool(templates[i].type, MBPaletteBasic, templates[i].name)
 end
 
 mb.SmartBlock = function(sBlock, smart)
@@ -109,9 +109,31 @@ mb.MakeBlock = function(group, data, paletteID)
 
 	if not data.func or (data.func ~= "USER_SOCKET" and data.func ~= "USER_EDIT") then
 
-		b.text:SetText(data.name)
+		if data.func == "USER_CHOICE" then
 
-		if data.func ~= "MOD_CONDITION" then
+			b.backdropFrame.text:SetText(data.name)
+			b.backdropFrame:SetWidth(b.backdropFrame.text:GetStringWidth() + 18)
+
+			b.choices = {}
+			for i=1, 6 do
+				if i <= #data.choices then
+					b["choice"..i].text:SetText(data.choices[i].name)
+					b["choice"..i].enabled = false
+					b["choice"..i].value = data.choices[i].value
+
+					b["choice"..i]:SetWidth(b["choice"..i].text:GetStringWidth())
+					b["choice"..i]:Hide()
+				else
+					b["choice"..i]:Disable()
+					b["choice"..i]:Hide()
+					b["choice"..i]:ClearAllPoints()
+				end
+			end
+
+			b._payload = data.payload
+			b.origWidth = b:GetWidth()			
+		else
+			b.text:SetText(data.name)
 			local bw = b.text:GetStringWidth() + 18
 			if bw >= 28 then b:SetWidth(bw) else b:SetWidth(28) end
 		end

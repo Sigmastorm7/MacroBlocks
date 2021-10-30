@@ -8,6 +8,23 @@ local Item = C_Item
 local Mounts = C_MountJournal
 local Pets = C_PetJournal
 
+local flyoutWidth = { [true] = 156 }
+local flyoutText = { [false] = "❭❭", [true] = "❬❬" }
+local choiceTextColor = { [false] = { 0.55, 0.55, 0.55, }, [true] = { 0, 1, 0.4, }, }
+
+MB_CHOICE_BLOCK_RESET = function(self)
+    for i=1, #self.data.choices do
+        self["choice"..i].enabled = false
+        self["choice"..i]:Hide()
+        self["choice"..i].text:SetTextColor(unpack(choiceTextColor[false]))
+    end
+    self.choiceNum = 0
+    self.data.payload = self._payload
+    self:SetWidth(self.origWidth)
+    self.flyout.text:SetText(flyoutText[false])
+    self.flyout.open = false
+end
+
 UserBlockBackdrop = {
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -67,8 +84,8 @@ function MB_OnDragStop(self)
             elseif self.data.func == "USER_EDIT" then
                 self.data.payload = ""
                 self.edit:SetText("")
-            elseif self.data.func == "MOD_CONDITION" then
-                self.config.closeFunc(self, self.config)
+            elseif self.data.func == "USER_CHOICE" then
+                self.reset(self)
             end
         end
 
@@ -173,66 +190,38 @@ function MB_EDIT_OnTextChanged(self, userInput)
     if userInput then UpdateMacroBlockText() end
 end
 
--- Conditional modifier block handlers
-local function ModOption_SetShown(block)
-    block.shift:SetShown(block.config.open)
-    block.ctrl:SetShown(block.config.open)
-    block.alt:SetShown(block.config.open)
+-- Choice block handlers
+function MB_CHOICE_BLOCK_OnLoad(self) MB_OnLoad(self); self.choiceNum = 0; end
 
-    -- StackAdjust()
-end
-
-local MOD_OPEN = function(block, button)
-    button.text:SetText("❬❬")
-    button.open = true
-    block:SetWidth(156)
-
-    ModOption_SetShown(block)
-end
-local MOD_CLOSE = function(block, button)
-    button.text:SetText("❭❭")
-    button.open = false
-    block:SetWidth(57)
-
-    ModOption_SetShown(block)
-end
-
-function MB_MOD_OnLoad(self)
-    MB_OnLoad(self)
-    self.config.openFunc = MOD_OPEN
-    self.config.closeFunc = MOD_CLOSE
-
-    self.mods = 0
-end
-
-function MB_MOD_OnShow(self)
+function MB_CHOICE_BLOCK_OnShow(self)
     self:SetBackdropColor(0, 128/255, 77/255)
     self.text:Hide()
-    self.shift:SetShown(self.config.open)
-    self.ctrl:SetShown(self.config.open)
-    self.alt:SetShown(self.config.open)
 end
 
-function MB_MOD_ConfigOnClick(self, button, down)
+function MB_CHOICE_FlyoutOnClick(self, button, down)
     local p = self:GetParent()
 
     if not p.stacked then return end
 
-    if not self.open then self.openFunc(p, self) elseif self.open then self.closeFunc(p, self) end
+    if button == nil then
+        self.open = true
+    else
+        self.open = not self.open
+    end
+
+    for i=1, #p.data.choices do p["choice"..i]:SetShown(self.open) end
+
+    self.text:SetText(flyoutText[self.open])
+
+    p:SetWidth(flyoutWidth[self.open] or p.origWidth)
 end
 
-local textColor = {
-    [false] = { 0.55, 0.55, 0.55, },
-    [true] = { 1, 150/255, 0, },
-}
-
-function MB_MOD_OptionOnLoad(self)
+function MB_CHOICE_BUTTON_OnLoad(self)
     self:RegisterForClicks("LeftButtonUp")
     self:SetWidth(self.text:GetStringWidth())
     self.enabled = false
-    self.text:SetTextColor(unpack(textColor[self.enabled]))
+    self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
 end
-
 
 local modCase = {
     "[mod:shift]",
@@ -244,17 +233,17 @@ local modCase = {
     "[mod:shiftctrlalt]",
 }
 
-function MB_MOD_OptionOnClick(self, button, down)
+function MB_CHOICE_BUTTON_OnClick(self, button, down)
     local p = self:GetParent()
     if not self.enabled then
         self.enabled = true
-        p.mods = p.mods + self.val
+        p.choiceNum = p.choiceNum + self.value
     elseif self.enabled then
         self.enabled = false
-        p.mods = p.mods - self.val
+        p.choiceNum = p.choiceNum - self.value
     end
 
-    p.data.payload = modCase[p.mods] or "[mod]"
+    p.data.payload = modCase[p.choiceNum] or "[mod]"
     UpdateMacroBlockText()
-    self.text:SetTextColor(unpack(textColor[self.enabled]))
+    self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
 end

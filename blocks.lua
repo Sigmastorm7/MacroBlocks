@@ -117,8 +117,13 @@ mb.BasicBlocks = {
 	["Condition"] = {
 		{	["name"] = "mod",
 			["payload"] = "[mod]",
-			["func"] = "MOD_CONDITION",
-			["template"] = "ModBlockTemplate"
+			["template"] = "ChoiceBlockTemplate",
+			["func"] = "USER_CHOICE",
+			["choices"] = {
+				{ ["name"] = "shift", ["value"] = 1, },
+				{ ["name"] = "ctrl", ["value"] = 2, },
+				{ ["name"] = "alt", ["value"] = 4, },
+			}
 		},
 		{	["name"] = "combat",
 			["payload"] = "[combat]",
