@@ -33,12 +33,10 @@
         <Size x="50" y="28"/>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="handle" text="⣿" justifyH="CENTER" justifyV="MIDDLE" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf">
+                <FontString parentKey="handle" text="⣿" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksSymbolFont">
                     <Anchors>
                         <Anchor point="RIGHT" relativePoint="RIGHT" x="-7" y="-2"/>
                     </Anchors>
-                    <FontHeight val="16"/>
-                    <Shadow x="1" y="-1" r="0" g="0" b="0" a="1"/>
                 </FontString>
             </Layer>
         </Layers>
@@ -93,7 +91,7 @@
         </Size>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="handle" text="⣿" justifyH="CENTER" justifyV="MIDDLE" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf">
+                <FontString parentKey="handle" text="⣿" justifyH="CENTER" justifyV="MIDDLE" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansSymbols2-Regular.ttf">
                     <Anchors>
                         <Anchor point="RIGHT" relativePoint="RIGHT" x="-7" y="-2"/>
                     </Anchors>
@@ -212,7 +210,7 @@
                 <Anchors>
                     <Anchor point="RIGHT"/>
                 </Anchors>
-                <ButtonText parentKey="text" text="❭❭" inherits="MacroBlockSymbolFont_Small">
+                <ButtonText parentKey="text" text="❭❭" inherits="MacroBlocksSymbolFont_Small">
                     <Anchors>
                         <Anchor point="CENTER" x="-2" y="-2.5"/>
                     </Anchors>

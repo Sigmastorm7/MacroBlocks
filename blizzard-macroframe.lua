@@ -245,7 +245,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameTextButton:SetSize(290, 100)
 
 		MacroFrameCharLimitText:SetJustifyH("LEFT")
-		MacroFrameCharLimitText:SetFontObject(MacroBlockMonoFont)
+		MacroFrameCharLimitText:SetFontObject(MacroBlocksMonoFont)
 
 		-- Macro frame inset adjustment
 		MacroFrame.Inset:SetPoint("BOTTOMRIGHT", -12 - 256, 26 + 128 + 193)

@@ -126,7 +126,7 @@ mb.MakeBlock = function(group, data, paletteID)
 		end
 
 		if data.symbol then
-			b.text:SetFontObject(MacroBlockSymbolFont)
+			b.text:SetFontObject(MacroBlocksSymbolFont)
 			b.text:SetPoint("CENTER", 0, -3)
 		end
 	end
