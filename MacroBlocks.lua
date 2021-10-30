@@ -357,36 +357,30 @@ mb.Stack.saveBlocks = function()
 end
 ]]
 
+mb.GeneralMacros = {}
+mb.CharacterMacros =  {}
 
+mb.LogEditHistory = function(index, timestamp)
 
+	local name, iconID, body = GetMacroInfo(index)
+
+	if name ~=nil then
+		if index <= 120 then
+			mb.GeneralMacros[index]["changelog"][timestamp] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body }
+		elseif index > 120 then
+			mb.CharacterMacros[index]["changelog"][timestamp] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body }
+		end
+	end
+end
 
 frame:SetScript("OnEvent", function(self, event, arg)
 	if event == "PLAYER_ENTERING_WORLD" then
 
-
-		local mnum, mchar = GetNumMacros()
-		local mname, miconID, mbody
-		print("GENERAL MACROS:"..mnum)
-		for i=1, mnum do
-			mname, miconID, mbody = GetMacroInfo(i)
-			print(mname, miconID, mbody)
-		end
-		print("CHARACTER MACROS:"..mchar)
-		for i=1, mchar do
-			mname, miconID, mbody = GetMacroInfo(i+120)
-			print(mname, miconID, mbody)
-		end
-
-
-
 		if UserGeneralMacros == nil then UserGeneralMacros = {} end
 		if UserCharacterMacros == nil then UserCharacterMacros = {} end
 
-		mb.GeneralMacros = UserGeneralMacros or {}
-		mb.CharacterMacros = UserCharacterMacros or {}
-		mb.CharacterMacros["@character@"] = PlayerName:GetText()
-		mb.CharacterMacros["@realm@"] = GetNormalizedRealmName()
-		-- mb.UserMacros = { ["general"] = mb.GeneralMacros, ["character"] = mb.CharacterMacros }
+		mb.CharacterMacros["character"] = PlayerName:GetText()
+		mb.CharacterMacros["realm"] = GetNormalizedRealmName()
 
 		local numGen, numChar = GetNumMacros()
 		local name, iconID, body
@@ -394,14 +388,22 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		if numGen > 0 then
 			for i=1, numGen do
 				name, iconID, body = GetMacroInfo(i)
-				if name ~= nil then	mb.GeneralMacros[i] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body } end
+				if name ~= nil then
+					mb.GeneralMacros[i] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body }
+
+					if mb.GeneralMacros[i]["changelog"] == nil then mb.GeneralMacros[i]["changelog"] = {} end
+				end
 			end
 		end
 	
 		if numChar > 0 then
-			for i=1, numChar do
-				name, iconID, body = GetMacroInfo(i+120)
-				if name ~= nil then mb.CharacterMacros[i+120] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body } end
+			for i=1+120, numChar+120 do
+				name, iconID, body = GetMacroInfo(i)
+				if name ~= nil then
+					mb.CharacterMacros[i] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body }
+				
+					if mb.CharacterMacros[i]["changelog"] == nil then mb.CharacterMacros[i]["changelog"] = {} end
+				end
 			end
 		end
 	end
@@ -411,8 +413,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		UserCharacterMacros = mb.CharacterMacros
 	end
 end)
-
-
 
 --@do-not-package@
 	--[[ Export all available slash commands

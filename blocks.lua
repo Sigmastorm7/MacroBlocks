@@ -53,69 +53,88 @@ mb.ClassColors = {
 
 mb.BasicBlocks = {
 	["Utility"] = {
-		{	["name"] = "#showtooltip",
+		["UTL1"] = {
+			["name"] = "#showtooltip",
 			["payload"] = "#showtooltip\n",
 			["func"] = "NEW_LINE",
 		},
-		{	["name"] = "#show",
+		["UTL2"] = {
+			["name"] = "#show",
 			["payload"] = "#show\n",
 			["func"] = "NEW_LINE",
 		},
-		{	["name"] = "⮐",
+		["UTL3"] = {
+			["name"] = "⮐",
 			["payload"] = "\n",
 			["symbol"] = true,
 			["func"] = "NEW_LINE",
 		},
-		{	["name"] = ";",
+		["UTL4"] = {
+			["name"] = ";",
 			["payload"] = ";",
 		},
 	},
 	["Command"] = {
-		{	["name"] = "/use",
+		["CMD1"] = {
+			["name"] = "/use",
 			["payload"] = "/use",
 		},
-		{	["name"] = "/cast",
+		["CMD2"] = {
+			["name"] = "/cast",
 			["payload"] = "/cast",
 		},
-		{	["name"] = "/target",
+		["CMD3"] = {
+			["name"] = "/target",
 			["payload"] = "/tar",
 		},
-		{	["name"] = "/cleartarget",
+		["CMD4"] = {
+			["name"] = "/cleartarget",
 			["payload"] = "/cleartarget",
 		},--[[
-		{	["name"] = "/targetlasttarget",
+		["CMD#"] = {
+			["name"] = "/targetlasttarget",
 			["payload"] = "/targetlasttarget",
 		},]]
-		{	["name"] = "/focus",
+		["CMD5"] = {
+			["name"] = "/focus",
 			["payload"] = "/focus",
 		},
-		{	["name"] = "/clearfocus",
+		["CMD6"] = {
+			["name"] = "/clearfocus",
 			["payload"] = "/clearfocus",
 		},
-		{	["name"] = "/assist",
+		["CMD7"] = {
+			["name"] = "/assist",
 			["payload"] = "/a",
 		},
-		{	["name"] = "/equip",
+		["CMD8"] = {
+			["name"] = "/equip",
 			["payload"] = "/eq",
 		},--[[
-		{	["name"] = "/equipset",
+		["CMD#"] = {
+			["name"] = "/equipset",
 			["payload"] = "/equipset",
 		},
-		{	["name"] = "/equipslot",
+		["CMD#"] = {
+			["name"] = "/equipslot",
 			["payload"] = "/equipslot",
 		},
-		{	["name"] = "/click",
+		["CMD#"] = {
+			["name"] = "/click",
 			["payload"] = "/click",
 		},
-		{	["name"] = "/golfclap",
+		["CMD#"] = {
+			["name"] = "/golfclap",
 			["payload"] = "/golfclap",
 		},]]
-		{	["name"] = "/summonpet",
+		["CMD9"] = {
+			["name"] = "/summonpet",
 			["payload"] = "/sp"
 		},
 	},
 	["Condition"] = {
-		{	["name"] = "mod",
+		["CON1"] = {
+			["name"] = "mod",
 			["payload"] = "[mod]",
 			["template"] = "ChoiceBlockTemplate",
 			["func"] = "USER_CHOICE",
@@ -125,50 +144,62 @@ mb.BasicBlocks = {
 				{ ["name"] = "alt", ["value"] = 4, },
 			}
 		},--[[
-		{	["name"] = "combat",
+		["CON#"] = {
+			["name"] = "combat",
 			["payload"] = "[combat]",
 		},
-		{	["name"] = "exists",
+		["CON#"] = {
+			["name"] = "exists",
 			["payload"] = "[exists]",
 		},]]
-		{	["name"] = "help",
+		["CON2"] = {
+			["name"] = "help",
 			["payload"] = "[help]",
 		},
-		{	["name"] = "harm",
+		["CON3"] = {
+			["name"] = "harm",
 			["payload"] = "[harm]",
 		},--[[
-		{	["name"] = "dead",
+		["CON#"] = {
+			["name"] = "dead",
 			["payload"] = "[dead]",
 		},]]
-		{	["name"] = "@mouseover",
+		["CON4"] = {
+			["name"] = "@mouseover",
 			["payload"] = "[@mouseover]",
 		},
-		{	["name"] = "@cursor",
+		["CON5"] = {
+			["name"] = "@cursor",
 			["payload"] = "[@cursor]",
 		},
-		{	["name"] = "@focus",
+		["CON6"] = {
+			["name"] = "@focus",
 			["payload"] = "[@focus]",
 		},
 	},--[[
 	["Social"] = {
-		{	["name"] = "AaBbCc",
+		["@#"] = {
+			["name"] = "AaBbCc",
 			["payload"] = "AaBbCc",
 		},
 	},]]
 	["User"] = {
-		{	["name"] = "socket",
+		["USR1"] = {
+			["name"] = "socket",
 			["payload"] = "",
 			["func"] = "USER_SOCKET",
 			["template"] = "SocketBlockTemplate"
 		},
-		{	["name"] = "custom input",
+		["USR2"] = {
+			["name"] = "custom input",
 			["payload"] = "",
 			["func"] = "USER_EDIT",
 			["template"] = "EditBlockTemplate"
 		},
 	},
 	["Smart"] = {
-		{	["name"] = "no",
+		["SMT1"] = {
+			["name"] = "no",
 			-- ["payload"] = "no",
 			["func"] = "NO_CONDITION",
 			["smart"] = {

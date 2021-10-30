@@ -16,7 +16,13 @@ local MACRO_NAME_ONENTERPRESSED = function(self)
 	MacroFrame_SelectMacro(index)
 	MacroFrame_Update()
 end
-local MACRO_NAME_ONESCAPEPRESSED = function(self) self:ClearFocus() MacroFrame_Update() MacroPopupFrame.selectedIcon = nil end
+
+local MACRO_NAME_ONESCAPEPRESSED = function(self)
+	self:ClearFocus()
+	MacroFrame_Update()
+	MacroPopupFrame.selectedIcon = nil
+end
+
 local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
     local cCount = MacroFrameText:GetNumLetters()
 	MacroFrame.textChanged = 1;
@@ -35,7 +41,16 @@ local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
 
 	ScrollingEdit_OnTextChanged(self, self:GetParent());
 end
-local MACRO_SAVE_ONCLICK = function() for _, block in pairs(mb.Stack.blocks) do block.saved = true end end
+
+local MACRO_SAVE_ONCLICK = function()
+	mb.LogEditHistory(MacroFrame.selectedMacro, date("%y-%m-%d_%X"))
+
+	for _, block in pairs(mb.Stack.blocks) do
+		block.saved = true
+	end
+
+end
+
 local MACRO_CANCEL_ONCLICK = function()
     local clearBlocks = {}
 	for _, block in pairs(mb.Stack.blocks) do table.insert(clearBlocks, block) end
@@ -49,11 +64,13 @@ local MACRO_CANCEL_ONCLICK = function()
 	clearBlocks = nil
 	MacroFrameText:SetText(mb.Stack.undo)
 end
+
 local MACRO_NEW_ONCLICK = function()
 	MacroFrame_SaveMacro()
 	MacroPopupFrame.mode = "new"
 	MacroPopupFrame:Show()
 end
+
 local MACRO_DELETE_ONCLICK = function()
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 	StaticPopup_Show("CONFIRM_DELETE_SELECTED_MACRO")
