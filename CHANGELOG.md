@@ -8,9 +8,9 @@
     - /equip, /summonpet
 
 - **6 Condition blocks**
-    - [help], [harm]
-    - A configurable [mod] block that allows multiple mod keys
-    - [@focus], [@mouseover], [@cursor] 
+    - [ help ], [ harm ]
+    - A configurable [ mod ] block that allows multiple mod keys
+    - [ \@ focus ], [ \@ mouseover ], [ \@ cursor ] 
 - **4 Utility blocks**
     - #Show, #Showtooltip
     - A newline/return block that creates a new line in the macro and the block stack
