@@ -36,17 +36,17 @@
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlockFonts" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="11" virtual="true">
+    <Font name="MacroBlocksFont" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="11" virtual="true">
         <Shadow x="1" y="-2">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlockFonts_Small" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-ExtraBold.ttf" height="9" virtual="true">
+    <Font name="MacroBlocksFont_Small" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-ExtraBold.ttf" height="9" virtual="true">
         <!--<Shadow x="1" y="0">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>-->
     </Font>
-    <Font name="MacroBlockFonts_Large" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="16" virtual="true">
+    <Font name="MacroBlocksFont_Large" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="16" virtual="true">
         <Shadow x="1" y="-2">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>

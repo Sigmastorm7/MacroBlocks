@@ -15,7 +15,7 @@
         </KeyValues>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="text" text="BLOCK" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlockFonts"> 
+                <FontString parentKey="text" text="BLOCK" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont"> 
                     <Anchors>
                         <Anchor point="CENTER" x="0" y="-0.5"/>
                     </Anchors>
@@ -103,14 +103,14 @@
             </Layer>
         </Layers>
         <Frames>
-            <EditBox parentKey="edit" autoFocus="false" font="MacroBlockFonts_Small" multiLine="false" letters="255" countInvisibleLetters="true" enableMouse="true">
+            <EditBox parentKey="edit" autoFocus="false" font="MacroBlocksFont_Small" multiLine="false" letters="255" countInvisibleLetters="true" enableMouse="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" x="9" y="-3"/>
                     <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-18" y="3"/>
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
-			     	    <FontString parentKey="instructions" text="Custom String" justifyH="LEFT" justifyV="MIDDLE" inherits="MacroBlockFonts_Small"  setAllPoints="true">
+			     	    <FontString parentKey="instructions" text="Custom String" justifyH="LEFT" justifyV="MIDDLE" inherits="MacroBlocksFont_Small"  setAllPoints="true">
 			     		    <Color r="0.55" g="0.55" b="0.55"/>
 			     	    </FontString>
 			        </Layer>
@@ -188,7 +188,7 @@
             <KeyValue key="value" value="0" type="number"/>
         </KeyValues>
         <Size x="24" y="24"/>
-        <ButtonText parentKey="text" setAllPoints="true" inherits="MacroBlockFonts"/>
+        <ButtonText parentKey="text" setAllPoints="true" inherits="MacroBlocksFont"/>
         <Scripts>
             <OnLoad function="MB_CHOICE_BUTTON_OnLoad"/>
             <OnClick function="MB_CHOICE_BUTTON_OnClick"/>
@@ -228,7 +228,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
-                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlockFonts"> 
+                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont"> 
                             <Anchors>
                                 <Anchor point="CENTER" x="-0.5" y="-0.5"/>
                             </Anchors>
