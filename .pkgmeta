@@ -1,9 +1,15 @@
 package-as: MacroBlocks
+enable-nolib-creation: no
 
+manual-changelog:
+    filename: CHANGELOG.txt
+    markup-type: markdown
+
+license-output: LICENSE.txt
 
 ignore:
-    LICENSE
-    README.md
-    Blizzard_MacroUI
-    command_DB.lua
-    macroblocks.code-workspace
+    - Blizzard_MacroUI
+    - LICENSE
+    - README.md
+    - command_DB.lua
+    - macroblocks.code-workspace
