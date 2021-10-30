@@ -1,5 +1,6 @@
 local addon, mb = ...
 
+-- Frame backdrop templates
 mb.USRBackdrop = {
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -30,6 +31,7 @@ mb.stackBackdrop = {
 	insets = { left = 5, right = 5, top = 5, bottom = 5 },
 }
 
+-- Color tables
 mb.GroupColors = {
 	["HT"] = { -- HUNTER
 		["hex"] = "ffa9d271",
@@ -81,6 +83,7 @@ mb.GroupColors = {
 	},
 }
 
+-- Default blocks shown in the basic palette
 mb.BasicBlocks = {
 	["UTL"] = {
 		{
