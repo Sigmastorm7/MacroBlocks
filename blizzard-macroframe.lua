@@ -74,7 +74,7 @@ local MACRO_CANCEL_ONCLICK = function()
 
     for _, block in pairs(clearBlocks) do
 		if not block.saved then
-			if block.group == "Smart" then block.UNHOOK_PAYLOAD() end
+			if block.group == "SMT" then block.UNHOOK_PAYLOAD() end
   			mb.Stack.remBlock(block)
 		    MB_OnDragStop(block)
 	    end

@@ -10,33 +10,13 @@ end
 
 local mb_init = false
 
-local blockBackdrop = {
-	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-	tile = true,
-	tileEdge = true,
-	tileSize = 24,
-	edgeSize = 12,
-	insets = { left = 2, right = 2, top = 2, bottom = 2 },
-}
-
-local stackBackdrop = {
-	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background-Maw",
-	edgeFile = "Interface\\FriendsFrame\\UI-Toast-Border",
-	tile = true,
-	tileEdge = true,
-	tileSize = 12,
-	edgeSize = 12,
-	insets = { left = 5, right = 5, top = 5, bottom = 5 },
-}
-
 mb.Frame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
 MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", mb.Frame, "InsetFrameTemplate")
 MBPaletteBasic.blocks = {}
 
 mb.Stack = CreateFrame("Frame", "$parentStack", mb.Frame, "BackdropTemplate")
-mb.Stack:SetBackdrop(stackBackdrop)
+mb.Stack:SetBackdrop(mb.stackBackdrop)
 mb.Stack.Instructions = mb.Stack:CreateFontString("$parentInstructions", "ARTWORK")
 mb.Stack.Instructions:SetPoint("CENTER")
 mb.Stack.Instructions:SetFontObject("MacroBlocksFont_Large")
@@ -63,15 +43,15 @@ for i=1, #templates do
 	mb.BlockPoolCollection:CreatePool(templates[i].type, MBPaletteBasic, templates[i].name)
 end
 
-mb.SmartBlock = function(sBlock, smart)
+mb.SMTBlock = function(sBlock, smt)
 
 	local funcTable = {}
 
-	if not smart.orphan then
+	if not smt.orphan then
 		funcTable.ORPHAN = function()
 			local bool = false
 			for _, block in pairs(mb.Stack.blocks) do
-				bool = bool or block.group == smart.group
+				bool = bool or block.group == smt.group
 			end
 			return bool
 		end
@@ -79,12 +59,12 @@ mb.SmartBlock = function(sBlock, smart)
 
 	funcTable.PLACEMENT = function()
 		if not mb.Stack.displace then return false end
-		return mb.Stack.blocks[mb.Stack.displaceID].group == smart.group
+		return mb.Stack.blocks[mb.Stack.displaceID].group == smt.group
 	end
 
-	if smart.hookPayload ~= nil then
-		local index = smart.hookPayload[1]
-		local str = smart.hookPayload[2]
+	if smt.hookPayload ~= nil then
+		local index = smt.hookPayload[1]
+		local str = smt.hookPayload[2]
 
 		funcTable.HOOK_PAYLOAD = function(payload)
 			return string.sub(payload, index-1, index-1)..str..string.sub(payload, index)
@@ -99,7 +79,7 @@ mb.SmartBlock = function(sBlock, smart)
 	funcTable.STACK = function()
 		mb.Stack.addBlock(sBlock)
 		mb.Stack.blocks[sBlock.stackID+1].hooked = true
-		mb.Stack.blocks[sBlock.stackID+1].smartHook = sBlock
+		mb.Stack.blocks[sBlock.stackID+1].smtHook = sBlock
 		UpdateMacroBlockText()
 	end
 
@@ -114,9 +94,9 @@ mb.MakeBlock = function(group, data, paletteID)
 
 	local b = mb.BlockPoolCollection:Acquire(data.template or "MacroBlockTemplate")
 
-	if not data.func or (data.func ~= "USER_SOCKET" and data.func ~= "USER_EDIT") then
+	if not data.func or (data.func ~= "USR_SOCKET" and data.func ~= "USR_EDIT") then
 
-		if data.func == "USER_CHOICE" then
+		if data.func == "USR_CHOICE" then
 
 			b.backdropFrame.text:SetText(data.name)
 			b.backdropFrame:SetWidth(b.backdropFrame.text:GetStringWidth() + 18)
@@ -151,8 +131,8 @@ mb.MakeBlock = function(group, data, paletteID)
 		end
 	end
 
-	if group == "Smart" then
-		b.smartFunc = mb.SmartBlock(b, data.smart)
+	if group == "SMT" then
+		b.smtFunc = mb.SMTBlock(b, data.smt)
 	end
 
 	b.group = group
@@ -160,9 +140,9 @@ mb.MakeBlock = function(group, data, paletteID)
 
 	b.paletteID = paletteID or #MBPaletteBasic.blocks + 1
 
-	b:SetBackdrop(blockBackdrop)
-	b:SetBackdropColor(unpack(mb.ClassColors[group].rgb))
-	b:SetBackdropBorderColor(unpack(mb.ClassColors[group].rgb))
+	b:SetBackdrop(mb.blockBackdrop)
+	b:SetBackdropColor(unpack(mb.GroupColors[group].rgb))
+	b:SetBackdropBorderColor(unpack(mb.GroupColors[group].rgb))
 
 	b:Show()
 
@@ -182,7 +162,7 @@ local function delimSwitch(index, block)
 	bool = bool or block.data.func == "NEW_LINE"
 	bool = bool or index == 1
 	bool = bool or #mb.Stack.blocks == 1
-	bool = bool or mb.Stack.blocks[index-1].group == "Smart"
+	bool = bool or mb.Stack.blocks[index-1].group == "SMT"
 	bool = bool or block.group == "Condition" and mb.Stack.blocks[index-1].group == "Condition"
 	-- bool = bool or index == #mb.Stack.blocks
 	-- bool = bool or 
@@ -209,7 +189,7 @@ function UpdateMacroBlockText()
 
 	for i, block in pairs(mb.Stack.blocks) do
 
-		if block.group ~= "Smart" then
+		if block.group ~= "SMT" then
 
 			mb.Stack.sTable[block.stackID] = block.data.payload
 
