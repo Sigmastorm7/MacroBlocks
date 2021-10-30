@@ -21,3 +21,5 @@
     - A socket block that accepts dragged and dropped spell, item, toy, pet, and mount buttons
 
 - **Graphical overhaul of many elements in the Macro Frame**
+- **Saved Variable storage of account & character macros**
+  - This will be utilized for cross-character macro sharing in a future update 
