@@ -17,7 +17,6 @@ local MACRO_NAME_ONENTERPRESSED = function(self)
 	MacroFrame_Update()
 end
 local MACRO_NAME_ONESCAPEPRESSED = function(self) self:ClearFocus() MacroFrame_Update() MacroPopupFrame.selectedIcon = nil end
-
 local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
     local cCount = MacroFrameText:GetNumLetters()
 	MacroFrame.textChanged = 1;
@@ -36,9 +35,8 @@ local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
 
 	ScrollingEdit_OnTextChanged(self, self:GetParent());
 end
-
 local MACRO_SAVE_ONCLICK = function() for _, block in pairs(mb.Stack.blocks) do block.saved = true end end
-local MACRO_CLEAR_ONCLICK = function()
+local MACRO_CANCEL_ONCLICK = function()
     local clearBlocks = {}
 	for _, block in pairs(mb.Stack.blocks) do table.insert(clearBlocks, block) end
     for _, block in pairs(clearBlocks) do
@@ -49,6 +47,7 @@ local MACRO_CLEAR_ONCLICK = function()
 	    end
 	end
 	clearBlocks = nil
+	MacroFrameText:SetText(mb.Stack.undo)
 end
 local MACRO_NEW_ONCLICK = function()
 	MacroFrame_SaveMacro()
@@ -178,13 +177,13 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.Save:SetSize(86, 28)
 		MFSM.Save:SetText("Save")
 
-		MFSM.Clear=CreateFrame("Button", "$parentClear", mb.Frame, "SharedButtonSmallTemplate")
-		MFSM.Clear:SetPoint("TOPLEFT", MFSM.Save, "TOPRIGHT", 2, 0)
-		MFSM.Clear:SetSize(86, 28)
-		MFSM.Clear:SetText("Clear")
+		MFSM.Cancel=CreateFrame("Button", "$parentCancel", mb.Frame, "SharedButtonSmallTemplate")
+		MFSM.Cancel:SetPoint("TOPLEFT", MFSM.Save, "TOPRIGHT", 2, 0)
+		MFSM.Cancel:SetSize(86, 28)
+		MFSM.Cancel:SetText("Undo")
 
 		MFSM.Delete=CreateFrame("Button", "$parentDelete", mb.Frame, "SharedButtonSmallTemplate")
-		MFSM.Delete:SetPoint("TOPLEFT", MFSM.Clear, "TOPRIGHT", 2, 0)
+		MFSM.Delete:SetPoint("TOPLEFT", MFSM.Cancel, "TOPRIGHT", 2, 0)
 		MFSM.Delete:SetSize(86, 28)
 		MFSM.Delete:SetText("Delete")
 
@@ -205,7 +204,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrameSelectedMacroName = MFSM.Name
 		MacroEditButton = MFSM.Button.Config
 		MacroSaveButton = MFSM.Save
-		MacroCancelButton = MFSM.Clear
+		MacroCancelButton = MFSM.Cancel
 		MacroDeleteButton = MFSM.Delete
 		MacroNewButton = MFSM.New
 
@@ -239,7 +238,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
         MacroFrameText:SetScript("OnTextChanged", MACRO_TEXT_ONTEXTCHANGED)
 
 		MacroSaveButton:HookScript("OnClick", MACRO_SAVE_ONCLICK)
-		MacroCancelButton:HookScript("OnClick", MACRO_CLEAR_ONCLICK)
+		MacroCancelButton:HookScript("OnClick", MACRO_CANCEL_ONCLICK)
 
 
 		-- Attach addon's visibility to blizzard's macro frame visibility

@@ -1,5 +1,7 @@
 local addon, mb = ...
 local frame = CreateFrame("Frame", nil, UIParent)
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent("PLAYER_LEAVING_WORLD")
 
 SLASH_PRINT1 = "/print"
 SlashCmdList["PRINT"] = function(msg, editBox)
@@ -42,6 +44,7 @@ mb.Stack.sTable = {}
 mb.Stack.string = ""
 mb.Stack.displace = false
 mb.Stack.displaceID = 0
+mb.Stack.undo = ""
 
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
@@ -176,7 +179,7 @@ local function delimSwitch(index, block)
 	bool = bool or index == 1
 	bool = bool or #mb.Stack.blocks == 1
 	bool = bool or mb.Stack.blocks[index-1].group == "Smart"
-	bool = bool or block.group == "Condition"
+	bool = bool or block.group == "Condition" and mb.Stack.blocks[index-1].group == "Condition"
 	-- bool = bool or index == #mb.Stack.blocks
 	-- bool = bool or 
 	-- bool = bool or 
@@ -348,9 +351,68 @@ mb.Init = function()
 	end
 end
 
+--[[
 mb.Stack.saveBlocks = function()
 
 end
+]]
+
+
+
+
+frame:SetScript("OnEvent", function(self, event, arg)
+	if event == "PLAYER_ENTERING_WORLD" then
+
+
+		local mnum, mchar = GetNumMacros()
+		local mname, miconID, mbody
+		print("GENERAL MACROS:"..mnum)
+		for i=1, mnum do
+			mname, miconID, mbody = GetMacroInfo(i)
+			print(mname, miconID, mbody)
+		end
+		print("CHARACTER MACROS:"..mchar)
+		for i=1, mchar do
+			mname, miconID, mbody = GetMacroInfo(i+120)
+			print(mname, miconID, mbody)
+		end
+
+
+
+		if UserGeneralMacros == nil then UserGeneralMacros = {} end
+		if UserCharacterMacros == nil then UserCharacterMacros = {} end
+
+		mb.GeneralMacros = UserGeneralMacros or {}
+		mb.CharacterMacros = UserCharacterMacros or {}
+		mb.CharacterMacros["@character@"] = PlayerName:GetText()
+		mb.CharacterMacros["@realm@"] = GetNormalizedRealmName()
+		-- mb.UserMacros = { ["general"] = mb.GeneralMacros, ["character"] = mb.CharacterMacros }
+
+		local numGen, numChar = GetNumMacros()
+		local name, iconID, body
+		
+		if numGen > 0 then
+			for i=1, numGen do
+				name, iconID, body = GetMacroInfo(i)
+				if name ~= nil then	mb.GeneralMacros[i] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body } end
+			end
+		end
+	
+		if numChar > 0 then
+			for i=1, numChar do
+				name, iconID, body = GetMacroInfo(i+120)
+				if name ~= nil then mb.CharacterMacros[i+120] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body } end
+			end
+		end
+	end
+
+	if event == "PLAYER_LEAVING_WORLD" then
+		UserGeneralMacros = mb.GeneralMacros
+		UserCharacterMacros = mb.CharacterMacros
+	end
+end)
+
+
 
 --@do-not-package@
 	--[[ Export all available slash commands

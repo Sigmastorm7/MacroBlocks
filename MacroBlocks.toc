@@ -4,5 +4,8 @@
 ## Version: 9.1.0
 ## Notes:
 
+## SavedVariables: UserGeneralMacros
+## SavedVariablesPerCharacter: UserCharacterMacros
+
 embeds.xml
 MacroBlocks.lua
