@@ -272,16 +272,16 @@ function StackAdjust(index, xOff, yOff)
 end
 
 function StackDisplaceCheck(self)
-	local bool = false
-	local dis = 0
-
+	-- Escapes
 	if not MouseIsOver(mb.Stack) then return end
-
 	if #mb.Stack.blocks == 0 then return end
 
+	local bool = false
+	local dist = 0
+
 	for index, block in pairs(mb.Stack.blocks) do
-		if block.displaced then dis = 32 end
-		if MouseIsOver(block, 0, 0, -(16+dis), -block:GetWidth()+16) then
+		if block.displaced then dist = 32 end
+		if MouseIsOver(block, 0, 0, -(16+dist), -block:GetWidth()+16) then
 			mb.Stack.displaceID = index
 			block.displaced = true
 			bool = bool or true

@@ -25,8 +25,6 @@ MB_CHOICE_BLOCK_RESET = function(self)
     self.flyout.open = false
 end
 
-
-
 -- Generic block handlers
 function MB_OnLoad(self)
     self:SetClampedToScreen(true)

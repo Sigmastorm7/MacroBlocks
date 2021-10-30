@@ -258,7 +258,7 @@ mb.BasicBlocks = {
 			["func"] = "USR_EDIT",
 			["template"] = "EditBlockTemplate"
 		},
-	},  --[[
+	},
 	["SMT"] = {
 		{
 			["groupID"] = "SMT1",
@@ -267,12 +267,12 @@ mb.BasicBlocks = {
 			["func"] = "NO_CONDITION",
 			["smt"] = {
 				["palette"] = true,
-				["group"] = "Condition",
+				["group"] = "CON",
 				["hookPayload"] = { 2, "no" },
 				["orphan"] = false,
 			}
 		}
-	},]]
+	},
 }
 
 mb.AdvancedBlocks = {
