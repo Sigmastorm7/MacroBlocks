@@ -1,58 +1,58 @@
 local addon, mb = ...
 
 mb.ClassColors = {
-	["HUNTER"] = { -- HUNTER
+	["HT"] = { -- HUNTER
 		["hex"] = "ffa9d271",
 		["rgb"] = { 0.6666651964187622, 0.8274491429328918, 0.447057843208313 },
 	},
-	["WARRIOR"] = { -- WARRIOR
+	["WR"] = { -- WARRIOR
 		["hex"] = "ffc59a6c",
 		["rgb"] = { 0.7764688730239868, 0.6078417897224426, 0.427450031042099 },
 	},
-	["SHAMAN"] = { -- SHAMAN
+	["SM"] = { -- SHAMAN
 		["hex"] = "ff006fdc",
 		["rgb"] = { 0,  0.4392147064208984, 0.8666647672653198 },
 	},
-	["Command"] = { -- MAGE
+	["CMD"] = { -- MAGE
 		["hex"] = "ff3ec6ea",
 		["rgb"] = { 0.2470582872629166,  0.7803904414176941, 0.9215666055679321 },
 	},
-	["PRIEST"] = { -- PRIEST
+	["PT"] = { -- PRIEST
 		["hex"] = "fffefefe",
 		["rgb"] = { 0.9999977946281433,  0.9999977946281433, 0.9999977946281433 },
 	},
-	["Smart"] = { -- PALADIN
+	["SMT"] = { -- PALADIN
 		["hex"] = "fff38bb9",
 		["rgb"] = { 0.9568606615066528,  0.549018383026123, 0.7294101715087891 },
 	},
-	["WARLOCK"] = { -- WARLOCK
+	["WK"] = { -- WARLOCK
 		["hex"] = "ff8687ed",
 		["rgb"] = { 0.5294106006622314, 0.5333321690559387, 0.933331310749054 },
 	},
-	["DEMONHUNTER"] = { -- DEMONHUNTER
+	["DH"] = { -- DEMONHUNTER
 		["hex"] = "ffa22fc8",
 		["rgb"] = { 0.639214277267456,  0.188234880566597, 0.7882335782051086 },
 	},
-	["DEATHKNIGHT"] = { -- DEATHKNIGHT
+	["DK"] = { -- DEATHKNIGHT
 		["hex"] = "ffc31d39",
 		["rgb"] = { 0.7686257362365723,  0.117646798491478, 0.2274504750967026 },
 	},
-	["User"] = { -- DRUID
+	["USR"] = { -- DRUID
 		["hex"] = "fffe7b09",
 		["rgb"] = { 0.9999977946281433, 0.4862734377384186, 0.03921560198068619 },
 	},
-	["Condition"] = { -- MONK
+	["CON"] = { -- MONK
 		["hex"] = "ff00fe97",
 		["rgb"] = { 0, 0.9999977946281433, 0.5960771441459656 },
 	},
-	["Utility"] = { -- ROGUE
+	["UTL"] = { -- ROGUE
 		["hex"] = "fffef367",
 		["rgb"] = { 0.9999977946281433, 0.9568606615066528, 0.4078422486782074 },
 	},
 }
 
 mb.BasicBlocks = {
-	["Utility"] = {
+	["UTL"] = {
 		{
 			["groupID"] = "UTL1",
 			["name"] = "#showtooltip",
@@ -78,7 +78,7 @@ mb.BasicBlocks = {
 			["payload"] = ";",
 		},
 	},
-	["Command"] = {
+	["CMD"] = {
 		{
 			["groupID"] = "CMD1",
 			["name"] = "/use",
@@ -150,7 +150,7 @@ mb.BasicBlocks = {
 			["payload"] = "/sp"
 		},
 	},
-	["Condition"] = {
+	["CON"] = {
 		{
 			["groupID"] = "CON1",
 			["name"] = "mod",
@@ -210,7 +210,7 @@ mb.BasicBlocks = {
 			["payload"] = "AaBbCc",
 		},
 	},]]
-	["User"] = {
+	["USR"] = {
 		{
 			["groupID"] = "USR1",
 			["name"] = "socket",
@@ -226,7 +226,7 @@ mb.BasicBlocks = {
 			["template"] = "EditBlockTemplate"
 		},
 	},
-	["Smart"] = {
+	["SMT"] = {
 		{
 			["groupID"] = "SMT1",
 			["name"] = "no",

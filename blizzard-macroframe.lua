@@ -217,8 +217,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		-- Hide the things we can't put in the bin neatly
 		MacroFrame.TopTileStreaks:Hide()
 
-		-- YEEEEET this fuckin' dumb bar outta here cos the right half
-		-- can't be accessed and we want both halves GONE
+		-- YEEEEET this dumb bar outta here, the right half can't be accessed so its anchor has to be sent somewhere
 		MacroHorizontalBarLeft:SetPoint("TOPLEFT", UIParent, "TOPLEFT", -1000, 1000)
 
 		-- Attach the character count to the text box for easier adjustment of frames
@@ -361,8 +360,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
         MFSM.Name:SetScript("OnEnterPressed", MACRO_NAME_ONENTERPRESSED)
         MFSM.Name:SetScript("OnEscapePressed", MACRO_NAME_ONESCAPEPRESSED)
 
-		-- MFSM.Save:SetScript()
-		-- MFSM.Clear:SetScript()
 		MFSM.New:SetScript("OnClick", MACRO_NEW_ONCLICK)
 		MFSM.Delete:SetScript("OnClick", MACRO_DELETE_ONCLICK)
 

@@ -123,7 +123,7 @@ function MB_USER_ELEMENT_OnShow(self)
     -- self.p = self:GetParent()
     self:SetBackdrop(UserBlockBackdrop)
     self:SetBackdropColor(128/255, 62/255, 5/255)
-    self:SetBackdropBorderColor(unpack(classColors.User.rgb))
+    self:SetBackdropBorderColor(unpack(classColors.USR.rgb))
 end
 
 -- Smart block generator for specific instances
