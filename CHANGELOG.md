@@ -22,4 +22,4 @@
 
 - **Graphical overhaul of many elements in the Macro Frame**
 - **Saved Variable storage of account & character macros**
-  - This will be utilized for cross-character macro sharing in a future update 
+  - This will be utilized for cross-character macro sharing in a future update
