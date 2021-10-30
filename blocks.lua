@@ -255,7 +255,7 @@ mb.BasicBlocks = {
 			["func"] = "USR_EDIT",
 			["template"] = "EditBlockTemplate"
 		},
-	}, --[[
+	},  --[[
 	["SMT"] = {
 		{
 			["groupID"] = "SMT1",
