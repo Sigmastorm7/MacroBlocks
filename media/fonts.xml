@@ -5,48 +5,48 @@
     <!--🖰  🖉  ⛓  🪶  🖍-->
     <!--Arrows: ❬❬ ❭❭ ❮ ❯ ⮈ ⮊ 🢔 🢖 ⮜ ⮞ ⮄⮆ -->
 
-    <Font name="MacroBlockSymbolFont_Normal" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
+    <Font name="MacroBlockSymbolFont_Normal" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
         <Color r="1" g="1" b="1" a="1"/>
         <Shadow x="2" y="-2">
             <Color r="1" g="1" b="1" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlockSymbolFont_Highlight" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
+    <Font name="MacroBlockSymbolFont_Highlight" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
         <Color r="1" g="1" b="0" a="1"/>
         <Shadow x="2" y="-2">
             <Color r="1" g="1" b="1" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlockSymbolFont_Disabled" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
+    <Font name="MacroBlockSymbolFont_Disabled" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
         <Color r="0.55" g="0.55" b="0.55" a="0.55"/>
         <Shadow x="1" y="-2">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlockMonoFont" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="10" virtual="true">
+    <Font name="MacroBlockMonoFont" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansMono\NotoSansMono-SemiBold.ttf" height="10" virtual="true">
         <Color r="1" g="1" b="1" a="1"/>
     </Font>
-    <Font name="MacroBlockSymbolFont" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="16" virtual="true">
+    <Font name="MacroBlockSymbolFont" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansSymbols2-Regular.ttf" height="16" virtual="true">
         <Shadow x="1" y="-2">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlockSymbolFont_Small" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
+    <Font name="MacroBlockSymbolFont_Small" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
         <Shadow x="1" y="-2">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlocksFont" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="11" virtual="true">
+    <Font name="MacroBlocksFont" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansMono\NotoSansMono-SemiBold.ttf" height="11" virtual="true">
         <Shadow x="1" y="-2">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlocksFont_Small" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-ExtraBold.ttf" height="9" virtual="true">
+    <Font name="MacroBlocksFont_Small" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansMono\NotoSansMono-ExtraBold.ttf" height="9" virtual="true">
         <!--<Shadow x="1" y="0">
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>-->
     </Font>
-    <Font name="MacroBlocksFont_Large" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="16" virtual="true">
+    <Font name="MacroBlocksFont_Large" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansMono\NotoSansMono-SemiBold.ttf" height="16" virtual="true">
         <Color r="1" g="1" b="1" a="0.2"/>
         <Shadow x="1" y="-2">
             <Color r="0" g="0" b="0" a="1"/>
