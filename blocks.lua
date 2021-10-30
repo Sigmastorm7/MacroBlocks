@@ -1,6 +1,36 @@
 local addon, mb = ...
 
-mb.ClassColors = {
+mb.USRBackdrop = {
+	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+	tile = true,
+	tileEdge = true,
+	tileSize = 24,
+	edgeSize = 12,
+	insets = { left = 2, right = 2, top = 2, bottom = 2 },
+}
+
+mb.blockBackdrop = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	tile = true,
+	tileEdge = true,
+	tileSize = 24,
+	edgeSize = 12,
+	insets = { left = 2, right = 2, top = 2, bottom = 2 },
+}
+
+mb.stackBackdrop = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background-Maw",
+	edgeFile = "Interface\\FriendsFrame\\UI-Toast-Border",
+	tile = true,
+	tileEdge = true,
+	tileSize = 12,
+	edgeSize = 12,
+	insets = { left = 5, right = 5, top = 5, bottom = 5 },
+}
+
+mb.GroupColors = {
 	["HT"] = { -- HUNTER
 		["hex"] = "ffa9d271",
 		["rgb"] = { 0.6666651964187622, 0.8274491429328918, 0.447057843208313 },
@@ -9,7 +39,7 @@ mb.ClassColors = {
 		["hex"] = "ffc59a6c",
 		["rgb"] = { 0.7764688730239868, 0.6078417897224426, 0.427450031042099 },
 	},
-	["SM"] = { -- SHAMAN
+	["SH"] = { -- SHAMAN
 		["hex"] = "ff006fdc",
 		["rgb"] = { 0,  0.4392147064208984, 0.8666647672653198 },
 	},
@@ -156,7 +186,7 @@ mb.BasicBlocks = {
 			["name"] = "mod",
 			["payload"] = "[mod]",
 			["template"] = "ChoiceBlockTemplate",
-			["func"] = "USER_CHOICE",
+			["func"] = "USR_CHOICE",
 			["choices"] = {
 				{ ["name"] = "shift", ["value"] = 1, },
 				{ ["name"] = "ctrl", ["value"] = 2, },
@@ -215,31 +245,31 @@ mb.BasicBlocks = {
 			["groupID"] = "USR1",
 			["name"] = "socket",
 			["payload"] = "",
-			["func"] = "USER_SOCKET",
+			["func"] = "USR_SOCKET",
 			["template"] = "SocketBlockTemplate"
 		},
 		{
 			["groupID"] = "USR2",
 			["name"] = "custom input",
 			["payload"] = "",
-			["func"] = "USER_EDIT",
+			["func"] = "USR_EDIT",
 			["template"] = "EditBlockTemplate"
 		},
-	},
+	}, --[[
 	["SMT"] = {
 		{
 			["groupID"] = "SMT1",
 			["name"] = "no",
 			-- ["payload"] = "no",
 			["func"] = "NO_CONDITION",
-			["smart"] = {
+			["smt"] = {
 				["palette"] = true,
 				["group"] = "Condition",
 				["hookPayload"] = { 2, "no" },
 				["orphan"] = false,
 			}
 		}
-	}
+	},]]
 }
 
 mb.AdvancedBlocks = {

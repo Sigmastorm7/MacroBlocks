@@ -1,7 +1,7 @@
 local addon, mb = ...
 
 local MakeBlock = mb.MakeBlock
-local classColors = mb.ClassColors
+local groupColors = mb.GroupColors
 
 -- Blizzard API
 local Item = C_Item
@@ -25,15 +25,7 @@ MB_CHOICE_BLOCK_RESET = function(self)
     self.flyout.open = false
 end
 
-UserBlockBackdrop = {
-	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-	tile = true,
-	tileEdge = true,
-	tileSize = 24,
-	edgeSize = 12,
-	insets = { left = 2, right = 2, top = 2, bottom = 2 },
-}
+
 
 -- Generic block handlers
 function MB_OnLoad(self)
@@ -47,7 +39,7 @@ function MB_OnDragStart(self, button)
     self:SetFrameStrata("TOOLTIP")
 
     if self.stacked then
-        if self.group == "Smart" then self.UNHOOK_PAYLOAD() end
+        if self.group == "SMT" then self.UNHOOK_PAYLOAD() end
         mb.Stack.remBlock(self)
     end
 
@@ -65,7 +57,7 @@ function MB_OnDragStop(self)
         if not self.stacked then
             MBPaletteBasic.blocks[self.paletteID] = mb.MakeBlock(self.group, self.data, self.paletteID)
         end
-        if self.group == "Smart" then
+        if self.group == "SMT" then
             if self.ORPHAN() and self.PLACEMENT() then
                 self.STACK() -- mb.Stack.addBlock(self)
             else
@@ -78,26 +70,26 @@ function MB_OnDragStop(self)
         end
     elseif not MouseIsOver(mb.Stack) and self.stacked then
         if self.data.func ~= nil then
-            if self.data.func == "USER_SOCKET" then
+            if self.data.func == "USR_SOCKET" then
                 self.data.payload = ""
                 self.socket.icon:SetColorTexture(0, 0, 0, 0)
-            elseif self.data.func == "USER_EDIT" then
+            elseif self.data.func == "USR_EDIT" then
                 self.data.payload = ""
                 self.edit:SetText("")
-            elseif self.data.func == "USER_CHOICE" then
+            elseif self.data.func == "USR_CHOICE" then
                 self.reset(self)
             end
         end
 
-        if self.smartHook ~= nil then
-            mb.Stack.remBlock(self.smartHook)
+        if self.smtHook ~= nil then
+            mb.Stack.remBlock(self.smtHook)
 
-            mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.smartHook.paletteID])
-            MBPaletteBasic.blocks[self.smartHook.paletteID] = self.smartHook
-            self.smartHook.stacked = false
+            mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.smtHook.paletteID])
+            MBPaletteBasic.blocks[self.smtHook.paletteID] = self.smtHook
+            self.smtHook.stacked = false
 
             self.hooked = false
-            self.smartHook = nil
+            self.smtHook = nil
         end
 
         self.saved = false
@@ -118,18 +110,18 @@ function MB_OnDragStop(self)
     PaletteAdjust()
 end
 
--- User input element handler
-function MB_USER_ELEMENT_OnShow(self)
+-- USR input element handler
+function MB_USR_ELEMENT_OnShow(self)
     -- self.p = self:GetParent()
-    self:SetBackdrop(UserBlockBackdrop)
+    self:SetBackdrop(mb.USRBackdrop)
     self:SetBackdropColor(128/255, 62/255, 5/255)
-    self:SetBackdropBorderColor(unpack(classColors.USR.rgb))
+    self:SetBackdropBorderColor(unpack(groupColors.USR.rgb))
 end
 
--- Smart block generator for specific instances
+-- SMT block generator for specific instances
 --[[local sbData = {}
-local function SmartBlock()
-    local sb = mb.MakeBlock("Command", sbData, -1)
+local function SMTBlock()
+    local sb = mb.MakeBlock("CMD", sbData, -1)
 
     mb.Stack.displace = true
     mb.Stack.displaceID = sb.data.sbIndex
@@ -139,7 +131,7 @@ local function SmartBlock()
 
 end]]
 
--- User socket block handlers
+-- USR socket block handlers
 function MB_SOCKET_OnClick(self, button, down)
     local itemType, name, spellID, itemID, mountID, iconID
 
@@ -173,7 +165,7 @@ function MB_SOCKET_OnClick(self, button, down)
         end
 
         --[[if sbData.make then
-            mb.Stack.addBlock(SmartBlock())
+            mb.Stack.addBlock(SMTBlock())
         end]]
 
 	    self.icon:SetTexture(iconID)
@@ -182,7 +174,7 @@ function MB_SOCKET_OnClick(self, button, down)
     end
 end
 
--- User edit block handlers
+-- USR edit block handlers
 function MB_EDIT_OnTextChanged(self, userInput)
     self.instructions:SetShown(self:GetText() == "")
     self:GetParent().data.payload = self:GetText()
@@ -191,7 +183,14 @@ function MB_EDIT_OnTextChanged(self, userInput)
 end
 
 -- Choice block handlers
-function MB_CHOICE_BLOCK_OnLoad(self) MB_OnLoad(self); self.choiceNum = 0; end
+function MB_CHOICE_BLOCK_OnLoad(self)
+    MB_OnLoad(self)
+    self.choiceNum = 0
+
+    self.backdropFrame:SetBackdrop(mb.USRBackdrop);
+    self.backdropFrame:SetBackdropColor(0, 0.9999977946281433, 0.5960771441459656);
+    self.backdropFrame:SetBackdropBorderColor(0, 0.9999977946281433, 0.5960771441459656);
+end
 
 function MB_CHOICE_BLOCK_OnShow(self)
     self:SetBackdropColor(0, 128/255, 77/255)
