@@ -2,7 +2,8 @@ package-as: MacroBlocks
 
 
 ignore:
+    LICENSE
+    README.md
     Blizzard_MacroUI
     command_DB.lua
-    command_list_backup.lua
     macroblocks.code-workspace
