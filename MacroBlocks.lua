@@ -256,8 +256,8 @@ function StackAdjust(index, xOff, yOff)
 	if index <= #mb.Stack.blocks then
 
 		if (xOff + mb.Stack.blocks[index]:GetWidth()) >= (mb.Stack:GetWidth() - 6) then
-			xOff = 4
-			yOff = yOff - 32
+			xOff = 7
+			yOff = yOff - 30
 		end
 
 		if index == mb.Stack.displaceID and mb.Stack.displace then
