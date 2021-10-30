@@ -29,11 +29,11 @@ mb.ClassColors = {
 		["hex"] = "ff8687ed",
 		["rgb"] = { 0.5294106006622314, 0.5333321690559387, 0.933331310749054 },
 	},
-	["Smart"] = { -- DEMONHUNTER
+	["DEMONHUNTER"] = { -- DEMONHUNTER
 		["hex"] = "ffa22fc8",
 		["rgb"] = { 0.639214277267456,  0.188234880566597, 0.7882335782051086 },
 	},
-	["DEATHKNIGHT"] = { -- DEATHKNIGHT
+	["Smart"] = { -- DEATHKNIGHT
 		["hex"] = "ffc31d39",
 		["rgb"] = { 0.7686257362365723,  0.117646798491478, 0.2274504750967026 },
 	},
@@ -82,10 +82,10 @@ mb.BasicBlocks = {
 		},
 		{	["name"] = "/cleartarget",
 			["payload"] = "/cleartarget",
-		},
+		},--[[
 		{	["name"] = "/targetlasttarget",
 			["payload"] = "/targetlasttarget",
-		},
+		},]]
 		{	["name"] = "/focus",
 			["payload"] = "/focus",
 		},
@@ -97,7 +97,7 @@ mb.BasicBlocks = {
 		},
 		{	["name"] = "/equip",
 			["payload"] = "/eq",
-		},
+		},--[[
 		{	["name"] = "/equipset",
 			["payload"] = "/equipset",
 		},
@@ -109,7 +109,7 @@ mb.BasicBlocks = {
 		},
 		{	["name"] = "/golfclap",
 			["payload"] = "/golfclap",
-		},
+		},]]
 		{	["name"] = "/summonpet",
 			["payload"] = "/sp"
 		},
@@ -124,22 +124,22 @@ mb.BasicBlocks = {
 				{ ["name"] = "ctrl", ["value"] = 2, },
 				{ ["name"] = "alt", ["value"] = 4, },
 			}
-		},
+		},--[[
 		{	["name"] = "combat",
 			["payload"] = "[combat]",
 		},
 		{	["name"] = "exists",
 			["payload"] = "[exists]",
-		},
+		},]]
 		{	["name"] = "help",
 			["payload"] = "[help]",
 		},
 		{	["name"] = "harm",
 			["payload"] = "[harm]",
-		},
+		},--[[
 		{	["name"] = "dead",
 			["payload"] = "[dead]",
-		},
+		},]]
 		{	["name"] = "@mouseover",
 			["payload"] = "[@mouseover]",
 		},
@@ -149,12 +149,12 @@ mb.BasicBlocks = {
 		{	["name"] = "@focus",
 			["payload"] = "[@focus]",
 		},
-	},
+	},--[[
 	["Social"] = {
 		{	["name"] = "AaBbCc",
 			["payload"] = "AaBbCc",
 		},
-	},
+	},]]
 	["User"] = {
 		{	["name"] = "socket",
 			["payload"] = "",
