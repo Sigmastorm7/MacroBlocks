@@ -45,6 +45,7 @@ mb.Stack.string = ""
 mb.Stack.displace = false
 mb.Stack.displaceID = 0
 mb.Stack.undo = ""
+mb.Stack.preserve = false
 
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
@@ -195,7 +196,7 @@ end
 
 function UpdateMacroBlockText()
 
-	if not mb_init then return end
+	if not mb_init or mb.Stack.preserve then return end
 
 	local delim, str
 	local preDelim, postDelim
@@ -357,61 +358,71 @@ mb.Stack.saveBlocks = function()
 end
 ]]
 
-mb.GeneralMacros = {}
-mb.CharacterMacros =  {}
-
 mb.LogEditHistory = function(index, timestamp)
 
-	local name, iconID, body = GetMacroInfo(index)
+	local name, texture, body = GetMacroInfo(index)
 
-	if name ~=nil then
-		if index <= 120 then
-			mb.GeneralMacros[index]["changelog"][timestamp] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body }
-		elseif index > 120 then
-			mb.CharacterMacros[index]["changelog"][timestamp] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body }
-		end
+	-- if name == User
+
+	local t = { ["time"] = timestamp, ["name"] = name, ["texture"] = texture, ["body"] = body }
+
+	if index <= 120 then
+		table.insert(mb.GeneralMacros[index]["changelog"], t)
+	elseif index > 120 then
+		table.insert(mb.CharacterMacros[index]["changelog"], t)
 	end
+
 end
 
 frame:SetScript("OnEvent", function(self, event, arg)
 	if event == "PLAYER_ENTERING_WORLD" then
 
-		if UserGeneralMacros == nil then UserGeneralMacros = {} end
-		if UserCharacterMacros == nil then UserCharacterMacros = {} end
+		if UserMacros == nil then UserMacros = {} end
 
-		mb.CharacterMacros["character"] = PlayerName:GetText()
-		mb.CharacterMacros["realm"] = GetNormalizedRealmName()
+		mb.CharacterID = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
+
+		mb.UserMacros = {
+			["general"] = UserMacros.general or {},
+			[mb.CharacterID] = UserMacros[mb.CharacterID] or {},
+		}
 
 		local numGen, numChar = GetNumMacros()
-		local name, iconID, body
+		local name, texture, body
 		
 		if numGen > 0 then
 			for i=1, numGen do
-				name, iconID, body = GetMacroInfo(i)
+				name, texture, body = GetMacroInfo(i)
 				if name ~= nil then
-					mb.GeneralMacros[i] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body }
+					mb.UserMacros["general"][i] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
 
-					if mb.GeneralMacros[i]["changelog"] == nil then mb.GeneralMacros[i]["changelog"] = {} end
+					if mb.UserMacros["general"][i]["changelog"] == nil then
+						mb.UserMacros["general"][i]["changelog"] = {}
+					end
 				end
 			end
 		end
 	
 		if numChar > 0 then
 			for i=1+120, numChar+120 do
-				name, iconID, body = GetMacroInfo(i)
+				name, texture, body = GetMacroInfo(i)
 				if name ~= nil then
-					mb.CharacterMacros[i] = { ["name"] = name, ["iconID"] = iconID, ["body"] = body }
+					mb.UserMacros[mb.CharacterID][i] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
 				
-					if mb.CharacterMacros[i]["changelog"] == nil then mb.CharacterMacros[i]["changelog"] = {} end
+					if mb.UserMacros[mb.CharacterID][i]["changelog"] == nil then
+						mb.UserMacros[mb.CharacterID][i]["changelog"] = {}
+					end
 				end
 			end
 		end
+
+		
+
 	end
 
 	if event == "PLAYER_LEAVING_WORLD" then
-		UserGeneralMacros = mb.GeneralMacros
-		UserCharacterMacros = mb.CharacterMacros
+		UserMacros = mb.UserMacros
 	end
+
 end)
 
 --@do-not-package@

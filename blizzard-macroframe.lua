@@ -6,6 +6,11 @@ mb.textureLoadGroup:AddTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\
 -- mb.textureLoadGroup:AddTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_highlight.tga")
 mb.textureLoadGroup:AddTexture("Interface\\AddOns\\MacroBlocks\\media\\textures\\gear_disabled.tga")
 
+local MACRO_FRAME_BUTTONS_SETENABLED = function(bool)
+	MacroSaveButton:SetEnabled(bool)
+	MacroCancelButton:SetEnabled(bool)
+end
+
 local MACRO_NAME_ONENTERPRESSED = function(self)
     self:ClearFocus()
 	local index = 1
@@ -25,7 +30,7 @@ end
 
 local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
     local cCount = MacroFrameText:GetNumLetters()
-	MacroFrame.textChanged = 1;
+	MacroFrame.textChanged = 1
 
 	if ( MacroPopupFrame.mode == "new" ) then MacroPopupFrame:Hide(); end
 
@@ -39,6 +44,8 @@ local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
 		MacroFrameCharLimitText:SetTextColor(1, 1, 1, 0.3)
 	end
 
+	MACRO_FRAME_BUTTONS_SETENABLED(true)
+
 	ScrollingEdit_OnTextChanged(self, self:GetParent());
 end
 
@@ -49,11 +56,16 @@ local MACRO_SAVE_ONCLICK = function()
 		block.saved = true
 	end
 
+	MACRO_FRAME_BUTTONS_SETENABLED(false)
+
 end
 
 local MACRO_CANCEL_ONCLICK = function()
+	mb.Stack.preserve = true
+
     local clearBlocks = {}
 	for _, block in pairs(mb.Stack.blocks) do table.insert(clearBlocks, block) end
+
     for _, block in pairs(clearBlocks) do
 		if not block.saved then
 			if block.group == "Smart" then block.UNHOOK_PAYLOAD() end
@@ -61,8 +73,15 @@ local MACRO_CANCEL_ONCLICK = function()
 		    MB_OnDragStop(block)
 	    end
 	end
+
+	MacroFrameText:SetText(mb.UserMacros[mb.CharacterID][MacroFrame.selectedMacro]["body"])
+	MacroFrame.changes = false
+	-- MacroCancelButton:Disable()
+
 	clearBlocks = nil
-	MacroFrameText:SetText(mb.Stack.undo)
+
+	MACRO_FRAME_BUTTONS_SETENABLED(false)
+	mb.Stack.preserve = false
 end
 
 local MACRO_NEW_ONCLICK = function()
@@ -74,6 +93,91 @@ end
 local MACRO_DELETE_ONCLICK = function()
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 	StaticPopup_Show("CONFIRM_DELETE_SELECTED_MACRO")
+end
+
+local MACRO_FRAME_UPDATE = function()
+	local numMacros;
+	local numAccountMacros, numCharacterMacros = GetNumMacros();
+	local macroButtonName, macroButton, macroIcon, macroName;
+	local name, texture, body;
+	local selectedName, selectedBody, selectedIcon;
+
+	if ( MacroFrame.macroBase == 0 ) then
+		numMacros = numAccountMacros;
+	else
+		numMacros = numCharacterMacros;
+	end
+
+	-- Macro List
+	local maxMacroButtons = max(MAX_ACCOUNT_MACROS, MAX_CHARACTER_MACROS);
+	for i=1, maxMacroButtons do
+		macroButtonName = "MacroButton"..i;
+		macroButton = _G[macroButtonName];
+		macroIcon = _G[macroButtonName.."Icon"];
+		macroName = _G[macroButtonName.."Name"];
+		if ( i <= MacroFrame.macroMax ) then
+			if ( i <= numMacros ) then
+				name, texture, body = GetMacroInfo(MacroFrame.macroBase + i);
+				macroIcon:SetTexture(texture);
+				macroName:SetText(name);
+				macroButton:Enable();
+				-- Highlight Selected Macro
+				if ( MacroFrame.selectedMacro and (i == (MacroFrame.selectedMacro - MacroFrame.macroBase)) ) then
+					macroButton:SetChecked(true);
+					MacroFrameSelectedMacroName:SetText(name);
+					MacroFrameText:SetText(body);
+					MacroFrameSelectedMacroButton:SetID(i);
+					MacroFrameSelectedMacroButtonIcon:SetTexture(texture);
+					if (type(texture) == "number") then
+						MacroPopupFrame.selectedIconTexture = texture;
+					elseif (type(texture) == "string") then
+						MacroPopupFrame.selectedIconTexture = gsub( strupper(texture), "INTERFACE\\ICONS\\", "");
+					else
+						MacroPopupFrame.selectedIconTexture = nil;
+					end
+				else
+					macroButton:SetChecked(false);
+				end
+			else
+				macroButton:SetChecked(false);
+				macroIcon:SetTexture("");
+				macroName:SetText("");
+				macroButton:Disable();
+			end
+			macroButton:Show();
+		else
+			macroButton:Hide();
+		end
+	end
+
+	-- Macro Details
+	if ( MacroFrame.selectedMacro ~= nil ) then
+		MacroFrame_ShowDetails();
+		MacroDeleteButton:Enable();
+	else
+		MacroFrame_HideDetails();
+		MacroDeleteButton:Disable();
+	end
+	
+	--Update New Button
+	if ( numMacros < MacroFrame.macroMax ) then
+		MacroNewButton:Enable();
+	else
+		MacroNewButton:Disable();
+	end
+
+	-- Disable Buttons
+	if ( MacroPopupFrame:IsShown() ) then
+		MacroEditButton:Disable();
+		MacroDeleteButton:Disable();
+	else
+		MacroEditButton:Enable();
+		MacroDeleteButton:Enable();
+	end
+
+	if ( not MacroFrame.selectedMacro ) then
+		MacroDeleteButton:Disable();
+	end
 end
 
 local frame = CreateFrame("Frame", nil, UIParent)
@@ -257,9 +361,20 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroSaveButton:HookScript("OnClick", MACRO_SAVE_ONCLICK)
 		MacroCancelButton:HookScript("OnClick", MACRO_CANCEL_ONCLICK)
 
+		MacroFrame_Update = MACRO_FRAME_UPDATE
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
-		MacroFrame:HookScript("OnShow", function() mb.Frame:Show() mb.Init() end)
-		MacroFrame:HookScript("OnHide", function() mb.Frame:Hide() end)
+		MacroFrame:HookScript("OnShow", function()
+			mb.Frame:Show()
+			mb.Init()
+			MacroFrame.changes = false
+			MacroSaveButton:Disable()
+			MFSM.Save:Disable()
+			MacroCancelButton:Disable()
+			MFSM.Cancel:Disable()
+		end)
+		MacroFrame:HookScript("OnHide", function()
+			mb.Frame:Hide()
+		end)
 	end
 end)
