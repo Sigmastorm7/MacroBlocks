@@ -1,27 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 
-    <!--🛈-->
-    <!--🯰🯱🯲🯳🯴🯵🯶🯷🯸🯹-->
-    <!--🖰  🖉  ⛓  -->
-    <!--Arrows: ❬❬ ❭❭ ❮ ❯ ⮈ ⮊ 🢔 🢖 ⮜ ⮞ ⮄⮆  🙲  🙳  🙴  ➠  🗘  🗩  ⚙  -->
-
     <!--Import frame elements from a new file to clean up MacroBlocks.lua a bit-->
     <Script file="scripts.lua"/>
 
 <!--Custom fonts used in the block templates w/ variations for special cases-->
-    <Font name="MacroBlockSymbolFont" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="16" virtual="true">
-        <Shadow x="1" y="-2" r="0" g="0" b="0" a="1"/>
-    </Font>
-    <Font name="MacroBlockSymbolFont_Small" font="Interface\AddOns\MacroBlocks\media\NotoSansSymbols2-Regular.ttf" height="12" virtual="true">
-        <Shadow x="1" y="-2" r="0" g="0" b="0" a="1"/>
-    </Font>
-    <Font name="MacroBlockFont" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-SemiBold.ttf" height="11" virtual="true">
-        <Shadow x="1" y="-2" r="0" g="0" b="0" a="1"/>
-    </Font>
-    <Font name="MacroBlockFont_Small" font="Interface\AddOns\MacroBlocks\media\NotoSansMono\NotoSansMono-ExtraBold.ttf" height="9" virtual="true">
-        <!--<Shadow x="1" y="0" r="0" g="0" b="0" a="1"/>-->
-    </Font> 
-
     <!--Generic block templates-->
     <Frame name="MacroBlockTemplate" enableMouse="true" movable="true" inherits="BackdropTemplate" virtual="true">
         <Size>
@@ -33,7 +15,7 @@
         </KeyValues>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="text" text="BLOCK" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlockFont"> 
+                <FontString parentKey="text" text="BLOCK" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlockFonts"> 
                     <Anchors>
                         <Anchor point="CENTER" x="0" y="-0.5"/>
                     </Anchors>
@@ -121,14 +103,14 @@
             </Layer>
         </Layers>
         <Frames>
-            <EditBox parentKey="edit" autoFocus="false" font="MacroBlockFont_Small" multiLine="false" letters="255" countInvisibleLetters="true" enableMouse="true">
+            <EditBox parentKey="edit" autoFocus="false" font="MacroBlockFonts_Small" multiLine="false" letters="255" countInvisibleLetters="true" enableMouse="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" x="9" y="-3"/>
                     <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-18" y="3"/>
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
-			     	    <FontString parentKey="instructions" text="Custom String" justifyH="LEFT" justifyV="MIDDLE" inherits="MacroBlockFont_Small"  setAllPoints="true">
+			     	    <FontString parentKey="instructions" text="Custom String" justifyH="LEFT" justifyV="MIDDLE" inherits="MacroBlockFonts_Small"  setAllPoints="true">
 			     		    <Color r="0.55" g="0.55" b="0.55"/>
 			     	    </FontString>
 			        </Layer>
@@ -199,14 +181,14 @@
             <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
-    <!--Condition block that allows user to select 1 or more different options-->
+    <!--Block that allows user to select 1 or more different options-->
     <Button name="ChoiceButtonTemplate" enableMouse="true" virtual="true">
         <KeyValues>
             <KeyValue key="enabled" value="false" type="boolean"/>
             <KeyValue key="value" value="0" type="number"/>
         </KeyValues>
         <Size x="24" y="24"/>
-        <ButtonText parentKey="text" setAllPoints="true" inherits="MacroBlockFont"/>
+        <ButtonText parentKey="text" setAllPoints="true" inherits="MacroBlockFonts"/>
         <Scripts>
             <OnLoad function="MB_CHOICE_BUTTON_OnLoad"/>
             <OnClick function="MB_CHOICE_BUTTON_OnClick"/>
@@ -246,7 +228,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
-                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlockFont"> 
+                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlockFonts"> 
                             <Anchors>
                                 <Anchor point="CENTER" x="-0.5" y="-0.5"/>
                             </Anchors>
