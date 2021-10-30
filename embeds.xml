@@ -5,6 +5,6 @@
     <Include file="blocks\block-templates.xml"/>
     <Include file="blizzard-macroframe.lua"/>
     <!--@do-not-package@-->
-    <Include file="command_DB.lua"/>
+    <!--<Include file="command_DB.lua"/>-->
     <!--@end-do-not-package@-->
 </Ui>
