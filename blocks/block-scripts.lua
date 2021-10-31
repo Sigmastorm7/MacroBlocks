@@ -142,7 +142,9 @@ function MB_SOCKET_OnClick(self, button, down)
         itemType, itemID, mountID, spellID = GetCursorInfo()
         if itemType == "spell" then
             name, _, iconID = GetSpellInfo(spellID)
-            self:GetParent().data.payload = name
+
+            mb.Stack.payloadTable[self:GetParent().stackID] = name
+
         elseif itemType == "item" then
             iconID = Item.GetItemIconByID(itemID)
 
@@ -150,24 +152,20 @@ function MB_SOCKET_OnClick(self, button, down)
                 itemType = "toy"
             end
 
-            self:GetParent().data.payload = "item:"..itemID
+            mb.Stack.payloadTable[self:GetParent().stackID] = "item:"..itemID
+
         elseif itemType == "mount" then
             name, _, iconID = Mounts.GetMountInfoByID(itemID)
-            self:GetParent().data.payload = name
+
+            mb.Stack.payloadTable[self:GetParent().stackID] = name
+
         elseif itemType == "battlepet" then
             local petInfo = Pets.GetPetInfoTableByPetID(itemID)
 
             iconID = petInfo.icon
-            self:GetParent().data.payload = petInfo.name
+            mb.Stack.payloadTable[self:GetParent().stackID] = petInfo.name
 
-        -- elseif itemType == "" then
-        -- elseif itemType == "" then
-        -- elseif itemType == "" then
         end
-
-        --[[if sbData.make then
-            mb.Stack.addBlock(SMTBlock())
-        end]]
 
 	    self.icon:SetTexture(iconID)
         ClearCursor()
