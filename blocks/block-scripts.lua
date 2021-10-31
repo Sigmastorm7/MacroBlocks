@@ -7,6 +7,7 @@ local groupColors = mb.GroupColors
 local Item = C_Item
 local Mounts = C_MountJournal
 local Pets = C_PetJournal
+local ToyBox = C_ToyBox
 
 local flyoutWidth = { [true] = 156 }
 local flyoutText = { [false] = "❭❭", [true] = "❬❬" }
