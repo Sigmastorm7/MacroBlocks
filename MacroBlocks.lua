@@ -45,9 +45,9 @@ end
 
 mb.SMTBlock = function(self, smartData)
 
-	local funcTable = {}
+	local ft = {}
 
-	funcTable.GROUPCHECK = function()
+	ft.GROUPCHECK = function()
 		local bool = false
 		for _, block in pairs(mb.Stack.blocks) do
 			bool = bool or block.group == smartData.group
@@ -55,20 +55,20 @@ mb.SMTBlock = function(self, smartData)
 		return bool
 	end
 
-	funcTable.PLACEMENT = function()
+	ft.PLACEMENT = function()
 		if not mb.Stack.displace then return false end
 		return mb.Stack.blocks[mb.Stack.displaceID].group == smartData.group
 	end
 
-	funcTable.HOOK = function()
+	ft.HOOK = function()
 		
 	end
 
-	funcTable.UNHOOK = function()
+	ft.UNHOOK = function()
 		
 	end
 
-	for k, v in pairs(funcTable) do
+	for k, v in pairs(ft) do
 		self[k] = v
 	end
 
