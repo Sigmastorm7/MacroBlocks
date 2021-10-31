@@ -176,9 +176,12 @@ end
 -- USR edit block handlers
 function MB_EDIT_OnTextChanged(self, userInput)
     self.instructions:SetShown(self:GetText() == "")
-    self:GetParent().data.payload = self:GetText()
+    if userInput then
+        mb.Stack.payloadTable[self:GetParent().stackID] = self:GetText()
+        UpdateMacroBlockText()
+    end
 
-    if userInput then UpdateMacroBlockText() end
+    -- if userInput then  end
 end
 
 -- Choice block handlers
