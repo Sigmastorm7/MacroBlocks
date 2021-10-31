@@ -263,7 +263,7 @@ mb.BasicBlocks = {
 		{
 			["groupID"] = "SMT1",
 			["name"] = "no",
-			["payload"] = "no",
+			["payload"] = "[no",
 			["smartData"] = {
 				["hooks"] = { 1, },
 				["palette"] = true,
@@ -273,7 +273,7 @@ mb.BasicBlocks = {
 		{
 			["groupID"] = "SMT2",
 			["name"] = "and",
-			["payload"] = ", ",
+			["payload"] = ",",
 			["smartData"] = {
 				["hooks"] = { -1, 1, },
 				["palette"] = true,

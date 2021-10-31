@@ -42,7 +42,6 @@ function MB_OnDragStart(self, button)
     mb.Frame.dragging = self
     StackDisplaceSetup()
     -- mb.Stack:SetScript("OnUpdate", StackDisplaceSetup)
-
 end
 
 function MB_OnDragStop(self)
@@ -78,6 +77,12 @@ function MB_OnDragStop(self)
             end
         end
 
+        if self.hooked then
+            self.hooker.UNHOOK(self.stackID)
+        end
+
+
+        --[[
         if self.hooker ~= nil then
             mb.Stack.remBlock(self.hooker)
 
@@ -88,11 +93,12 @@ function MB_OnDragStop(self)
             self.hooked = false
             self.hooker = nil
         end
-
-        self.saved = false
+        ]]
 
         mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.paletteID])
         MBPaletteBasic.blocks[self.paletteID] = self
+
+        self.saved = false
         self.stacked = false
     end
 
