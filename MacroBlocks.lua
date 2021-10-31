@@ -29,6 +29,7 @@ mb.Stack.displace = false
 mb.Stack.displaceID = 0
 mb.Stack.undo = ""
 mb.Stack.preserve = false
+mb.Stack.payloadTable = {}
 
 mb.BlockPoolCollection = CreateFramePoolCollection()
 
@@ -163,7 +164,8 @@ local function delimSwitch(index, block)
 	bool = bool or index == 1
 	bool = bool or #mb.Stack.blocks == 1
 	bool = bool or mb.Stack.blocks[index-1].group == "SMT"
-	bool = bool or block.group == "Condition" and mb.Stack.blocks[index-1].group == "Condition"
+	bool = bool or block.group == "CON" and mb.Stack.blocks[index-1].group == "CON"
+	bool = bool or block.stackOffset.x == 7
 	-- bool = bool or index == #mb.Stack.blocks
 	-- bool = bool or 
 	-- bool = bool or 
@@ -181,31 +183,31 @@ function UpdateMacroBlockText()
 
 	if not mb_init or mb.Stack.preserve then return end
 
-	local delim, str
+	local delim -- , str
 	local preDelim, postDelim
 
 	mb.Stack.string = ""
+
+	for i, str in pairs(mb.Stack.payloadTable) do
+		delim = delimSwitch(i, mb.Stack.blocks[i])
+		mb.Stack.string = mb.Stack.string..delim..str
+	end
+
+--[[
 	mb.Stack.sTable = {}
-
 	for i, block in pairs(mb.Stack.blocks) do
-
 		if block.group ~= "SMT" then
-
 			mb.Stack.sTable[block.stackID] = block.data.payload
-
 			delim = delimSwitch(i, block)
-
 			if block.hooked then
 				str = mb.Stack.blocks[i-1].HOOK_PAYLOAD(block.data.payload)
 			else
 				str = block.data.payload
 			end
-
 			mb.Stack.string = mb.Stack.string..delim..str
-
 		end
-
 	end
+]]
 	MacroFrameText:SetText(mb.Stack.string)
 end
 
@@ -255,6 +257,8 @@ function StackAdjust(index, xOff, yOff)
 
 		mb.Stack.blocks[index]:ClearAllPoints()
 		mb.Stack.blocks[index]:SetPoint("TOPLEFT", mb.Stack, "TOPLEFT", xOff, yOff)
+		
+		mb.Stack.blocks[index].stackOffset = { ["x"] = xOff, ["y"] = yOff }
 		xOff = xOff + mb.Stack.blocks[index]:GetWidth()
 
 		-- Creates a new line if the updated block is utility block with the NEW_LINE flag
@@ -303,8 +307,10 @@ mb.Stack.addBlock = function(block)
 
 	if mb.Stack.displace then
 		table.insert(mb.Stack.blocks, mb.Stack.displaceID, block)
+		table.insert(mb.Stack.payloadTable, mb.Stack.displaceID, block.data.payload)
 	else
 		table.insert(mb.Stack.blocks, block)
+		table.insert(mb.Stack.payloadTable, block.data.payload)
 	end
 
 	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
@@ -317,6 +323,7 @@ mb.Stack.remBlock = function(block)
 	block:SetParent(MBPaletteBasic)
 
 	table.remove(mb.Stack.blocks, block.stackID)
+	table.remove(mb.Stack.payloadTable, block.stackID)
 
 	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
 	StackAdjust()
