@@ -1,8 +1,8 @@
 ## Interface: 90100
 ## Title: MacroBlocks
 ## Author: Siggy
-## Version: 1.0.1
-## Notes:
+## Version: 1.0.2
+## Notes: Easily create macros with drag'n'drop blocks
 
 ## SavedVariables: UserMacros, MacroChangelog
 

@@ -1,4 +1,8 @@
 # Macro Blocks Changelog
+## 1.0.2-Release
+#### Fixed
+- Multiple socket blocks, edit blocks, or mod blocks will no longer overwrite each other
+
 ## 1.0.1-Release
 #### Fixed
 - [ mod ] block now properly shifts adjacent blocks when opened/closed

@@ -138,7 +138,9 @@ function MB_SOCKET_OnClick(self, button, down)
         itemType, itemID, mountID, spellID = GetCursorInfo()
         if itemType == "spell" then
             name, _, iconID = GetSpellInfo(spellID)
-            self:GetParent().data.payload = name
+
+            mb.Stack.payloadTable[self:GetParent().stackID] = name
+
         elseif itemType == "item" then
             iconID = Item.GetItemIconByID(itemID)
 
@@ -146,24 +148,20 @@ function MB_SOCKET_OnClick(self, button, down)
                 itemType = "toy"
             end
 
-            self:GetParent().data.payload = "item:"..itemID
+            mb.Stack.payloadTable[self:GetParent().stackID] = "item:"..itemID
+
         elseif itemType == "mount" then
             name, _, iconID = Mounts.GetMountInfoByID(itemID)
-            self:GetParent().data.payload = name
+
+            mb.Stack.payloadTable[self:GetParent().stackID] = name
+
         elseif itemType == "battlepet" then
             local petInfo = Pets.GetPetInfoTableByPetID(itemID)
 
             iconID = petInfo.icon
-            self:GetParent().data.payload = petInfo.name
+            mb.Stack.payloadTable[self:GetParent().stackID] = petInfo.name
 
-        -- elseif itemType == "" then
-        -- elseif itemType == "" then
-        -- elseif itemType == "" then
         end
-
-        --[[if sbData.make then
-            mb.Stack.addBlock(SMTBlock())
-        end]]
 
 	    self.icon:SetTexture(iconID)
         ClearCursor()
@@ -174,9 +172,12 @@ end
 -- USR edit block handlers
 function MB_EDIT_OnTextChanged(self, userInput)
     self.instructions:SetShown(self:GetText() == "")
-    self:GetParent().data.payload = self:GetText()
+    if userInput then
+        mb.Stack.payloadTable[self:GetParent().stackID] = self:GetText()
+        UpdateMacroBlockText()
+    end
 
-    if userInput then UpdateMacroBlockText() end
+    -- if userInput then  end
 end
 
 -- Choice block handlers
@@ -241,6 +242,8 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
         p.choiceNum = p.choiceNum - self.value
     end
 
+    mb.Stack.payloadTable[p.stackID] = modCase[p.choiceNum] or "[mod]"
+    UpdateMacroBlockText()
     self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
 
     p.data.payload = modCase[p.choiceNum] or "[mod]"
