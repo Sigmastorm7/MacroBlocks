@@ -166,14 +166,7 @@ local function delimSwitch(index, block)
 	bool = bool or mb.Stack.blocks[index-1].group == "SMT"
 	bool = bool or block.group == "CON" and mb.Stack.blocks[index-1].group == "CON"
 	bool = bool or block.stackOffset.x == 7
-	-- bool = bool or index == #mb.Stack.blocks
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
+	bool = bool or block.data.name == ";"
 
 	if bool then return "" else return " " end
 
