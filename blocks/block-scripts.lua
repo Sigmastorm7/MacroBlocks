@@ -214,6 +214,8 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
     self.text:SetText(flyoutText[self.open])
 
     p:SetWidth(flyoutWidth[self.open] or p.origWidth)
+
+    StackAdjust()
 end
 
 function MB_CHOICE_BUTTON_OnLoad(self)
