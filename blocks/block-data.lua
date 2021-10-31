@@ -146,14 +146,14 @@ mb.BasicBlocks = {
 			["groupID"] = "CMD6",
 			["name"] = "/clearfocus",
 			["payload"] = "/clearfocus",
-		},
+		},--[[
 		{
 			["groupID"] = "CMD7",
 			["name"] = "/assist",
 			["payload"] = "/a",
-		},
+		},]]
 		{
-			["groupID"] = "CMD8",
+			["groupID"] = "CMD7",
 			["name"] = "/equip",
 			["payload"] = "/eq",
 		},--[[
@@ -178,7 +178,7 @@ mb.BasicBlocks = {
 			["payload"] = "/golfclap",
 		},]]
 		{
-			["groupID"] = "CMD9",
+			["groupID"] = "CMD8",
 			["name"] = "/summonpet",
 			["payload"] = "/sp"
 		},
