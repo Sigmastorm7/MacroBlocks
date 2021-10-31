@@ -243,7 +243,7 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
         p.choiceNum = p.choiceNum - self.value
     end
 
-    p.data.payload = modCase[p.choiceNum] or "[mod]"
+    mb.Stack.payloadTable[p.stackID] = modCase[p.choiceNum] or "[mod]"
     UpdateMacroBlockText()
     self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
 end
