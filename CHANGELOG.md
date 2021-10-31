@@ -1,4 +1,9 @@
 # Macro Blocks Changelog
+## 1.0.1-Release
+#### Fixed
+- **[ mod ] block now properly shifts adjacent blocks when opened/closed**
+- **socket block will not throw errors when toys are dropped on it**
+
 ## 1.0.0-Release
 #### Added
 - **20 blocks for the initial release with many more to come**
