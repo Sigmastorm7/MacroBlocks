@@ -37,13 +37,11 @@ function MB_OnDragStart(self, button)
     self:StartMoving()
     self:SetFrameStrata("TOOLTIP")
 
-    if self.stacked then
-        if self.group == "SMT" then self.UNHOOK_PAYLOAD() end
-        mb.Stack.remBlock(self)
-    end
+    if self.stacked then mb.Stack.remBlock(self) end
 
     mb.Frame.dragging = self
-    mb.Stack:SetScript("OnUpdate", StackDisplaceCheck)
+    StackDisplaceSetup()
+    -- mb.Stack:SetScript("OnUpdate", StackDisplaceSetup)
 
 end
 
@@ -57,8 +55,8 @@ function MB_OnDragStop(self)
             MBPaletteBasic.blocks[self.paletteID] = mb.MakeBlock(self.group, self.data, self.paletteID)
         end
         if self.group == "SMT" then
-            if self.ORPHAN() and self.PLACEMENT() then
-                self.STACK() -- mb.Stack.addBlock(self)
+            if self.GROUPCHECK() and self.PLACEMENT() then
+                mb.Stack.addBlock(self)
             else
                 mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.paletteID])
                 MBPaletteBasic.blocks[self.paletteID] = self
@@ -80,15 +78,15 @@ function MB_OnDragStop(self)
             end
         end
 
-        if self.smtHook ~= nil then
-            mb.Stack.remBlock(self.smtHook)
+        if self.hooker ~= nil then
+            mb.Stack.remBlock(self.hooker)
 
-            mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.smtHook.paletteID])
-            MBPaletteBasic.blocks[self.smtHook.paletteID] = self.smtHook
-            self.smtHook.stacked = false
+            mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.hooker.paletteID])
+            MBPaletteBasic.blocks[self.hooker.paletteID] = self.hooker
+            self.hooker.stacked = false
 
             self.hooked = false
-            self.smtHook = nil
+            self.hooker = nil
         end
 
         self.saved = false
@@ -243,7 +241,9 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
         p.choiceNum = p.choiceNum - self.value
     end
 
-    p.data.payload = modCase[p.choiceNum] or "[mod]"
-    UpdateMacroBlockText()
     self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
+
+    p.data.payload = modCase[p.choiceNum] or "[mod]"
+
+    UpdatePayloadTable()
 end

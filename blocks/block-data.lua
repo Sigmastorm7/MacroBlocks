@@ -263,15 +263,23 @@ mb.BasicBlocks = {
 		{
 			["groupID"] = "SMT1",
 			["name"] = "no",
-			-- ["payload"] = "no",
-			["func"] = "NO_CONDITION",
-			["smt"] = {
+			["payload"] = "no",
+			["smartData"] = {
+				["hooks"] = { 1, },
 				["palette"] = true,
 				["group"] = "CON",
-				["hookPayload"] = { 2, "no" },
-				["orphan"] = false,
 			}
-		}
+		},
+		{
+			["groupID"] = "SMT2",
+			["name"] = "and",
+			["payload"] = ", ",
+			["smartData"] = {
+				["hooks"] = { -1, 1, },
+				["palette"] = true,
+				["group"] = "CON",
+			}
+		},
 	},
 }
 
