@@ -23,7 +23,7 @@ mb.Stack.Instructions:SetFontObject("MacroBlocksFont_Large")
 mb.Stack.Instructions:SetText("Drag & Drop Blocks Here")
 
 mb.Stack.blocks = {}
-mb.Stack.sTable = {}
+mb.Stack.payloadTable = {}
 mb.Stack.string = ""
 mb.Stack.displace = false
 mb.Stack.displaceID = 0
@@ -43,48 +43,33 @@ for i=1, #templates do
 	mb.BlockPoolCollection:CreatePool(templates[i].type, MBPaletteBasic, templates[i].name)
 end
 
-mb.SMTBlock = function(sBlock, smt)
+mb.SMTBlock = function(self, smartData)
 
 	local funcTable = {}
 
-	if not smt.orphan then
-		funcTable.ORPHAN = function()
-			local bool = false
-			for _, block in pairs(mb.Stack.blocks) do
-				bool = bool or block.group == smt.group
-			end
-			return bool
+	funcTable.GROUPCHECK = function()
+		local bool = false
+		for _, block in pairs(mb.Stack.blocks) do
+			bool = bool or block.group == smartData.group
 		end
+		return bool
 	end
 
 	funcTable.PLACEMENT = function()
 		if not mb.Stack.displace then return false end
-		return mb.Stack.blocks[mb.Stack.displaceID].group == smt.group
+		return mb.Stack.blocks[mb.Stack.displaceID].group == smartData.group
 	end
 
-	if smt.hookPayload ~= nil then
-		local index = smt.hookPayload[1]
-		local str = smt.hookPayload[2]
-
-		funcTable.HOOK_PAYLOAD = function(payload)
-			return string.sub(payload, index-1, index-1)..str..string.sub(payload, index)
-		end
-
-		funcTable.UNHOOK_PAYLOAD = function()
-			mb.Stack.blocks[sBlock.stackID+1].hooked = false
-			UpdateMacroBlockText()
-		end
+	funcTable.HOOK = function()
+		
 	end
 
-	funcTable.STACK = function()
-		mb.Stack.addBlock(sBlock)
-		mb.Stack.blocks[sBlock.stackID+1].hooked = true
-		mb.Stack.blocks[sBlock.stackID+1].smtHook = sBlock
-		UpdateMacroBlockText()
+	funcTable.UNHOOK = function()
+		
 	end
 
 	for k, v in pairs(funcTable) do
-		sBlock[k] = v
+		self[k] = v
 	end
 
 end
@@ -132,11 +117,15 @@ mb.MakeBlock = function(group, data, paletteID)
 	end
 
 	if group == "SMT" then
-		b.smtFunc = mb.SMTBlock(b, data.smt)
+		mb.SMTBlock(b, data.smartData)
 	end
 
 	b.group = group
 	b.data = data
+
+	if group == "CON" then
+		b.data.hookedPayload = string.sub(data.payload, 2, string.len(data.payload) -1)
+	end
 
 	b.paletteID = paletteID or #MBPaletteBasic.blocks + 1
 
@@ -163,18 +152,10 @@ local function delimSwitch(index, block)
 	bool = bool or index == 1
 	bool = bool or #mb.Stack.blocks == 1
 	bool = bool or mb.Stack.blocks[index-1].group == "SMT"
-	bool = bool or block.group == "Condition" and mb.Stack.blocks[index-1].group == "Condition"
-	-- bool = bool or index == #mb.Stack.blocks
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
-	-- bool = bool or 
+	bool = bool or block.group == "CON" and mb.Stack.blocks[index-1].group == "CON"
+	bool = bool or mb.Stack.payloadTable[i] == ""
 
 	if bool then return "" else return " " end
-
 end
 
 function UpdateMacroBlockText()
@@ -185,20 +166,22 @@ function UpdateMacroBlockText()
 	local preDelim, postDelim
 
 	mb.Stack.string = ""
-	mb.Stack.sTable = {}
 
+	for _, payload in pairs(mb.Stack.payloadTable) do
+		mb.Stack.string = mb.Stack.string..payload
+	end
+
+	--[[
 	for i, block in pairs(mb.Stack.blocks) do
 
+		delim = delimSwitch(i, block)
+
 		if block.group ~= "SMT" then
-
-			mb.Stack.sTable[block.stackID] = block.data.payload
-
-			delim = delimSwitch(i, block)
 
 			if block.hooked then
 				str = mb.Stack.blocks[i-1].HOOK_PAYLOAD(block.data.payload)
 			else
-				str = block.data.payload
+				str = mb.Stack.payloadTable[block.stackID]
 			end
 
 			mb.Stack.string = mb.Stack.string..delim..str
@@ -206,7 +189,35 @@ function UpdateMacroBlockText()
 		end
 
 	end
+	]]
 	MacroFrameText:SetText(mb.Stack.string)
+end
+
+function UpdatePayloadTable()
+	for i, block in pairs(mb.Stack.blocks) do
+		if not block.hooked then
+			mb.Stack.payloadTable[i] = block.data.payload
+		else
+			mb.Stack.payloadTable[i] = block.data.hookedPayload
+		end
+	end
+
+	--[[
+	if #hooks > 0 then
+		for hooker, _ in pairs(hooks) do
+			local hookIDs = hooker.data.smt.hooks
+			if #hookIDs == 2 then
+				mb.Stack.payloadTable[] = "["..mb.Stack.payloadTable[]
+				mb.Stack.payloadTable[] = mb.Stack.payloadTable[].."]"
+			else
+				mb.Stack.payloadTable[] = "["..mb.Stack.payloadTable[]
+				mb.Stack.payloadTable[] = mb.Stack.payloadTable[].."]"
+			end
+		end
+	end
+	]]
+
+	UpdateMacroBlockText()
 end
 
 function PaletteAdjust(index, xOff, yOff)
@@ -266,15 +277,14 @@ function StackAdjust(index, xOff, yOff)
 		
 		StackAdjust(index + 1, xOff, yOff)
 	else
-		UpdateMacroBlockText()
+		UpdatePayloadTable()
 		return
 	end
 end
 
-function StackDisplaceCheck(self)
+local function StackDisplaceCheck(self)
 	-- Escapes
-	if not MouseIsOver(mb.Stack) then return end
-	if #mb.Stack.blocks == 0 then return end
+	if not MouseIsOver(mb.Stack) or #mb.Stack.blocks == 0 then return end
 
 	local bool = false
 	local dist = 0
@@ -282,9 +292,20 @@ function StackDisplaceCheck(self)
 	for index, block in pairs(mb.Stack.blocks) do
 		if block.displaced then dist = 32 end
 		if MouseIsOver(block, 0, 0, -(16+dist), -block:GetWidth()+16) then
-			mb.Stack.displaceID = index
-			block.displaced = true
-			bool = bool or true
+			if mb.Stack.dragIsSmart then
+				if string.sub(block.data.groupID, 1, 3) == mb.Stack.dragGroup then
+					mb.Stack.displaceID = index
+					block.displaced = true
+					bool = bool or true
+				else
+					block.displaced = false
+					bool = bool or false
+				end
+			else
+				mb.Stack.displaceID = index
+				block.displaced = true
+				bool = bool or true
+			end
 		else
 			block.displaced = false
 			bool = bool or false
@@ -296,6 +317,18 @@ function StackDisplaceCheck(self)
 	StackAdjust()
 end
 
+function StackDisplaceSetup()
+	if string.sub(mb.Frame.dragging.data.groupID, 1, 3) == "SMT" then
+		mb.Stack.dragIsSmart = true
+		mb.Stack.dragGroup = mb.Frame.dragging.data.smt.group
+	else
+		mb.Stack.dragIsSmart = false
+		mb.Stack.dragGroup = nil
+	end
+
+	mb.Stack:SetScript("OnUpdate", StackDisplaceCheck)
+end
+
 mb.Stack.addBlock = function(block)
 	block:SetParent(mb.Stack)
 	block.stacked = true
@@ -303,11 +336,18 @@ mb.Stack.addBlock = function(block)
 
 	if mb.Stack.displace then
 		table.insert(mb.Stack.blocks, mb.Stack.displaceID, block)
+		-- table.insert(mb.Stack.payloadTable, mb.Stack.displaceID, block.data.payload)
 	else
 		table.insert(mb.Stack.blocks, block)
+		-- table.insert(mb.Stack.payloadTable, block.data.payload)
 	end
 
-	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
+	for id, b in pairs(mb.Stack.blocks) do
+		b.stackID = id
+	end
+
+	if block.group == "SMT" then block.HOOK() end
+
 	StackAdjust()
 
 	mb.Stack.Instructions:Hide()
@@ -317,6 +357,11 @@ mb.Stack.remBlock = function(block)
 	block:SetParent(MBPaletteBasic)
 
 	table.remove(mb.Stack.blocks, block.stackID)
+	-- table.remove(mb.Stack.payloadTable, block.stackID)
+
+	if block.group == "SMT" then block.UNHOOK() end
+
+	block.stackID = nil
 
 	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
 	StackAdjust()
