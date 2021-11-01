@@ -114,8 +114,11 @@ mb.BasicBlocks = {
 			["name"] = "/equipslot",
 			["payload"] = "/equipslot",
 		},{
-			["name"] = "/targetlasttarget",
-			["payload"] = "/targetlasttarget",
+			["name"] = "/targetfriend",
+			["payload"] = "/targetfriend",
+		},{
+			["name"] = "/targetenemy",
+			["payload"] = "/targetenemy",
 		},--[[{
 			["name"] = "/click",
 			["payload"] = "/click",
