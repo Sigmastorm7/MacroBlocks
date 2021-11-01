@@ -26,8 +26,6 @@ MB_CHOICE_BLOCK_RESET = function(self)
     self.flyout.open = false
 end
 
-
-
 -- Generic block handlers
 function MB_OnLoad(self)
     self:SetClampedToScreen(true)
@@ -39,14 +37,13 @@ function MB_OnDragStart(self, button)
     self:StartMoving()
     self:SetFrameStrata("TOOLTIP")
 
-    if self.stacked then
-        if self.group == "SMT" then self.UNHOOK_PAYLOAD() end
+    if self.InStack then
+        if self.group == "SMT" then self.UNHOOK() end
         mb.Stack.remBlock(self)
     end
 
     mb.Frame.dragging = self
     mb.Stack:SetScript("OnUpdate", StackDisplaceCheck)
-
 end
 
 function MB_OnDragStop(self)
@@ -55,21 +52,21 @@ function MB_OnDragStop(self)
 	self:SetUserPlaced(false)
 
     if MouseIsOver(mb.Stack) then
-        if not self.stacked then
-            MBPaletteBasic.blocks[self.paletteID] = mb.MakeBlock(self.group, self.data, self.paletteID)
+        if not self.InStack then
+            mb.Palette.blocks[self.PaletteID] = mb.MakeBlock(self.group, self.data, self.PaletteID)
         end
-        if self.group == "SMT" then
+        if self.group ~= "SMT" then
+            mb.Stack.addBlock(self)
+        elseif self.group == "SMT" then
             if self.ORPHAN() and self.PLACEMENT() then
                 self.STACK() -- mb.Stack.addBlock(self)
             else
-                mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.paletteID])
-                MBPaletteBasic.blocks[self.paletteID] = self
-                self.stacked = false
+                mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
+                mb.Palette.blocks[self.PaletteID] = self
+                self.InStack = false -- self.InStack = false
             end
-        else
-            mb.Stack.addBlock(self)
         end
-    elseif not MouseIsOver(mb.Stack) and self.stacked then
+    elseif not MouseIsOver(mb.Stack) and self.InStack then
         if self.data.func ~= nil then
             if self.data.func == "USR_SOCKET" then
                 self.data.payload = ""
@@ -82,22 +79,22 @@ function MB_OnDragStop(self)
             end
         end
 
-        if self.smtHook ~= nil then
-            mb.Stack.remBlock(self.smtHook)
+        --[[if self.smtHook ~= nil then
+            mmb.Stack.remBlock(self.smtHook)
 
-            mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.smtHook.paletteID])
-            MBPaletteBasic.blocks[self.smtHook.paletteID] = self.smtHook
-            self.smtHook.stacked = false
+            mb.BlockPoolCollection:Release(mb.Palette.blocks[self.smtHook.PaletteID])
+            mb.Palette.blocks[self.smtHook.PaletteID] = self.smtHook
+            self.smtHook.InStack = false
 
             self.hooked = false
             self.smtHook = nil
-        end
+        end]]
 
         self.saved = false
 
-        mb.BlockPoolCollection:Release(MBPaletteBasic.blocks[self.paletteID])
-        MBPaletteBasic.blocks[self.paletteID] = self
-        self.stacked = false
+        mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
+        mb.Palette.blocks[self.PaletteID] = self
+        self.InStack = false
     end
 
     mb.Frame.dragging = nil
@@ -107,8 +104,8 @@ function MB_OnDragStop(self)
     mb.Stack.displace = false
     mb.Stack.displaceID = 0
 
-    if self.stacked then StackAdjust() end
-    PaletteAdjust()
+    if self.InStack then mb.StackAdjust() end
+    mb.PaletteAdjust()
 end
 
 -- USR input element handler
@@ -143,7 +140,7 @@ function MB_SOCKET_OnClick(self, button, down)
         if itemType == "spell" then
             name, _, iconID = GetSpellInfo(spellID)
 
-            mb.Stack.payloadTable[self:GetParent().stackID] = name
+            mb.Stack.payloadTable[self:GetParent().StackID] = name
 
         elseif itemType == "item" then
             iconID = Item.GetItemIconByID(itemID)
@@ -152,18 +149,18 @@ function MB_SOCKET_OnClick(self, button, down)
                 itemType = "toy"
             end
 
-            mb.Stack.payloadTable[self:GetParent().stackID] = "item:"..itemID
+            mb.Stack.payloadTable[self:GetParent().StackID] = "item:"..itemID
 
         elseif itemType == "mount" then
             name, _, iconID = Mounts.GetMountInfoByID(itemID)
 
-            mb.Stack.payloadTable[self:GetParent().stackID] = name
+            mb.Stack.payloadTable[self:GetParent().StackID] = name
 
         elseif itemType == "battlepet" then
             local petInfo = Pets.GetPetInfoTableByPetID(itemID)
 
             iconID = petInfo.icon
-            mb.Stack.payloadTable[self:GetParent().stackID] = petInfo.name
+            mb.Stack.payloadTable[self:GetParent().StackID] = petInfo.name
 
         end
 
@@ -177,7 +174,7 @@ end
 function MB_EDIT_OnTextChanged(self, userInput)
     self.instructions:SetShown(self:GetText() == "")
     if userInput then
-        mb.Stack.payloadTable[self:GetParent().stackID] = self:GetText()
+        mb.Stack.payloadTable[self:GetParent().StackID] = self:GetText()
         UpdateMacroBlockText()
     end
 
@@ -202,7 +199,7 @@ end
 function MB_CHOICE_FlyoutOnClick(self, button, down)
     local p = self:GetParent()
 
-    if not p.stacked then return end
+    if not p.InStack then return end
 
     if button == nil then
         self.open = true
@@ -216,7 +213,7 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
 
     p:SetWidth(flyoutWidth[self.open] or p.origWidth)
 
-    StackAdjust()
+    mb.StackAdjust()
 end
 
 function MB_CHOICE_BUTTON_OnLoad(self)
@@ -246,7 +243,7 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
         p.choiceNum = p.choiceNum - self.value
     end
 
-    mb.Stack.payloadTable[p.stackID] = modCase[p.choiceNum] or "[mod]"
+    mb.Stack.payloadTable[p.StackID] = modCase[p.choiceNum] or "[mod]"
     UpdateMacroBlockText()
     self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
 end

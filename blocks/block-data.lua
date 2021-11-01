@@ -176,12 +176,12 @@ mb.BasicBlocks = {
 			["groupID"] = "CMD#",
 			["name"] = "/golfclap",
 			["payload"] = "/golfclap",
-		},]]
+		},
 		{
 			["groupID"] = "CMD8",
 			["name"] = "/summonpet",
 			["payload"] = "/sp"
-		},
+		},]]
 	},
 	["CON"] = {
 		{

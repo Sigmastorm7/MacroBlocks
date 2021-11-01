@@ -28,83 +28,6 @@ local MACRO_NAME_ONESCAPEPRESSED = function(self)
 	MacroPopupFrame.selectedIcon = nil
 end
 
-local MACRO_TEXT_ONTEXTCHANGED = function(self, userInput)
-    local cCount = MacroFrameText:GetNumLetters()
-	MacroFrame.textChanged = 1
-
-	if ( MacroPopupFrame.mode == "new" ) then MacroPopupFrame:Hide(); end
-
-	MacroFrameCharLimitText:SetText("["..cCount.."/255]")
-
-	if cCount >= 170 and cCount < 210 then
-		MacroFrameCharLimitText:SetTextColor(1, 1, 0, 0.4)
-	elseif cCount >= 210 then
-		MacroFrameCharLimitText:SetTextColor(1, 0, 0, 0.5)
-	else
-		MacroFrameCharLimitText:SetTextColor(1, 1, 1, 0.3)
-	end
-
-	MACRO_FRAME_BUTTONS_SETENABLED(true)
-
-	ScrollingEdit_OnTextChanged(self, self:GetParent());
-end
-
-local MACRO_SAVE_ONCLICK = function()
-	-- mb.LogEditHistory(MacroFrame.selectedMacro, date("%y-%m-%d_%X"))
-
-	for _, block in pairs(mb.Stack.blocks) do
-		block.saved = true
-	end
-
-	if MacroFrame.selectedMacro > 120 then
-		mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
-	else
-		mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
-	end
-
-	MACRO_FRAME_BUTTONS_SETENABLED(false)
-
-end
-
-local MACRO_CANCEL_ONCLICK = function()
-	mb.Stack.preserve = true
-
-    local clearBlocks = {}
-	for _, block in pairs(mb.Stack.blocks) do table.insert(clearBlocks, block) end
-
-    for _, block in pairs(clearBlocks) do
-		if not block.saved then
-			if block.group == "SMT" then block.UNHOOK_PAYLOAD() end
-  			mb.Stack.remBlock(block)
-		    MB_OnDragStop(block)
-	    end
-	end
-
-
-	if MacroFrame.selectedMacro > 120 then
-		MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"])
-	else
-		MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro]["body"])
-	end
-	MacroFrame.changes = false
-
-	clearBlocks = nil
-	
-	mb.Stack.preserve = false
-	MACRO_FRAME_BUTTONS_SETENABLED(false)
-end
-
-local MACRO_NEW_ONCLICK = function()
-	MacroFrame_SaveMacro()
-	MacroPopupFrame.mode = "new"
-	MacroPopupFrame:Show()
-end
-
-local MACRO_DELETE_ONCLICK = function()
-	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-	StaticPopup_Show("CONFIRM_DELETE_SELECTED_MACRO")
-end
-
 local MACRO_FRAME_UPDATE = function()
 	local numMacros;
 	local numAccountMacros, numCharacterMacros = GetNumMacros();
@@ -322,7 +245,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.New:SetSize(86, 28)
 		MFSM.New:SetText("New")
 
-		MFSM.Copy=CreateFrame("Button", "$parentCopy", mb.Frame, "SharedButtonTemplate")
+		-- MFSM.Copy=CreateFrame("Button", "$parentCopy", mb.Frame, "SharedButtonTemplate")
 
 		MFSM.Name.Left:SetAtlas("auctionhouse-ui-inputfield-left"); MFSM.Name.Left:SetSize(8, 28); MFSM.Name.Left:SetPoint("LEFT", -8, -2)
 		MFSM.Name.Right:SetAtlas("auctionhouse-ui-inputfield-right"); MFSM.Name.Right:SetSize(8, 28); MFSM.Name.Right:SetPoint("RIGHT", 0, -2)
@@ -339,11 +262,11 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroNewButton = MFSM.New
 
 		-- Palette frame positioning
-		MBPaletteBasic:SetPoint("TOPLEFT", MacroFrame.Inset, "TOPRIGHT", 2, 0)
-		MBPaletteBasic:SetPoint("BOTTOMRIGHT", MacroFrameTextBackground, "BOTTOMRIGHT", 262, 2)
+		mb.Palette:SetPoint("TOPLEFT", MacroFrame.Inset, "TOPRIGHT", 2, 0)
+		mb.Palette:SetPoint("BOTTOMRIGHT", MacroFrameTextBackground, "BOTTOMRIGHT", 262, 2)
 
 		-- Stack frame positioning
-		mb.Stack:SetPoint("TOPRIGHT", MBPaletteBasic, "BOTTOMRIGHT", 0, -4)
+		mb.Stack:SetPoint("TOPRIGHT", mb.Palette, "BOTTOMRIGHT", 0, -4)
 		mb.Stack:SetPoint("BOTTOMLEFT", mb.Frame, "BOTTOMLEFT", 6, 7)
 
 		-- Title bar 'handle' that lets the user move the macro frame around the screen
@@ -360,27 +283,132 @@ frame:SetScript("OnEvent", function(self, event, arg)
         MFSM.Name:SetScript("OnEnterPressed", MACRO_NAME_ONENTERPRESSED)
         MFSM.Name:SetScript("OnEscapePressed", MACRO_NAME_ONESCAPEPRESSED)
 
-		MFSM.New:SetScript("OnClick", MACRO_NEW_ONCLICK)
-		MFSM.Delete:SetScript("OnClick", MACRO_DELETE_ONCLICK)
+		MFSM.New:SetScript("OnClick", function(_self, button)
+			MacroFrame_SaveMacro()
+			MacroPopupFrame.mode = "new"
+			MacroPopupFrame:Show()
+		end)
 
-        MacroFrameText:SetScript("OnTextChanged", MACRO_TEXT_ONTEXTCHANGED)
+		MFSM.Delete:SetScript("OnClick", function(_self, button)
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+			StaticPopup_Show("CONFIRM_DELETE_SELECTED_MACRO")
+		end)
 
-		MacroSaveButton:HookScript("OnClick", MACRO_SAVE_ONCLICK)
-		MacroCancelButton:HookScript("OnClick", MACRO_CANCEL_ONCLICK)
+        MacroFrameText:SetScript("OnTextChanged", function(_self, userInput)
+
+			if _self.saved and (userInput or _self.blockInput)then
+				MACRO_FRAME_BUTTONS_SETENABLED(true)
+				_self.saved = false
+			end
+
+			local cCount = MacroFrameText:GetNumLetters()
+
+			if ( MacroPopupFrame.mode == "new" ) then MacroPopupFrame:Hide(); end
+
+			MacroFrameCharLimitText:SetText("["..cCount.."/255]")
+
+			if cCount >= 170 and cCount < 210 then
+				MacroFrameCharLimitText:SetTextColor(1, 1, 0, 0.4)
+			elseif cCount >= 210 then
+				MacroFrameCharLimitText:SetTextColor(1, 0, 0, 0.5)
+			else
+				MacroFrameCharLimitText:SetTextColor(1, 1, 1, 0.3)
+			end
+
+			MacroFrame.textChanged = 1
+			MacroFrameText.payloadUpdate = false
+			ScrollingEdit_OnTextChanged(_self, _self:GetParent())
+		end)
+
+		-- MacroSaveButton:HookScript("OnClick", MACRO_SAVE_ONCLICK)
+		MacroSaveButton:SetScript("OnClick", function(_self, button)
+
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+			MacroFrame_SaveMacro()
+			MacroFrame_Update()
+			MacroPopupFrame:Hide()
+			MacroFrameText:ClearFocus()
+
+			for _, block in pairs(mb.Stack.blocks) do
+				block.saved = true
+			end
+
+			if MacroFrame.selectedMacro > 120 then
+				mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
+			else
+				mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
+			end
+
+			MacroFrameText.blockInput = false
+			MacroFrameText.saved = true
+			MACRO_FRAME_BUTTONS_SETENABLED(false)
+
+		end)
+		-- MacroCancelButton:HookScript("OnClick", MACRO_CANCEL_ONCLICK)
+		MacroCancelButton:SetScript("OnClick", function(_self, button)
+
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+			MacroFrame_Update()
+			MacroPopupFrame:Hide()
+			MacroFrameText:ClearFocus()
+
+			mb.Stack.preserve = true
+
+    		local clearBlocks = {}
+			for _, block in pairs(mb.Stack.blocks) do table.insert(clearBlocks, block) end
+
+    		for _, block in pairs(clearBlocks) do
+				if not block.saved then
+					if block.group == "SMT" then block.UNHOOK() end
+  					mb.Stack.remBlock(block)
+				    MB_OnDragStop(block)
+			    end
+			end
+
+			if MacroFrame.selectedMacro > 120 then
+				MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"])
+			else
+				MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro]["body"])
+			end
+			MacroFrame.changes = false
+
+			clearBlocks = nil
+
+			MacroFrameText.saved = true
+			mb.Stack.preserve = false
+			MacroFrameText.blockInput = false
+			MACRO_FRAME_BUTTONS_SETENABLED(false)
+
+		end)
 
 		MacroFrame_Update = MACRO_FRAME_UPDATE
 
 		-- Attach addon's visibility to blizzard's macro frame visibility
-		MacroFrame:HookScript("OnShow", function()
+		MacroFrame:HookScript("OnShow", function(_self)
 			mb.Frame:Show()
 			mb.Init()
-			MacroFrame.changes = false
+			_self.textChanged = nil
+			_self.changes = false
 			MacroSaveButton:Disable()
-			MFSM.Save:Disable()
 			MacroCancelButton:Disable()
-			MFSM.Cancel:Disable()
+			MacroFrameText.saved = true
+
+			--[[
+			local getTex
+			for i=1, 120 do
+				getTex = _G["MacroButton"..i.."Icon"]:GetTexture()
+				if not getTex then
+					_G["MacroButton"..i.."Icon"]:SetAtlas("tradeskills-icon-add")
+					_G["MacroButton"..i.."Icon"]:SetBlendMode("ADD")
+					_G["MacroButton"..i.."Icon"]:SetAlpha(0.6)
+					_G["MacroButton"..i]:Enable()
+					-- _G["MacroButton"..i.."Icon"]:Show()
+				end
+			end
+			]]
+
 		end)
-		MacroFrame:HookScript("OnHide", function()
+		MacroFrame:HookScript("OnHide", function(_self)
 			mb.Frame:Hide()
 		end)
 	end

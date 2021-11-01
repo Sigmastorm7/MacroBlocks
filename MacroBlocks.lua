@@ -12,8 +12,10 @@ local mb_init = false
 
 mb.Frame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
-MBPaletteBasic = CreateFrame("Frame", "$parentPaletteBasic", mb.Frame, "InsetFrameTemplate")
-MBPaletteBasic.blocks = {}
+mb.Palette = CreateFrame("Frame", "$parentPaletteBasic", mb.Frame, "InsetFrameTemplate")
+
+mb.Palette.name = "Palette"
+mb.Palette.blocks = {}
 
 mb.Stack = CreateFrame("Frame", "$parentStack", mb.Frame, "BackdropTemplate")
 mb.Stack:SetBackdrop(mb.stackBackdrop)
@@ -22,6 +24,7 @@ mb.Stack.Instructions:SetPoint("CENTER")
 mb.Stack.Instructions:SetFontObject("MacroBlocksFont_Large")
 mb.Stack.Instructions:SetText("Drag & Drop Blocks Here")
 
+mb.Stack.name = "Stack"
 mb.Stack.blocks = {}
 mb.Stack.sTable = {}
 mb.Stack.string = ""
@@ -41,7 +44,7 @@ local templates = {
 }
 
 for i=1, #templates do
-	mb.BlockPoolCollection:CreatePool(templates[i].type, MBPaletteBasic, templates[i].name)
+	mb.BlockPoolCollection:CreatePool(templates[i].type, mb.Palette, templates[i].name)
 end
 
 mb.SMTBlock = function(sBlock, smt)
@@ -72,15 +75,15 @@ mb.SMTBlock = function(sBlock, smt)
 		end
 
 		funcTable.UNHOOK_PAYLOAD = function()
-			mb.Stack.blocks[sBlock.stackID+1].hooked = false
+			mb.Stack.blocks[sBlock.StackID+1].hooked = false
 			UpdateMacroBlockText()
 		end
 	end
 
 	funcTable.STACK = function()
 		mb.Stack.addBlock(sBlock)
-		mb.Stack.blocks[sBlock.stackID+1].hooked = true
-		mb.Stack.blocks[sBlock.stackID+1].smtHook = sBlock
+		mb.Stack.blocks[sBlock.StackID+1].hooked = true
+		mb.Stack.blocks[sBlock.StackID+1].smtHook = sBlock
 		UpdateMacroBlockText()
 	end
 
@@ -91,7 +94,7 @@ mb.SMTBlock = function(sBlock, smt)
 end
 
 -- Acquires a new block from one of the block frame pools
-mb.MakeBlock = function(group, data, paletteID)
+mb.MakeBlock = function(group, data, PaletteID)
 
 	local b = mb.BlockPoolCollection:Acquire(data.template or "MacroBlockTemplate")
 
@@ -139,7 +142,7 @@ mb.MakeBlock = function(group, data, paletteID)
 	b.group = group
 	b.data = data
 
-	b.paletteID = paletteID or #MBPaletteBasic.blocks + 1
+	b.PaletteID = PaletteID or #mb.Palette.blocks + 1
 
 	b:SetBackdrop(mb.blockBackdrop)
 	b:SetBackdropColor(unpack(mb.GroupColors[group].rgb))
@@ -147,11 +150,11 @@ mb.MakeBlock = function(group, data, paletteID)
 
 	b:Show()
 
-	if b.paletteID == -1 then
-		b.stacked = true
+	if b.PaletteID == -1 then
+		b.InStack = true
 		mb.Stack.addBlock(b)
 	else
-		b.stacked = false
+		b.InStack = false
 	end
 
 	return b
@@ -190,7 +193,7 @@ function UpdateMacroBlockText()
 	mb.Stack.sTable = {}
 	for i, block in pairs(mb.Stack.blocks) do
 		if block.group ~= "SMT" then
-			mb.Stack.sTable[block.stackID] = block.data.payload
+			mb.Stack.sTable[block.StackID] = block.data.payload
 			delim = delimSwitch(i, block)
 			if block.hooked then
 				str = mb.Stack.blocks[i-1].HOOK_PAYLOAD(block.data.payload)
@@ -201,35 +204,12 @@ function UpdateMacroBlockText()
 		end
 	end
 ]]
+
+	MacroFrameText.blockInput = true
 	MacroFrameText:SetText(mb.Stack.string)
 end
 
-function PaletteAdjust(index, xOff, yOff)
-
-	index = index or 1
-	xOff = xOff or 6
-	yOff = yOff or -5
-
-	if index <= #MBPaletteBasic.blocks then
-
-		if not MBPaletteBasic.blocks[index]:IsShown() then MBPaletteBasic.blocks[index]:Show() end
-
-		if (xOff + MBPaletteBasic.blocks[index]:GetWidth()) >= (MBPaletteBasic:GetWidth() - 6) then
-			xOff = 6
-			yOff = yOff - 32
-		end
-
-		MBPaletteBasic.blocks[index]:ClearAllPoints()
-		MBPaletteBasic.blocks[index]:SetPoint("TOPLEFT", MBPaletteBasic, "TOPLEFT", xOff, yOff)
-		xOff = xOff + MBPaletteBasic.blocks[index]:GetWidth()
-
-		PaletteAdjust(index + 1, xOff, yOff)
-	else
-		return
-	end
-end
-
-function StackAdjust(index, xOff, yOff)
+mb.StackAdjust = function(index, xOff, yOff)
 
 	index = index or 1
 	xOff = xOff or 7
@@ -250,7 +230,6 @@ function StackAdjust(index, xOff, yOff)
 
 		mb.Stack.blocks[index]:ClearAllPoints()
 		mb.Stack.blocks[index]:SetPoint("TOPLEFT", mb.Stack, "TOPLEFT", xOff, yOff)
-		
 		mb.Stack.blocks[index].stackOffset = { ["x"] = xOff, ["y"] = yOff }
 		xOff = xOff + mb.Stack.blocks[index]:GetWidth()
 
@@ -260,10 +239,35 @@ function StackAdjust(index, xOff, yOff)
 				xOff = mb.Stack:GetWidth() - 6
 			end
 		end
-		
-		StackAdjust(index + 1, xOff, yOff)
+
+		mb.StackAdjust(index + 1, xOff, yOff)
 	else
 		UpdateMacroBlockText()
+		return
+	end
+end
+
+mb.PaletteAdjust = function(index, xOff, yOff)
+
+	index = index or 1
+	xOff = xOff or 6
+	yOff = yOff or -5
+
+	if index <= #mb.Palette.blocks then
+
+		-- if not mb.Palette.blocks[index]:IsShown() then mb.Palette.blocks[index]:Show() end
+
+		if (xOff + mb.Palette.blocks[index]:GetWidth()) >= (mb.Palette:GetWidth() - 6) then
+			xOff = 6
+			yOff = yOff - 32
+		end
+
+		mb.Palette.blocks[index]:ClearAllPoints()
+		mb.Palette.blocks[index]:SetPoint("TOPLEFT", mb.Palette, "TOPLEFT", xOff, yOff)
+		xOff = xOff + mb.Palette.blocks[index]:GetWidth()
+
+		mb.PaletteAdjust(index + 1, xOff, yOff)
+	else
 		return
 	end
 end
@@ -290,12 +294,12 @@ function StackDisplaceCheck(self)
 
 	mb.Stack.displace = bool
 
-	StackAdjust()
+	mb.StackAdjust()
 end
 
 mb.Stack.addBlock = function(block)
 	block:SetParent(mb.Stack)
-	block.stacked = true
+	block.InStack = true
 	block.saved = false
 
 	if mb.Stack.displace then
@@ -306,38 +310,42 @@ mb.Stack.addBlock = function(block)
 		table.insert(mb.Stack.payloadTable, block.data.payload)
 	end
 
-	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
-	StackAdjust()
+	for id, b in pairs(mb.Stack.blocks) do b.StackID = id end
+	mb.StackAdjust()
 
 	mb.Stack.Instructions:Hide()
 end
 
 mb.Stack.remBlock = function(block)
-	block:SetParent(MBPaletteBasic)
+	block:SetParent(mb.Palette)
+	table.remove(mb.Stack.blocks, block.StackID)
+	table.remove(mb.Stack.payloadTable, block.StackID)
 
-	table.remove(mb.Stack.blocks, block.stackID)
-	table.remove(mb.Stack.payloadTable, block.stackID)
-
-	for id, b in pairs(mb.Stack.blocks) do b.stackID = id end
-	StackAdjust()
+	for id, b in pairs(mb.Stack.blocks) do b.StackID = id end
+	mb.StackAdjust()
 
 	if #mb.Stack.blocks == 0 then
 		mb.Stack.Instructions:Show()
 	end
 end
 
+local initOrder = {"CMD", "CON", "USR", "UTL"}
 mb.Init = function()
 	if mb_init then return end
 	mb_init = true
 
 	local itr = 1
 
+	for i, grp in pairs(initOrder) do
+		print(i..": "..grp)
+	end
+
 	for group, blockData in pairs(mb.BasicBlocks) do
 		for i, data in pairs(blockData) do
-			MBPaletteBasic.blocks[itr] = mb.MakeBlock(group, data, itr)
+			mb.Palette.blocks[itr] = mb.MakeBlock(group, data, itr)
 			itr = itr + 1
 		end
-		PaletteAdjust()
+		mb.PaletteAdjust()
 	end
 end
 
@@ -423,6 +431,25 @@ frame:SetScript("OnEvent", function(self, event, arg)
 end)
 
 --@do-not-package@
+
+	-- testing auto-build/block reconstruction functionality
+
+	local testBlocks = { "UTL1", "CMD1", "CON1:1", "CON6", "USR1" }
+
+	mb.Stack:SetScript("OnShow", function()
+		local grp, num
+		for i, groupID in pairs(testBlocks) do
+			grp = string.sub(groupID, 1, 3)
+			num = tonumber(string.sub(groupID, 4, 4))
+			if string.len(groupID) > 4 then
+				
+			end
+			-- print(grp)
+			-- print(num)
+		end
+
+	end)
+
 	--[[ Export all available slash commands
 	function CommandList()
 		local HT = {}
