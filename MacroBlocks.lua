@@ -47,52 +47,6 @@ for i=1, #templates do
 	mb.BlockPoolCollection:CreatePool(templates[i].type, mb.Palette, templates[i].name)
 end
 
-mb.SMTBlock = function(sBlock, smt)
-
-	local funcTable = {}
-
-	if not smt.orphan then
-		funcTable.ORPHAN = function()
-			local bool = false
-			for _, block in pairs(mb.Stack.blocks) do
-				bool = bool or block.group == smt.group
-			end
-			return bool
-		end
-	end
-
-	funcTable.PLACEMENT = function()
-		if not mb.Stack.displace then return false end
-		return mb.Stack.blocks[mb.Stack.displaceID].group == smt.group
-	end
-
-	if smt.hookPayload ~= nil then
-		local index = smt.hookPayload[1]
-		local str = smt.hookPayload[2]
-
-		funcTable.HOOK_PAYLOAD = function(payload)
-			return string.sub(payload, index-1, index-1)..str..string.sub(payload, index)
-		end
-
-		funcTable.UNHOOK_PAYLOAD = function()
-			mb.Stack.blocks[sBlock.StackID+1].hooked = false
-			UpdateMacroBlockText()
-		end
-	end
-
-	funcTable.STACK = function()
-		mb.Stack.addBlock(sBlock)
-		mb.Stack.blocks[sBlock.StackID+1].hooked = true
-		mb.Stack.blocks[sBlock.StackID+1].smtHook = sBlock
-		UpdateMacroBlockText()
-	end
-
-	for k, v in pairs(funcTable) do
-		sBlock[k] = v
-	end
-
-end
-
 -- Acquires a new block from one of the block frame pools
 mb.MakeBlock = function(group, data, PaletteID)
 
@@ -122,7 +76,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 			end
 
 			b._payload = data.payload
-			b.origWidth = b:GetWidth()			
+			b.origWidth = b:GetWidth()
 		else
 			b.text:SetText(data.name)
 			local bw = b.text:GetStringWidth() + 18
@@ -136,12 +90,28 @@ mb.MakeBlock = function(group, data, PaletteID)
 	end
 
 	if group == "SMT" then
-		b.smtFunc = mb.SMTBlock(b, data.smt)
+		b.CheckNeighbors = function(self)
+			local bool = false
+			if mb.Stack.displace then
+				if strfind(data.payload, ">") then
+					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "CON"
+				end
+				if strfind(data.payload, "<") then
+					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID-1].GroupID, 1, 3) == "CON"
+				end
+			elseif #mb.Stack.blocks > 0 then
+				if strfind(data.payload, "<") then
+					bool = bool or strsub(mb.Stack.blocks[#mb.Stack.blocks].GroupID, 1, 3) == "CON"
+				end
+			end
+
+			return bool
+		end
 	end
 
-	b.group = group
 	b.data = data
 
+	b.GroupID = group..PaletteID
 	b.PaletteID = PaletteID or #mb.Palette.blocks + 1
 
 	b:SetBackdrop(mb.blockBackdrop)
@@ -163,11 +133,15 @@ end
 local function delimSwitch(index, block)
 	local bool = false
 
+	local BID = strsub(block.GroupID, 1, 3)
+	local LBID = ""
+	if index > 1 then LBID = strsub(mb.Stack.blocks[index-1].GroupID, 1, 3) end
+
 	bool = bool or block.data.func == "NEW_LINE"
 	bool = bool or index == 1
 	bool = bool or #mb.Stack.blocks == 1
-	bool = bool or mb.Stack.blocks[index-1].group == "SMT"
-	bool = bool or block.group == "CON" and mb.Stack.blocks[index-1].group == "CON"
+	bool = bool or BID == "SMT" or LBID == "SMT"
+	bool = bool or (BID == "CON" or BID == "TAR") and (LBID == "CON" or LBID == "TAR")
 	bool = bool or block.stackOffset.x == 7
 	bool = bool or block.data.name == ";"
 
@@ -179,8 +153,7 @@ function UpdateMacroBlockText()
 
 	if not mb_init or mb.Stack.preserve then return end
 
-	local delim -- , str
-	local preDelim, postDelim
+	local delim
 
 	mb.Stack.string = ""
 
@@ -189,24 +162,43 @@ function UpdateMacroBlockText()
 		mb.Stack.string = mb.Stack.string..delim..str
 	end
 
---[[
-	mb.Stack.sTable = {}
-	for i, block in pairs(mb.Stack.blocks) do
-		if block.group ~= "SMT" then
-			mb.Stack.sTable[block.StackID] = block.data.payload
-			delim = delimSwitch(i, block)
-			if block.hooked then
-				str = mb.Stack.blocks[i-1].HOOK_PAYLOAD(block.data.payload)
-			else
-				str = block.data.payload
-			end
-			mb.Stack.string = mb.Stack.string..delim..str
-		end
-	end
-]]
+	mb.Stack.string = gsub(mb.Stack.string, "%$!>%[", "%[no")
+	mb.Stack.string = gsub(mb.Stack.string, "%]<%$&>%[", ", ")
 
 	MacroFrameText.blockInput = true
 	MacroFrameText:SetText(mb.Stack.string)
+end
+
+mb.PaletteAdjust = function(group, index, xOff, yOff)
+
+	group = group or "CMD"
+	index = index or 1
+	xOff = xOff or 6
+	yOff = yOff or -6
+
+	if index <= #mb.Palette.blocks then
+
+		-- if not mb.Palette.blocks[index]:IsShown() then mb.Palette.blocks[index]:Show() end
+
+		if strsub(mb.Palette.blocks[index].GroupID, 1, 3) ~= group and strsub(mb.Palette.blocks[index].GroupID, 1, 3) ~= "SMT" then
+			xOff = 6
+			yOff = yOff - 28.5
+			group = strsub(mb.Palette.blocks[index].GroupID, 1, 3)
+		end
+
+		if (xOff + mb.Palette.blocks[index]:GetWidth()) >= (mb.Palette:GetWidth() - 4) then
+			xOff = 6
+			yOff = yOff - 28.5
+		end
+
+		mb.Palette.blocks[index]:ClearAllPoints()
+		mb.Palette.blocks[index]:SetPoint("TOPLEFT", mb.Palette, "TOPLEFT", xOff, yOff)
+		xOff = xOff + mb.Palette.blocks[index]:GetWidth()
+
+		mb.PaletteAdjust(group, index + 1, xOff, yOff)
+	else
+		return
+	end
 end
 
 mb.StackAdjust = function(index, xOff, yOff)
@@ -243,31 +235,6 @@ mb.StackAdjust = function(index, xOff, yOff)
 		mb.StackAdjust(index + 1, xOff, yOff)
 	else
 		UpdateMacroBlockText()
-		return
-	end
-end
-
-mb.PaletteAdjust = function(index, xOff, yOff)
-
-	index = index or 1
-	xOff = xOff or 6
-	yOff = yOff or -5
-
-	if index <= #mb.Palette.blocks then
-
-		-- if not mb.Palette.blocks[index]:IsShown() then mb.Palette.blocks[index]:Show() end
-
-		if (xOff + mb.Palette.blocks[index]:GetWidth()) >= (mb.Palette:GetWidth() - 6) then
-			xOff = 6
-			yOff = yOff - 32
-		end
-
-		mb.Palette.blocks[index]:ClearAllPoints()
-		mb.Palette.blocks[index]:SetPoint("TOPLEFT", mb.Palette, "TOPLEFT", xOff, yOff)
-		xOff = xOff + mb.Palette.blocks[index]:GetWidth()
-
-		mb.PaletteAdjust(index + 1, xOff, yOff)
-	else
 		return
 	end
 end
@@ -329,17 +296,23 @@ mb.Stack.remBlock = function(block)
 	end
 end
 
-local initOrder = {"CMD", "CON", "USR", "UTL"}
+local initOrder = {"CMD", "CON", "SMT", "TAR", "USR", "UTL"}
 mb.Init = function()
 	if mb_init then return end
 	mb_init = true
 
+	local block
 	local itr = 1
 
-	for i, grp in pairs(initOrder) do
-		print(i..": "..grp)
+	for _, grp in pairs(initOrder) do
+		for _, data in pairs(mb.BasicBlocks[grp]) do
+			mb.Palette.blocks[itr] = mb.MakeBlock(grp, data, itr)			
+			itr = itr + 1
+			mb.PaletteAdjust()
+		end
 	end
 
+	--[[
 	for group, blockData in pairs(mb.BasicBlocks) do
 		for i, data in pairs(blockData) do
 			mb.Palette.blocks[itr] = mb.MakeBlock(group, data, itr)
@@ -347,6 +320,7 @@ mb.Init = function()
 		end
 		mb.PaletteAdjust()
 	end
+	]]
 end
 
 --[[
@@ -444,13 +418,11 @@ end)
 			if string.len(groupID) > 4 then
 				
 			end
-			-- print(grp)
-			-- print(num)
 		end
 
 	end)
 
-	--[[ Export all available slash commands
+	--[[Export all available slash commands
 	function CommandList()
 		local HT = {}
 		HT.Commands = {}
@@ -463,14 +435,14 @@ end)
 				  	local cKey = cTypeKey..tostring(cSeq)
 				  	if _G[cPrime] and _G[cKey] then
 						if strsub(_G[cPrime], 1, 1) == "/" and strsub(_G[cKey], 1, 1) == "/" then
-						  	HT.Commands[_G[cKey]%] = _G[cPrime]
-						  	if HT.NormalizedCommands[_G[cPrime]%] then
+						  	HT.Commands[_G[cKey]~] = _G[cPrime]
+						  	if HT.NormalizedCommands[_G[cPrime]~] then
 						  		-- skip it
 						  	else
 						  		-- make it
-								HT.NormalizedCommands[_G[cPrime]%] = {}
+								HT.NormalizedCommands[_G[cPrime]~] = {}
 						  	end
-						  	HT.NormalizedCommands[_G[cPrime]%][_G[cKey]%] = true
+						  	HT.NormalizedCommands[_G[cPrime]~][_G[cKey]~] = true
 						end
 				  	else
 						break
@@ -480,6 +452,6 @@ end)
 		end
 		return CopyTable(HT)
 	end
-	SlashCommandList = CommandList()
+	TargetModifiers = CommandList()
 	--]]
 --@end-do-not-package@
