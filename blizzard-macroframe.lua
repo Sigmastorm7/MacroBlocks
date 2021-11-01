@@ -359,7 +359,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
     		for _, block in pairs(clearBlocks) do
 				if not block.saved then
-					if block.group == "SMT" then block.UNHOOK() end
+					if strsub(block.GroupID, 1, 3) == "SMT" then block.UNHOOK() end
   					mb.Stack.remBlock(block)
 				    MB_OnDragStop(block)
 			    end

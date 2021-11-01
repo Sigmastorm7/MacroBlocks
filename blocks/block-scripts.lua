@@ -38,7 +38,6 @@ function MB_OnDragStart(self, button)
     self:SetFrameStrata("TOOLTIP")
 
     if self.InStack then
-        if self.group == "SMT" then self.UNHOOK() end
         mb.Stack.remBlock(self)
     end
 
@@ -53,17 +52,19 @@ function MB_OnDragStop(self)
 
     if MouseIsOver(mb.Stack) then
         if not self.InStack then
-            mb.Palette.blocks[self.PaletteID] = mb.MakeBlock(self.group, self.data, self.PaletteID)
+            mb.Palette.blocks[self.PaletteID] = mb.MakeBlock(strsub(self.GroupID, 1, 3), self.data, self.PaletteID)
         end
-        if self.group ~= "SMT" then
+        if strsub(self.GroupID, 1, 3) ~= "SMT" then
             mb.Stack.addBlock(self)
-        elseif self.group == "SMT" then
-            if self.ORPHAN() and self.PLACEMENT() then
-                self.STACK() -- mb.Stack.addBlock(self)
+        elseif strsub(self.GroupID, 1, 3) == "SMT" then
+            if self.CheckNeighbors() then
+                mb.Stack.addBlock(self)
             else
                 mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
                 mb.Palette.blocks[self.PaletteID] = self
-                self.InStack = false -- self.InStack = false
+                self.InStack = false
+                mb.Stack.displace = false
+                mb.StackAdjust()
             end
         end
     elseif not MouseIsOver(mb.Stack) and self.InStack then
@@ -91,10 +92,13 @@ function MB_OnDragStop(self)
         end]]
 
         self.saved = false
+        self.InStack = false
 
         mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
         mb.Palette.blocks[self.PaletteID] = self
-        self.InStack = false
+        
+    elseif MouseIsOver(mb.Stack) and mb.Stack.displace then
+        mb.Stack.displace = false
     end
 
     mb.Frame.dragging = nil
