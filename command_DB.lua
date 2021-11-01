@@ -196,6 +196,54 @@ mb.SlashCommandList = {
 	}
 }
 
+--[[
+local DIRECT_MACRO_CONDITIONAL_NAMES = {
+    "SecureCmdOptionParse",
+    "GetShapeshiftForm", "IsStealthed",
+    "UnitExists", "UnitIsDead", "UnitIsGhost",
+    "UnitPlayerOrPetInParty", "UnitPlayerOrPetInRaid",
+    "IsRightAltKeyDown", "IsLeftAltKeyDown", "IsAltKeyDown",
+    "IsRightControlKeyDown", "IsLeftControlKeyDown", "IsControlKeyDown",
+    "IsLeftShiftKeyDown", "IsRightShiftKeyDown", "IsShiftKeyDown",
+    "IsModifierKeyDown", "IsModifiedClick",
+    "GetMouseButtonClicked", "GetActionBarPage", "GetBonusBarOffset",
+    "IsMounted", "IsSwimming", "IsSubmerged", "IsFlying", "IsFlyableArea",
+    "IsIndoors", "IsOutdoors",
+	"HasVehicleActionBar", "HasOverrideActionBar", "HasTempShapeshiftActionBar",
+	"HasBonusActionBar", "GetBonusBarIndex", "GetVehicleBarIndex", "GetOverrideBarIndex",
+	"HasExtraActionBar", "GetTempShapeshiftBarIndex", "CanExitVehicle"
+};
+
+local OTHER_SAFE_FUNCTION_NAMES = {
+    "GetBindingKey", "HasAction",
+    "IsHarmfulSpell", "IsHarmfulItem", "IsHelpfulSpell", "IsHelpfulItem",
+    "GetMultiCastTotemSpells", "FindSpellBookSlotBySpellID", "UnitTargetsVehicleInRaidUI"
+};
+
+-- Inventory slots
+INVSLOT_AMMO		= 0;
+INVSLOT_HEAD 		= 1; INVSLOT_FIRST_EQUIPPED = INVSLOT_HEAD;
+INVSLOT_NECK		= 2;
+INVSLOT_SHOULDER	= 3;
+INVSLOT_BODY		= 4;
+INVSLOT_CHEST		= 5;
+INVSLOT_WAIST		= 6;
+INVSLOT_LEGS		= 7;
+INVSLOT_FEET		= 8;
+INVSLOT_WRIST		= 9;
+INVSLOT_HAND		= 10;
+INVSLOT_FINGER1		= 11;
+INVSLOT_FINGER2		= 12;
+INVSLOT_TRINKET1	= 13;
+INVSLOT_TRINKET2	= 14;
+INVSLOT_BACK		= 15;
+INVSLOT_MAINHAND	= 16;
+INVSLOT_OFFHAND		= 17;
+INVSLOT_RANGED		= 18;
+INVSLOT_TABARD		= 19;
+INVSLOT_LAST_EQUIPPED = INVSLOT_TABARD;
+]]
+
 --@do-not-package@
 -- is this some kind of escape sequence for chat commands?
 -- ["/c"] = { "/c", "/csay", },
