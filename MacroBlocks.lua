@@ -323,27 +323,6 @@ mb.Init = function()
 	]]
 end
 
---[[
-mb.Stack.saveBlocks = function()
-
-end
-]]
-
---[[
-mb.Changelog = MacroChangelog or {}
-mb.LogEditHistory = function(index, time)
-	local name, texture, body = GetMacroInfo(index)
-	if mb.Changelog[index] == nil then mb.Changelog[index] = {} end
-
-	if index <= 120 then
-		mb.Changelog[index][time] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
-	elseif index > 120 then
-		if mb.Changelog[index][mb.CharacterID] == nil then mb.Changelog[index][mb.CharacterID] = {} end
-		mb.Changelog[index][mb.CharacterID][time] = t
-	end
-end
-]]
-
 frame:SetScript("OnEvent", function(self, event, arg)
 	if event == "PLAYER_ENTERING_WORLD" then
 
@@ -405,6 +384,27 @@ frame:SetScript("OnEvent", function(self, event, arg)
 end)
 
 --@do-not-package@
+
+	--[[
+mb.Stack.saveBlocks = function()
+
+end
+]]
+
+--[[
+mb.Changelog = MacroChangelog or {}
+mb.LogEditHistory = function(index, time)
+	local name, texture, body = GetMacroInfo(index)
+	if mb.Changelog[index] == nil then mb.Changelog[index] = {} end
+
+	if index <= 120 then
+		mb.Changelog[index][time] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
+	elseif index > 120 then
+		if mb.Changelog[index][mb.CharacterID] == nil then mb.Changelog[index][mb.CharacterID] = {} end
+		mb.Changelog[index][mb.CharacterID][time] = t
+	end
+end
+]]
 
 	-- testing auto-build/block reconstruction functionality
 
