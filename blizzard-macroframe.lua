@@ -320,7 +320,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			ScrollingEdit_OnTextChanged(_self, _self:GetParent())
 		end)
 
-		-- MacroSaveButton:HookScript("OnClick", MACRO_SAVE_ONCLICK)
+
 		MacroSaveButton:SetScript("OnClick", function(_self, button)
 
 			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
@@ -344,7 +344,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			MACRO_FRAME_BUTTONS_SETENABLED(false)
 
 		end)
-		-- MacroCancelButton:HookScript("OnClick", MACRO_CANCEL_ONCLICK)
 		MacroCancelButton:SetScript("OnClick", function(_self, button)
 
 			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
@@ -359,7 +358,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
     		for _, block in pairs(clearBlocks) do
 				if not block.saved then
-					if strsub(block.GroupID, 1, 3) == "SMT" then block.UNHOOK() end
   					mb.Stack.remBlock(block)
 				    MB_OnDragStop(block)
 			    end
