@@ -80,17 +80,6 @@ function MB_OnDragStop(self)
             end
         end
 
-        --[[if self.smtHook ~= nil then
-            mmb.Stack.remBlock(self.smtHook)
-
-            mb.BlockPoolCollection:Release(mb.Palette.blocks[self.smtHook.PaletteID])
-            mb.Palette.blocks[self.smtHook.PaletteID] = self.smtHook
-            self.smtHook.InStack = false
-
-            self.hooked = false
-            self.smtHook = nil
-        end]]
-
         self.saved = false
         self.InStack = false
 
