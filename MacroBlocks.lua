@@ -422,7 +422,7 @@ end
 
 	end)
 
-	--[[Export all available slash commands
+	-- Export all available slash commands
 	function CommandList()
 		local HT = {}
 		HT.Commands = {}

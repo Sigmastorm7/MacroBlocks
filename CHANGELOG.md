@@ -1,14 +1,32 @@
 # Macro Blocks Changelog
-## 1.0.2-Release
+### 1.1.0-Release
+#### Fixed
+- Extra spaces in macro text
+
+#### Added
+- 4 Command blocks
+  - /equipset, /equipslot, /targetfriend, /targetenemy
+- 3 Condition blocks
+  - combat, exists, dead
+- 2 Condition modifier blocks
+  - no, & (and)
+- 6 Target blocks
+  - moved: \@mouseover, \@cursor, \@focus to new target group
+  - new: \@player, \@target, \@pet
+
+#### Removed
+- /summonpet (will return with the release of the advanced block palette)
+
+### 1.0.2-Release
 #### Fixed
 - Multiple socket blocks, edit blocks, or mod blocks will no longer overwrite each other
 
-## 1.0.1-Release
+### 1.0.1-Release
 #### Fixed
 - [ mod ] block now properly shifts adjacent blocks when opened/closed
 - socket block will not throw errors when toys are dropped on it
 
-## 1.0.0-Release
+### 1.0.0-Release
 #### Added
 - 20 blocks for the initial release with many more to come
 - 8 Command blocks
