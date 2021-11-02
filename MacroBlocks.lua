@@ -311,16 +311,6 @@ mb.Init = function()
 			mb.PaletteAdjust()
 		end
 	end
-
-	--[[
-	for group, blockData in pairs(mb.BasicBlocks) do
-		for i, data in pairs(blockData) do
-			mb.Palette.blocks[itr] = mb.MakeBlock(group, data, itr)
-			itr = itr + 1
-		end
-		mb.PaletteAdjust()
-	end
-	]]
 end
 
 frame:SetScript("OnEvent", function(self, event, arg)
