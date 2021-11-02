@@ -406,7 +406,7 @@ mb.LogEditHistory = function(index, time)
 end
 ]]
 
-	-- testing auto-build/block reconstruction functionality
+	--[[ testing auto-build/block reconstruction functionality
 
 	local testBlocks = { "UTL1", "CMD1", "CON1:1", "CON6", "USR1" }
 
@@ -452,6 +452,6 @@ end
 		end
 		return CopyTable(HT)
 	end
-	TargetModifiers = CommandList()
+	TargetModifiers = CommandList()]]
 	--]]
 --@end-do-not-package@
