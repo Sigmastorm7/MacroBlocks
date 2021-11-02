@@ -3,7 +3,6 @@
     <!--Import frame elements from a new file to clean up MacroBlocks.lua a bit-->
     <Script file="block-scripts.lua"/>
 
-<!--Custom fonts used in the block templates w/ variations for special cases-->
     <!--Generic block templates-->
     <Frame name="MacroBlockTemplate" enableMouse="true" movable="true" inherits="BackdropTemplate" virtual="true">
         <Size>
