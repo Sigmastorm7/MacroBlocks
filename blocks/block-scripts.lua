@@ -109,19 +109,6 @@ function MB_USR_ELEMENT_OnShow(self)
     self:SetBackdropBorderColor(unpack(groupColors.USR.rgb))
 end
 
--- SMT block generator for specific instances
---[[local sbData = {}
-local function SMTBlock()
-    local sb = mb.MakeBlock("CMD", sbData, -1)
-
-    mb.Stack.displace = true
-    mb.Stack.displaceID = sb.data.sbIndex
-
-    return sb
-    -- mb.Stack.addBlock(sb)
-
-end]]
-
 -- USR socket block handlers
 function MB_SOCKET_OnClick(self, button, down)
     local itemType, name, spellID, itemID, mountID, iconID
@@ -170,8 +157,6 @@ function MB_EDIT_OnTextChanged(self, userInput)
         mb.Stack.payloadTable[self:GetParent().StackID] = self:GetText()
         UpdateMacroBlockText()
     end
-
-    -- if userInput then  end
 end
 
 -- Choice block handlers
