@@ -155,16 +155,24 @@ mb.BasicBlocks = {
 		},{
 			["name"] = "stealth",
 			["payload"] = "[stealth]",
-		},]]{
+		},]]
+		{
 			["name"] = "mod",
 			["payload"] = "[mod]",
 			["template"] = "ChoiceBlockTemplate",
 			["func"] = "USR_CHOICE",
+			["choose"] = "MOD",
 			["choices"] = {
 				{ ["name"] = "shift", ["value"] = 1, },
 				{ ["name"] = "ctrl", ["value"] = 2, },
 				{ ["name"] = "alt", ["value"] = 4, },
 			}
+		},{
+			["name"] = "spec",
+			["payload"] = "[spec:]",
+			["template"] = "ChoiceBlockTemplate",
+			["func"] = "USR_CHOICE",
+			["choose"] = "SPEC"
 		},--[[{
 			["name"] = "button",
 			["payload"] = "[btn]",
@@ -253,11 +261,16 @@ mb.BasicBlocks = {
 			["name"] = "no",
 			["payload"] = "$!>",
 			["neighbors"] = 1,
-		},
-		{
-			["name"] = "&",
+		},{
+			["name"] = "and",
 			["payload"] = "<$&>",
 			["neighbors"] = 2,
+		},{
+			["name"] = "or",
+			["payload"] = "[]"
+		},{
+			["name"] = "else",
+			["payload"] = ";"
 		},
 	},
 }

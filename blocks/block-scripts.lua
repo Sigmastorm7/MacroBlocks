@@ -57,7 +57,7 @@ function MB_OnDragStop(self)
         if strsub(self.GroupID, 1, 3) ~= "SMT" then
             mb.Stack.addBlock(self)
         elseif strsub(self.GroupID, 1, 3) == "SMT" then
-            if self.CheckNeighbors() then
+            if self:CheckNeighbors() then
                 mb.Stack.addBlock(self)
             else
                 mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
@@ -185,7 +185,7 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
         self.open = not self.open
     end
 
-    for i=1, #p.data.choices do p["choice"..i]:SetShown(self.open) end
+    for i=1, p.numChoices do p["choice"..i]:SetShown(self.open) end
 
     self.text:SetText(flyoutText[self.open])
 
@@ -201,27 +201,28 @@ function MB_CHOICE_BUTTON_OnLoad(self)
     self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
 end
 
-local modCase = {
-    "[mod:shift]",
-    "[mod:ctrl]",
-    "[mod:shiftctrl]",
-    "[mod:alt]",
-    "[mod:shiftalt]",
-    "[mod:ctrlalt]",
-    "[mod:shiftctrlalt]",
-}
-
 function MB_CHOICE_BUTTON_OnClick(self, button, down)
     local p = self:GetParent()
-    if not self.enabled then
-        self.enabled = true
-        p.choiceNum = p.choiceNum + self.value
-    elseif self.enabled then
-        self.enabled = false
-        p.choiceNum = p.choiceNum - self.value
-    end
 
-    mb.Stack.payloadTable[p.StackID] = modCase[p.choiceNum] or "[mod]"
-    UpdateMacroBlockText()
-    self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
+    if p.data.choose == "MOD" then
+
+        if not self.enabled then
+            self.enabled = true
+            p.choiceNum = p.choiceNum + self.value
+        elseif self.enabled then
+            self.enabled = false
+            p.choiceNum = p.choiceNum - self.value
+        end
+
+        mb.Stack.payloadTable[p.StackID] = mb.ModKeys[p.choiceNum] or "[mod]"
+        UpdateMacroBlockText()
+        self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
+    elseif p.data.choose == "SPEC" then
+        for i=1, p.numChoices do
+            p["choice"..i].enabled = p["choice"..i].value == self.value
+            p["choice"..i].text:SetTextColor(unpack(choiceTextColor[p["choice"..i].value == self.value]))
+        end
+        mb.Stack.payloadTable[p.StackID] = "[spec:"..self.value.."]"
+        UpdateMacroBlockText()
+    end
 end

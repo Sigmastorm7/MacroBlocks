@@ -196,7 +196,70 @@ mb.SlashCommandList = {
 	}
 }
 
+mb.ModKeys = {
+    "[mod:shift]", -- [1]
+    "[mod:ctrl]", -- [2]
+    "[mod:shiftctrl]", -- [3]
+    "[mod:alt]", -- [4]
+    "[mod:shiftalt]", -- [5]
+    "[mod:ctrlalt]", -- [6]
+    "[mod:shiftctrlalt]", -- [7]
+}
+
+mb.Specializations = {
+	["DEATHKNIGHT"] = 3, -- { 250, 251, 252 }, -- BLOOD FROST UNHOLY
+	["DEMONHUNTER"] = 2, -- { 577, 581 }, -- HAVOC VENGEANCE
+	["DRUID"] = 4, -- { 102, 103, 104, 105 }, -- BALANCE FERAL GUARDIAN RESTORATION
+	["HUNTER"] = 3, -- { 253, 254, 255 }, -- BEASTMASTERY MARKSMANSHIP SURVIVAL
+	["MAGE"] = 3, -- { 62, 63, 64 }, -- ARCANE FIRE FROST
+	["MONK"] = 3, -- { 268, 270, 269 }, -- BREWMASTER MISTWEAVER WINDWALKER
+	["PALADIN"] = 3, -- { 65, 66, 70 }, -- HOLY PROTECTION RETRIBUTION
+	["PRIEST"] = 3, -- { 256, 257, 258 }, -- DISCIPLINE HOLY SHADOW
+	["ROGUE"] = 3, -- { 259, 260, 261 }, -- ASSASSINATION OUTLAW SUBTLETY
+	["SHAMAN"] = 3, -- { 262, 263, 264 }, -- ELEMENTAL ENHANCEMENT RESTORATION
+	["WARLOCK"] = 3, -- { 265, 266, 267 }, -- AFFLICTION DEMONOLOGY DESTRUCTION
+	["WARRIOR"] = 3, -- { 71, 72, 73 } -- ARMS FURY PROTECTION
+}
+
+--@do-not-package@
 --[[
+/target [target=focustarget, harm, nodead]
+/castsequence : casts spells in a determined order
+/assist player name : Assist a friendly player .Often used in raids to let everybody attack the same target.
+/script UIErrorsFrame:Clear() Used to prevent the on screen error message when an item or ability is not ready.
+/petpassive : puts your pet on passive
+/petdefensive : puts your pet on defensive
+/petattack : Tells your pet to attack
+/petfollow : Tells your pet to follow you
+/petstay :Tells your pet to stay
+/cancelform : Cancels your current shapeshift form
+/cancelaura : Turns off an aura you have
+/changeactionbar : Changes your current actionbar
+/stopcasting : Stops whatever you are casting
+/stopwatch : Opens the stopwatch interface
+/targetlastenemy : Target the last enemy you had selected
+/targetexact : Target the exact name
+
+[combat] : True if you are In combat
+[nocombat] : True if you are not In combat
+[exists] : True if you have a tartget
+[dead] : True if Target is dead
+[harm] : True if you can cast harmful spells on the target
+[help] : True if your target can receive a beneficial effect
+[stealth] : True if you are in stealth
+[mounted] : True if you are on a mount
+[mod:shift] , [mod:ctrl] , [mod:alt] True if you hold the given key
+[channeling] : True if channeling a spell
+[nochanneling] : True if you are not channeling a spell
+[vehicleui] : True if the player has a vehicle UI
+[unithasvehicleui] : True if the target of the macro has a vehicle UI
+[party] and [raid]: True if target is in your party / raid
+[indoors] and [outdoors]: True if you are indoors / outdoors
+[nopet] : True if you don't have any pet active
+[pet:name] : True if you have a pet active
+[talent:Row/Column] : True if you have selected the talent for that row and column.
+
+
 local DIRECT_MACRO_CONDITIONAL_NAMES = {
     "SecureCmdOptionParse",
     "GetShapeshiftForm", "IsStealthed",
@@ -244,7 +307,7 @@ INVSLOT_TABARD		= 19;
 INVSLOT_LAST_EQUIPPED = INVSLOT_TABARD;
 ]]
 
---@do-not-package@
+
 -- is this some kind of escape sequence for chat commands?
 -- ["/c"] = { "/c", "/csay", },
 --[[commands = { -- obselete or for classic

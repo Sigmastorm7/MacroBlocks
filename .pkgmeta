@@ -1,9 +1,4 @@
 package-as: MacroBlocks
-enable-nolib-creation: no
-
-manual-changelog:
-    filename: CHANGELOG.md
-    markup-type: markdown
 
 ignore:
     - Blizzard_MacroUI
@@ -11,3 +6,7 @@ ignore:
     - README.md
     - command_DB.lua
     - macroblocks.code-workspace
+
+manual-changelog:
+    filename: CHANGELOG.md
+    markup-type: markdown

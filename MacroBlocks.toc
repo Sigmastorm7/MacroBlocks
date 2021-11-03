@@ -1,4 +1,4 @@
-## Interface: 90100
+## Interface: 90105
 ## Title: MacroBlocks
 ## Author: Siggy
 ## Version: 1.1.0

@@ -54,25 +54,47 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 	if not data.func or (data.func ~= "USR_SOCKET" and data.func ~= "USR_EDIT") then
 
-		if data.func == "USR_CHOICE" then
+		if data.choose then
 
 			b.backdropFrame.text:SetText(data.name)
 			b.backdropFrame:SetWidth(b.backdropFrame.text:GetStringWidth() + 18)
+			b:SetWidth(b.backdropFrame.text:GetStringWidth() + 36)
 
-			b.choices = {}
-			for i=1, 6 do
-				if i <= #data.choices then
-					b["choice"..i].text:SetText(data.choices[i].name)
-					b["choice"..i].enabled = false
-					b["choice"..i].value = data.choices[i].value
-
-					b["choice"..i]:SetWidth(b["choice"..i].text:GetStringWidth())
-					b["choice"..i]:Hide()
-				else
-					b["choice"..i]:Disable()
-					b["choice"..i]:Hide()
-					b["choice"..i]:ClearAllPoints()
+			if data.choose == "MOD" then
+				b.numChoices = #data.choices
+				for i=1, 6 do
+					if i <= b.numChoices then
+						b["choice"..i].text:SetText(data.choices[i].name)
+						b["choice"..i].enabled = false
+						b["choice"..i].value = data.choices[i].value
+						b["choice"..i]:SetWidth(b["choice"..i].text:GetStringWidth())
+						b["choice"..i]:Hide()
+					else
+						b["choice"..i]:Disable()
+						b["choice"..i]:Hide()
+						b["choice"..i]:ClearAllPoints()
+					end
 				end
+			elseif data.choose == "SPEC" then
+				_, b.class, _ = UnitClass(PLAYER)
+				b.numChoices = mb.Specializations[b.class]
+				for i=1, 6 do
+					if i <= b.numChoices then
+						local _, specName = GetSpecializationInfo(i)
+						b["choice"..i].text:SetText(specName)
+						b["choice"..i].enabled = false
+						b["choice"..i].value = i
+						b["choice"..i]:SetWidth(b["choice"..i].text:GetStringWidth())
+						b["choice"..i]:Hide()
+					else
+						b["choice"..i]:Disable()
+						b["choice"..i]:Hide()
+						b["choice"..i]:ClearAllPoints()
+					end
+				end
+
+				b.choice1.enabled = true
+
 			end
 
 			b._payload = data.payload
@@ -91,13 +113,15 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 	if group == "SMT" then
 		b.CheckNeighbors = function(self)
-			local bool = false
+			local bool = self.data.name == "or" or self.data.name == "else"
 			if mb.Stack.displace then
 				if strfind(data.payload, ">") then
 					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "CON"
+					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "TAR"
 				end
 				if strfind(data.payload, "<") then
 					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID-1].GroupID, 1, 3) == "CON"
+					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID-1].GroupID, 1, 3) == "TAR"
 				end
 			elseif #mb.Stack.blocks > 0 then
 				if strfind(data.payload, "<") then
@@ -153,7 +177,7 @@ function UpdateMacroBlockText()
 
 	if not mb_init or mb.Stack.preserve then return end
 
-	local delim
+	local delim = ""
 
 	mb.Stack.string = ""
 
@@ -162,7 +186,7 @@ function UpdateMacroBlockText()
 		mb.Stack.string = mb.Stack.string..delim..str
 	end
 
-	mb.Stack.string = gsub(mb.Stack.string, "%$!>%[", "%[no")
+	mb.Stack.string = gsub(mb.Stack.string, "%$!>%[", delim.."%[no")
 	mb.Stack.string = gsub(mb.Stack.string, "%]<%$&>%[", ", ")
 
 	MacroFrameText.blockInput = true

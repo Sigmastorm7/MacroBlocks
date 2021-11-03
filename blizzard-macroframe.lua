@@ -128,13 +128,15 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame:RegisterForDrag()
 		MacroFrame:SetClampedToScreen(true)
 
+		MacroFrameEnterMacroText:SetText("")
+
 		-- Trash all the original MacroFrame elements in favor of replacing them with our own
 		local bin = { MacroEditButton, MacroExitButton, MacroSaveButton, MacroCancelButton, MacroDeleteButton, MacroNewButton, MacroFrameEnterMacroText, MacroButtonScrollFrameTop, MacroButtonScrollFrameBottom, MacroButtonScrollFrameMiddle, MacroFrameSelectedMacroBackground, MacroHorizontalBarLeft, MacroPopupFrame, MacroButtonScrollFrameTop, MacroButtonScrollFrameBottom, MacroButtonScrollFrameMiddle }
 
 		for _, trash in pairs(bin) do
 			trash:SetParent(UIParent)
-			trash:ClearAllPoints()
 			trash:Hide()
+			trash:ClearAllPoints()
 		end
 
 		-- Hide the things we can't put in the bin neatly
