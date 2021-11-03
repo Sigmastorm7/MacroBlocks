@@ -196,7 +196,7 @@ mb.SlashCommandList = {
 	}
 }
 
-mb.ModKeys = {
+mb.ModCombos = {
     "[mod:shift]", -- [1]
     "[mod:ctrl]", -- [2]
     "[mod:shiftctrl]", -- [3]
@@ -206,19 +206,22 @@ mb.ModKeys = {
     "[mod:shiftctrlalt]", -- [7]
 }
 
-mb.Specializations = {
-	["DEATHKNIGHT"] = 3, -- { 250, 251, 252 }, -- BLOOD FROST UNHOLY
-	["DEMONHUNTER"] = 2, -- { 577, 581 }, -- HAVOC VENGEANCE
-	["DRUID"] = 4, -- { 102, 103, 104, 105 }, -- BALANCE FERAL GUARDIAN RESTORATION
-	["HUNTER"] = 3, -- { 253, 254, 255 }, -- BEASTMASTERY MARKSMANSHIP SURVIVAL
-	["MAGE"] = 3, -- { 62, 63, 64 }, -- ARCANE FIRE FROST
-	["MONK"] = 3, -- { 268, 270, 269 }, -- BREWMASTER MISTWEAVER WINDWALKER
-	["PALADIN"] = 3, -- { 65, 66, 70 }, -- HOLY PROTECTION RETRIBUTION
-	["PRIEST"] = 3, -- { 256, 257, 258 }, -- DISCIPLINE HOLY SHADOW
-	["ROGUE"] = 3, -- { 259, 260, 261 }, -- ASSASSINATION OUTLAW SUBTLETY
-	["SHAMAN"] = 3, -- { 262, 263, 264 }, -- ELEMENTAL ENHANCEMENT RESTORATION
-	["WARLOCK"] = 3, -- { 265, 266, 267 }, -- AFFLICTION DEMONOLOGY DESTRUCTION
-	["WARRIOR"] = 3, -- { 71, 72, 73 } -- ARMS FURY PROTECTION
+mb.Choices = {
+	["MOD"] = { "shift", "ctrl", "alt" },
+	["SPEC"] = {
+		["DEATHKNIGHT"] = 3, -- { 250, 251, 252 }, -- BLOOD FROST UNHOLY
+		["DEMONHUNTER"] = 2, -- { 577, 581 }, -- HAVOC VENGEANCE
+		["DRUID"] = 4, -- { 102, 103, 104, 105 }, -- BALANCE FERAL GUARDIAN RESTORATION
+		["HUNTER"] = 3, -- { 253, 254, 255 }, -- BEASTMASTERY MARKSMANSHIP SURVIVAL
+		["MAGE"] = 3, -- { 62, 63, 64 }, -- ARCANE FIRE FROST
+		["MONK"] = 3, -- { 268, 270, 269 }, -- BREWMASTER MISTWEAVER WINDWALKER
+		["PALADIN"] = 3, -- { 65, 66, 70 }, -- HOLY PROTECTION RETRIBUTION
+		["PRIEST"] = 3, -- { 256, 257, 258 }, -- DISCIPLINE HOLY SHADOW
+		["ROGUE"] = 3, -- { 259, 260, 261 }, -- ASSASSINATION OUTLAW SUBTLETY
+		["SHAMAN"] = 3, -- { 262, 263, 264 }, -- ELEMENTAL ENHANCEMENT RESTORATION
+		["WARLOCK"] = 3, -- { 265, 266, 267 }, -- AFFLICTION DEMONOLOGY DESTRUCTION
+		["WARRIOR"] = 3, -- { 71, 72, 73 } -- ARMS FURY PROTECTION
+	},
 }
 
 --@do-not-package@

@@ -58,34 +58,47 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 			b.backdropFrame.text:SetText(data.name)
 			b.backdropFrame:SetWidth(b.backdropFrame.text:GetStringWidth() + 18)
+
 			b:SetWidth(b.backdropFrame.text:GetStringWidth() + 36)
+			b.closeW = b:GetWidth()
+
+			b.openW = 0
 
 			if data.choose == "MOD" then
-				b.numChoices = #data.choices
+				b.num = 3
 				for i=1, 6 do
-					if i <= b.numChoices then
-						b["choice"..i].text:SetText(data.choices[i].name)
+					if i <= b.num then
+						b["choice"..i].text:SetText(mb.Choices.MOD[i])
 						b["choice"..i].enabled = false
-						b["choice"..i].value = data.choices[i].value
+						if i == 3 then
+							b["choice"..i].value = 4
+						else
+							b["choice"..i].value = i
+						end
 						b["choice"..i]:SetWidth(b["choice"..i].text:GetStringWidth())
 						b["choice"..i]:Hide()
+						b.openW = b.openW + b["choice"..i]:GetWidth()
 					else
 						b["choice"..i]:Disable()
 						b["choice"..i]:Hide()
 						b["choice"..i]:ClearAllPoints()
 					end
 				end
+
+				b._payload = data.payload
 			elseif data.choose == "SPEC" then
 				_, b.class, _ = UnitClass(PLAYER)
-				b.numChoices = mb.Specializations[b.class]
+				b.num = mb.Choices.SPEC[b.class]
+				
 				for i=1, 6 do
-					if i <= b.numChoices then
+					if i <= b.num then
 						local _, specName = GetSpecializationInfo(i)
 						b["choice"..i].text:SetText(specName)
 						b["choice"..i].enabled = false
 						b["choice"..i].value = i
 						b["choice"..i]:SetWidth(b["choice"..i].text:GetStringWidth())
 						b["choice"..i]:Hide()
+						b.openW = b.openW + b["choice"..i]:GetWidth()
 					else
 						b["choice"..i]:Disable()
 						b["choice"..i]:Hide()
@@ -93,12 +106,12 @@ mb.MakeBlock = function(group, data, PaletteID)
 					end
 				end
 
-				b.choice1.enabled = true
+				local activeSpec = GetSpecialization()
 
+				b["choice"..activeSpec].enabled = true
+				b["choice"..activeSpec].text:SetTextColor(0, 1, 0.4)
 			end
-
-			b._payload = data.payload
-			b.origWidth = b:GetWidth()
+			b.openW = b.openW + 18
 		else
 			b.text:SetText(data.name)
 			local bw = b.text:GetStringWidth() + 18
@@ -117,7 +130,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 			if mb.Stack.displace then
 				if strfind(data.payload, ">") then
 					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "CON"
-					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "TAR"
+					bool = bool or (strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "TAR" and self.data.name == "and")
 				end
 				if strfind(data.payload, "<") then
 					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID-1].GroupID, 1, 3) == "CON"
@@ -126,9 +139,9 @@ mb.MakeBlock = function(group, data, PaletteID)
 			elseif #mb.Stack.blocks > 0 then
 				if strfind(data.payload, "<") then
 					bool = bool or strsub(mb.Stack.blocks[#mb.Stack.blocks].GroupID, 1, 3) == "CON"
+					bool = bool or strsub(mb.Stack.blocks[#mb.Stack.blocks].GroupID, 1, 3) == "TAR"
 				end
 			end
-
 			return bool
 		end
 	end

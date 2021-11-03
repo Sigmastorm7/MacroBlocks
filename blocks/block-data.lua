@@ -162,14 +162,9 @@ mb.BasicBlocks = {
 			["template"] = "ChoiceBlockTemplate",
 			["func"] = "USR_CHOICE",
 			["choose"] = "MOD",
-			["choices"] = {
-				{ ["name"] = "shift", ["value"] = 1, },
-				{ ["name"] = "ctrl", ["value"] = 2, },
-				{ ["name"] = "alt", ["value"] = 4, },
-			}
 		},{
 			["name"] = "spec",
-			["payload"] = "[spec:]",
+			["payload"] = "[spec:"..GetSpecialization().."]",
 			["template"] = "ChoiceBlockTemplate",
 			["func"] = "USR_CHOICE",
 			["choose"] = "SPEC"

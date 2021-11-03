@@ -11,17 +11,25 @@ local ToyBox = C_ToyBox
 
 local flyoutWidth = { [true] = 156 }
 local flyoutText = { [false] = "❭❭", [true] = "❬❬" }
-local choiceTextColor = { [false] = { 0.55, 0.55, 0.55, }, [true] = { 0, 1, 0.4, }, }
+local choiceTextColor = { [false] = { 0.55, 0.55, 0.55 }, [true] = { 0, 1, 0.4 }, }
 
 MB_CHOICE_BLOCK_RESET = function(self)
-    for i=1, #self.data.choices do
+    for i=1, self.num do
         self["choice"..i].enabled = false
         self["choice"..i]:Hide()
         self["choice"..i].text:SetTextColor(unpack(choiceTextColor[false]))
     end
-    self.choiceNum = 0
+
+    if self.choose == "SPEC" then
+        self.choice1.enabled = true
+        b.choice1.text:SetTextColor(0, 1, 0.4)
+    else
+        self.choiceValueSum = 0
+    end
+
     self.data.payload = self._payload
-    self:SetWidth(self.origWidth)
+
+    self:SetWidth(self.closeW)
     self.flyout.text:SetText(flyoutText[false])
     self.flyout.open = false
 end
@@ -162,7 +170,7 @@ end
 -- Choice block handlers
 function MB_CHOICE_BLOCK_OnLoad(self)
     MB_OnLoad(self)
-    self.choiceNum = 0
+    self.choiceValueSum = 0
 
     self.backdropFrame:SetBackdrop(mb.USRBackdrop);
     self.backdropFrame:SetBackdropColor(0, 0.9999977946281433, 0.5960771441459656);
@@ -171,6 +179,7 @@ end
 
 function MB_CHOICE_BLOCK_OnShow(self)
     self:SetBackdropColor(0, 128/255, 77/255)
+    self.payload = 
     self.text:Hide()
 end
 
@@ -185,11 +194,15 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
         self.open = not self.open
     end
 
-    for i=1, p.numChoices do p["choice"..i]:SetShown(self.open) end
+    for i=1, p.num do p["choice"..i]:SetShown(self.open) end
 
     self.text:SetText(flyoutText[self.open])
 
-    p:SetWidth(flyoutWidth[self.open] or p.origWidth)
+    if self.open then
+        p:SetWidth(p.closeW + p.openW)
+    else
+        p:SetWidth(p.closeW)
+    end
 
     mb.StackAdjust()
 end
@@ -208,21 +221,22 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
 
         if not self.enabled then
             self.enabled = true
-            p.choiceNum = p.choiceNum + self.value
+            p.choiceValueSum = p.choiceValueSum + self.value
         elseif self.enabled then
             self.enabled = false
-            p.choiceNum = p.choiceNum - self.value
+            p.choiceValueSum = p.choiceValueSum - self.value
         end
 
-        mb.Stack.payloadTable[p.StackID] = mb.ModKeys[p.choiceNum] or "[mod]"
+        mb.Stack.payloadTable[p.StackID] = mb.ModCombos[p.choiceValueSum] or "[mod]"
         UpdateMacroBlockText()
         self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
     elseif p.data.choose == "SPEC" then
-        for i=1, p.numChoices do
+        for i=1, p.num do
             p["choice"..i].enabled = p["choice"..i].value == self.value
             p["choice"..i].text:SetTextColor(unpack(choiceTextColor[p["choice"..i].value == self.value]))
         end
-        mb.Stack.payloadTable[p.StackID] = "[spec:"..self.value.."]"
+        mb.Stack.payloadTable[p.StackID] = "[spec:"..self.value.."]" or p.payload
         UpdateMacroBlockText()
     end
+
 end

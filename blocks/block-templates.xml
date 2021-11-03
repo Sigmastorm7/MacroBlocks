@@ -194,7 +194,6 @@
     <Frame name="ChoiceBlockTemplate" inherits="MacroBlockTemplate" virtual="true">
         <KeyValues>
             <KeyValue key="multiChoice" value="false" type="boolean"/>
-            <KeyValue key="origWidth" value="nil" type="number" nillable="true"/>
             <KeyValue key="reset" value="MB_CHOICE_BLOCK_RESET" type="global"/>
         </KeyValues>
         <Size x="57" y="28"/>
