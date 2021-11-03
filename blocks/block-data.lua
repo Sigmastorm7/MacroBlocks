@@ -1,5 +1,8 @@
 local addon, mb = ...
 
+_, mb.UserClass, _ = UnitClass(PLAYER)
+mb.UserSpec = GetSpecialization()
+
 -- Frame backdrop templates
 mb.USRBackdrop = {
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -164,10 +167,15 @@ mb.BasicBlocks = {
 			["choose"] = "MOD",
 		},{
 			["name"] = "spec",
-			["payload"] = "[spec:"..GetSpecialization().."]",
 			["template"] = "ChoiceBlockTemplate",
 			["func"] = "USR_CHOICE",
 			["choose"] = "SPEC"
+		},{
+			["name"] = "talent",
+			["payload"] = "[talent]",
+			["template"] = "TalentBlockTemplate",
+			["func"] = "USR_CHOICE",
+			["choose"] = "TALENT"
 		},--[[{
 			["name"] = "button",
 			["payload"] = "[btn]",
@@ -261,7 +269,7 @@ mb.BasicBlocks = {
 			["payload"] = "<$&>",
 			["neighbors"] = 2,
 		},{
-			["name"] = "or",
+			["name"] = "true",
 			["payload"] = "[]"
 		},{
 			["name"] = "else",

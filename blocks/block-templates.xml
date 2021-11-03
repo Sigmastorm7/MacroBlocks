@@ -270,4 +270,125 @@
             <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
+    <!--Special talent choice block-->
+    <Button name="TalentButtonTemplate" enableMouse="true" virtual="true">
+        <KeyValues>
+            <KeyValue key="enabled" value="false" type="boolean"/>
+            <KeyValue key="value" value="0" type="number"/>
+        </KeyValues>
+        <Size x="22" y="22"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="icon" setAllPoints="true"/>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnLoad function="MB_CHOICE_BUTTON_OnLoad"/>
+            <OnClick function="MB_CHOICE_BUTTON_OnClick"/>
+        </Scripts>
+    </Button>
+    <Frame name="TalentRowTemplate" hidden="true" virtual="true">
+        <Size x="72" y="24"/>
+        <Frames>
+            <Button parentKey="btn1" inherits="TalentButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" x="2"/>
+                </Anchors>
+            </Button>
+            <Button parentKey="btn2" inherits="TalentButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.btn1" relativePoint="RIGHT" x="2"/>
+                </Anchors>
+            </Button>
+            <Button parentKey="btn3" inherits="TalentButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.btn2" relativePoint="RIGHT" x="2"/>
+                </Anchors>
+            </Button>
+        </Frames>
+    </Frame>
+    <Frame name="TalentBlockTemplate" inherits="MacroBlockTemplate" virtual="true">
+        <KeyValues>
+            <KeyValue key="multiChoice" value="false" type="boolean"/>
+            <KeyValue key="reset" value="MB_CHOICE_BLOCK_RESET" type="global"/>
+        </KeyValues>
+        <Size x="57" y="28"/>
+        <Frames>
+            <Button parentKey="flyout" enableMouse="true">
+                <Size>
+                    <AbsDimension x="18" y="28"/>
+                </Size>
+                <KeyValues>
+                    <KeyValue key="open" value="false" type="boolean"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="RIGHT"/>
+                </Anchors>
+                <ButtonText parentKey="text" text="❭❭" inherits="MacroBlocksSymbolFont_Small">
+                    <Anchors>
+                        <Anchor point="CENTER" x="-2" y="-2.5"/>
+                    </Anchors>
+                </ButtonText>
+                <Scripts>
+                    <OnClick function="MB_CHOICE_FlyoutOnClick"/>
+                </Scripts>
+            </Button>
+            <Frame parentKey="backdropFrame" inherits="BackdropTemplate">
+                <Size x="32" y="28"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont"> 
+                            <Anchors>
+                                <Anchor point="CENTER" x="-0.5" y="-0.5"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame parentKey="row1" inherits="TalentRowTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.backdropFrame" relativePoint="RIGHT"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="row2" inherits="TalentRowTemplate">
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.row1" relativePoint="BOTTOM"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="row3" inherits="TalentRowTemplate">
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.row2" relativePoint="BOTTOM"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="row4" inherits="TalentRowTemplate">
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.row3" relativePoint="BOTTOM"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="row5" inherits="TalentRowTemplate">
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.row4" relativePoint="BOTTOM"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="row6" inherits="TalentRowTemplate">
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.row5" relativePoint="BOTTOM"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="row7" inherits="TalentRowTemplate">
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.row6" relativePoint="BOTTOM"/>
+                </Anchors>
+            </Frame>
+        </Frames>
+        <Scripts>
+            <OnLoad function="MB_CHOICE_BLOCK_OnLoad"/>
+            <OnShow function="MB_CHOICE_BLOCK_OnShow"/>
+            <OnDragStart function="MB_OnDragStart"/>
+            <OnDragStop function="MB_OnDragStop"/>
+        </Scripts>
+    </Frame>
 </Ui>

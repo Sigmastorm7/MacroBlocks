@@ -23,11 +23,12 @@ MB_CHOICE_BLOCK_RESET = function(self)
     if self.choose == "SPEC" then
         self.choice1.enabled = true
         b.choice1.text:SetTextColor(0, 1, 0.4)
+    elseif self.choose == "TALENT" then
+
     else
         self.choiceValueSum = 0
+        self.data.payload = self._payload
     end
-
-    self.data.payload = self._payload
 
     self:SetWidth(self.closeW)
     self.flyout.text:SetText(flyoutText[false])
@@ -179,7 +180,7 @@ end
 
 function MB_CHOICE_BLOCK_OnShow(self)
     self:SetBackdropColor(0, 128/255, 77/255)
-    self.payload = 
+    self.payload = self._payload
     self.text:Hide()
 end
 
@@ -194,31 +195,51 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
         self.open = not self.open
     end
 
-    for i=1, p.num do p["choice"..i]:SetShown(self.open) end
+    if p.data.choose ~= "TALENT" then
+        for i=1, p.num do p["choice"..i]:SetShown(self.open) end
+        if self.open then
+            p:SetWidth(p.closeW + p.openW)
+        else
+            p:SetWidth(p.closeW)
+        end
+    else
+        local row
+        for i=1, 7 do
+            row = p["row"..i]
+            row:SetShown(self.open)
+            for j=1, 3 do
+                row["btn"..j]:SetShown(self.open)
+            end
+        end
+        if self.open then
+            p:SetWidth(p.closeW + p.openW)
+        else
+            p:SetWidth(p.closeW)
+        end
+    end
 
     self.text:SetText(flyoutText[self.open])
-
-    if self.open then
-        p:SetWidth(p.closeW + p.openW)
-    else
-        p:SetWidth(p.closeW)
-    end
 
     mb.StackAdjust()
 end
 
 function MB_CHOICE_BUTTON_OnLoad(self)
     self:RegisterForClicks("LeftButtonUp")
-    self:SetWidth(self.text:GetStringWidth())
     self.enabled = false
-    self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
+    if self.text then
+        self:SetWidth(self.text:GetStringWidth())
+        self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
+    else
+
+    end
 end
 
 function MB_CHOICE_BUTTON_OnClick(self, button, down)
     local p = self:GetParent()
 
-    if p.data.choose == "MOD" then
+    if not p.data then p = p:GetParent() end
 
+    if p.data.choose == "MOD" then
         if not self.enabled then
             self.enabled = true
             p.choiceValueSum = p.choiceValueSum + self.value
@@ -226,9 +247,7 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
             self.enabled = false
             p.choiceValueSum = p.choiceValueSum - self.value
         end
-
         mb.Stack.payloadTable[p.StackID] = mb.ModCombos[p.choiceValueSum] or "[mod]"
-        UpdateMacroBlockText()
         self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
     elseif p.data.choose == "SPEC" then
         for i=1, p.num do
@@ -236,7 +255,14 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
             p["choice"..i].text:SetTextColor(unpack(choiceTextColor[p["choice"..i].value == self.value]))
         end
         mb.Stack.payloadTable[p.StackID] = "[spec:"..self.value.."]" or p.payload
-        UpdateMacroBlockText()
+    elseif p.data.choose == "TALENT" then
+        for i=1, 7 do
+            for j=1, 3 do
+                p["row"..i]["btn"..j].enabled = p["row"..i]["btn"..j] == self
+                p["row"..i]["btn"..j].icon:SetDesaturated(p["row"..i]["btn"..j] ~= self)
+            end
+        end
+        mb.Stack.payloadTable[p.StackID] = "[talent:"..self.value.."]" or p.payload
     end
-
+    UpdateMacroBlockText()
 end

@@ -41,6 +41,7 @@ local templates = {
 	{ ["name"] = "SocketBlockTemplate", ["type"] = "Frame" },
 	{ ["name"] = "EditBlockTemplate", ["type"] = "Frame" },
 	{ ["name"] = "ChoiceBlockTemplate", ["type"] = "Frame" },
+	{ ["name"] = "TalentBlockTemplate", ["type"] = "Frame" },
 }
 
 for i=1, #templates do
@@ -52,9 +53,13 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 	local b = mb.BlockPoolCollection:Acquire(data.template or "MacroBlockTemplate")
 
+	b.data = data
+
 	if not data.func or (data.func ~= "USR_SOCKET" and data.func ~= "USR_EDIT") then
 
 		if data.choose then
+
+			local activeSpec = GetSpecialization()
 
 			b.backdropFrame.text:SetText(data.name)
 			b.backdropFrame:SetWidth(b.backdropFrame.text:GetStringWidth() + 18)
@@ -106,10 +111,25 @@ mb.MakeBlock = function(group, data, PaletteID)
 					end
 				end
 
-				local activeSpec = GetSpecialization()
-
 				b["choice"..activeSpec].enabled = true
+				data.payload = "[spec:"..activeSpec.."]"
 				b["choice"..activeSpec].text:SetTextColor(0, 1, 0.4)
+			elseif data.choose == "TALENT" then
+				local talentID, talentName, talentIcon
+
+				for i=1, 7 do
+					for j=1, 3 do
+						talentID, talentName, talentIcon = GetTalentInfoBySpecialization(activeSpec, i, j)
+						b["row"..i]["btn"..j].icon:SetTexture(talentIcon)
+						b["row"..i]["btn"..j].icon:SetDesaturated(true)
+						b["row"..i]["btn"..j]:SetHighlightAtlas("QuestSharing-QuestLog-ButtonHighlight")
+						b["row"..i]["btn"..j].value = i.."/"..j
+						
+					end
+				end
+
+				b.openW = 54
+
 			end
 			b.openW = b.openW + 18
 		else
@@ -126,7 +146,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 	if group == "SMT" then
 		b.CheckNeighbors = function(self)
-			local bool = self.data.name == "or" or self.data.name == "else"
+			local bool = self.data.name == "or" or self.data.name == "true"
 			if mb.Stack.displace then
 				if strfind(data.payload, ">") then
 					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "CON"
