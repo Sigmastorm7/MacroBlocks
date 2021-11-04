@@ -2,4 +2,5 @@
 /macroblocks.code-workspace
 .vscode/settings.json
 emoteSort.py
+command_list_backup.lua
 .release
