@@ -100,14 +100,14 @@
             </Layer>
         </Layers>
         <Frames>
-            <EditBox parentKey="edit" autoFocus="false" font="MacroBlocksFont_Small" multiLine="false" letters="255" countInvisibleLetters="true" enableMouse="true">
+            <EditBox parentKey="edit" autoFocus="false" font="MacroBlocksFont_Input" multiLine="false" letters="255" countInvisibleLetters="true" enableMouse="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" x="9" y="-3"/>
                     <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-18" y="3"/>
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
-			     	    <FontString parentKey="instructions" text="Custom String" justifyH="LEFT" justifyV="MIDDLE" inherits="MacroBlocksFont_Small"  setAllPoints="true">
+			     	    <FontString parentKey="instructions" text="Custom String" justifyH="LEFT" justifyV="MIDDLE" inherits="MacroBlocksFont_Input"  setAllPoints="true">
 			     		    <Color r="0.55" g="0.55" b="0.55"/>
 			     	    </FontString>
 			        </Layer>
@@ -157,7 +157,7 @@
                     <OnTabPressed function="EditBox_OnTabPressed"/>
 			        <OnEscapePressed function="EditBox_ClearFocus"/>
 			        <OnEditFocusLost function="EditBox_ClearHighlight"/>
-			        <OnEditFocusGained function="EditBox_HighlightText"/>
+                    <OnEditFocusGained function="MB_EDIT_OnEditFocusGained"/>
                 </Scripts>
             </EditBox>
             <Frame parentKey="backdropFrame" inherits="BackdropTemplate">
@@ -270,16 +270,32 @@
             <OnDragStop function="MB_OnDragStop"/>
         </Scripts>
     </Frame>
+
     <!--Special talent choice block-->
-    <Button name="TalentButtonTemplate" enableMouse="true" virtual="true">
+    <Button name="ChoiceIconButtonTemplate" enableMouse="true" virtual="true">
         <KeyValues>
             <KeyValue key="enabled" value="false" type="boolean"/>
             <KeyValue key="value" value="0" type="number"/>
         </KeyValues>
-        <Size x="22" y="22"/>
+        <Size x="32" y="20.5"/>
+        <ButtonText parentKey="talentID" setAllPoints="true" inherits="MacroBlocksFont_Small">
+            <Anchors>
+                <Anchor point="BOTTOMRIGHT" y="1.5"/>
+            </Anchors>
+        </ButtonText>
         <Layers>
             <Layer level="ARTWORK">
-                <Texture parentKey="icon" setAllPoints="true"/>
+                <Texture parentKey="icon">
+                    <Size x="32" y="32"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+                <MaskTexture parentKey="mask" atlas="UI-Frame-IconMask" setAllPoints="true">
+                    <MaskedTextures>
+                        <MaskedTexture childKey="icon"/>
+                    </MaskedTextures>
+                </MaskTexture>
             </Layer>
         </Layers>
         <Scripts>
@@ -287,22 +303,22 @@
             <OnClick function="MB_CHOICE_BUTTON_OnClick"/>
         </Scripts>
     </Button>
-    <Frame name="TalentRowTemplate" hidden="true" virtual="true">
-        <Size x="72" y="24"/>
+    <Frame name="IconRowTemplate" hidden="true" virtual="true">
+        <Size x="96" y="20.5"/>
         <Frames>
-            <Button parentKey="btn1" inherits="TalentButtonTemplate">
+            <Button parentKey="btn1" inherits="ChoiceIconButtonTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" x="2"/>
+                    <Anchor point="LEFT"/>
                 </Anchors>
             </Button>
-            <Button parentKey="btn2" inherits="TalentButtonTemplate">
+            <Button parentKey="btn2" inherits="ChoiceIconButtonTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.btn1" relativePoint="RIGHT" x="2"/>
+                    <Anchor point="LEFT" relativeKey="$parent.btn1" relativePoint="RIGHT"/>
                 </Anchors>
             </Button>
-            <Button parentKey="btn3" inherits="TalentButtonTemplate">
+            <Button parentKey="btn3" inherits="ChoiceIconButtonTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.btn2" relativePoint="RIGHT" x="2"/>
+                    <Anchor point="LEFT" relativeKey="$parent.btn2" relativePoint="RIGHT"/>
                 </Anchors>
             </Button>
         </Frames>
@@ -315,12 +331,12 @@
         <Size x="57" y="28"/>
         <Frames>
             <Button parentKey="flyout" enableMouse="true">
-                <Size>
-                    <AbsDimension x="18" y="28"/>
-                </Size>
                 <KeyValues>
                     <KeyValue key="open" value="false" type="boolean"/>
                 </KeyValues>
+                <Size>
+                    <AbsDimension x="18" y="28"/>
+                </Size>
                 <Anchors>
                     <Anchor point="RIGHT"/>
                 </Anchors>
@@ -348,39 +364,46 @@
                     </Layer>
                 </Layers>
             </Frame>
-            <Frame parentKey="row1" inherits="TalentRowTemplate">
+            <Frame parentKey="row1" inherits="IconRowTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.backdropFrame" relativePoint="RIGHT"/>
+                    <Anchor point="LEFT" relativeKey="$parent.backdropFrame" relativePoint="RIGHT" x="2"/>
                 </Anchors>
             </Frame>
-            <Frame parentKey="row2" inherits="TalentRowTemplate">
+            <Frame parentKey="row2" inherits="IconRowTemplate">
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.row1" relativePoint="BOTTOM"/>
                 </Anchors>
             </Frame>
-            <Frame parentKey="row3" inherits="TalentRowTemplate">
+            <Frame parentKey="row3" inherits="IconRowTemplate">
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.row2" relativePoint="BOTTOM"/>
                 </Anchors>
             </Frame>
-            <Frame parentKey="row4" inherits="TalentRowTemplate">
+            <Frame parentKey="row4" inherits="IconRowTemplate">
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.row3" relativePoint="BOTTOM"/>
                 </Anchors>
             </Frame>
-            <Frame parentKey="row5" inherits="TalentRowTemplate">
+            <Frame parentKey="row5" inherits="IconRowTemplate">
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.row4" relativePoint="BOTTOM"/>
                 </Anchors>
             </Frame>
-            <Frame parentKey="row6" inherits="TalentRowTemplate">
+            <Frame parentKey="row6" inherits="IconRowTemplate">
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.row5" relativePoint="BOTTOM"/>
                 </Anchors>
             </Frame>
-            <Frame parentKey="row7" inherits="TalentRowTemplate">
+            <Frame parentKey="row7" inherits="IconRowTemplate">
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.row6" relativePoint="BOTTOM"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="bgFrame" hidden="true" inherits="BackdropTemplate">
+                <Size x="96" y="126"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.row1" x="-4" y="4"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.row7" x="4" y="-4"/>
                 </Anchors>
             </Frame>
         </Frames>

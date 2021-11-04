@@ -1,8 +1,5 @@
 local addon, mb = ...
 
-_, mb.UserClass, _ = UnitClass(PLAYER)
-mb.UserSpec = GetSpecialization()
-
 -- Frame backdrop templates
 mb.USRBackdrop = {
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -56,7 +53,7 @@ mb.GroupColors = {
 		["hex"] = "fffefefe",
 		["rgb"] = { 0.9999977946281433,  0.9999977946281433, 0.9999977946281433 },
 	},
-	["SMT"] = { -- PALADIN
+	["LOG"] = { -- PALADIN
 		["hex"] = "fff38bb9",
 		["rgb"] = { 0.9568606615066528,  0.549018383026123, 0.7294101715087891 },
 	},
@@ -88,7 +85,7 @@ mb.GroupColors = {
 
 -- Default blocks shown in the basic palette
 mb.BasicBlocks = {
-	["CMD"] = {
+	["CMD"] = { -- slash commands
 		{
 			["name"] = "/use",
 			["payload"] = "/use",
@@ -136,7 +133,7 @@ mb.BasicBlocks = {
 			["payload"] = "/sp"
 		},]]
 	},
-	["CON"] = {
+	["CON"] = { -- conditionals
 		{
 			["name"] = "combat",
 			["payload"] = "[combat]",
@@ -164,18 +161,18 @@ mb.BasicBlocks = {
 			["payload"] = "[mod]",
 			["template"] = "ChoiceBlockTemplate",
 			["func"] = "USR_CHOICE",
-			["choose"] = "MOD",
+			["label"] = "MOD",
 		},{
 			["name"] = "spec",
 			["template"] = "ChoiceBlockTemplate",
 			["func"] = "USR_CHOICE",
-			["choose"] = "SPEC"
+			["label"] = "SPEC"
 		},{
 			["name"] = "talent",
 			["payload"] = "[talent]",
 			["template"] = "TalentBlockTemplate",
 			["func"] = "USR_CHOICE",
-			["choose"] = "TALENT"
+			["label"] = "TALENT"
 		},--[[{
 			["name"] = "button",
 			["payload"] = "[btn]",
@@ -188,7 +185,7 @@ mb.BasicBlocks = {
 			}
 		},]]
 	},
-	["TAR"] = {
+	["TAR"] = { -- target modifiers
 		{
 			["name"] = "@player",
 			["payload"] = "[@player]",
@@ -227,7 +224,7 @@ mb.BasicBlocks = {
 			["payload"] = "AaBbCc",
 		},
 	},]]
-	["USR"] = {
+	["USR"] = { -- user input
 		{
 			["name"] = "socket",
 			["payload"] = "",
@@ -240,7 +237,7 @@ mb.BasicBlocks = {
 			["template"] = "EditBlockTemplate"
 		},
 	},
-	["UTL"] = {
+	["UTL"] = { -- utility
 		{
 			["name"] = "#show",
 			["payload"] = "#show\n",
@@ -259,7 +256,7 @@ mb.BasicBlocks = {
 			["payload"] = ";",
 		},
 	},
-	["SMT"] = {
+	["LOG"] = { -- logic
 		{
 			["name"] = "no",
 			["payload"] = "$!>",

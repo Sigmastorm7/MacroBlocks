@@ -12,22 +12,41 @@ local ToyBox = C_ToyBox
 local flyoutWidth = { [true] = 156 }
 local flyoutText = { [false] = "❭❭", [true] = "❬❬" }
 local choiceTextColor = { [false] = { 0.55, 0.55, 0.55 }, [true] = { 0, 1, 0.4 }, }
+local talentIDColor = { [true] = {1, 1, 1}, [false] = {1, 0.8, 0.3} }
+local talentIconAlpha = { [true] = 1, [false] = 0.8 }
 
 MB_CHOICE_BLOCK_RESET = function(self)
-    for i=1, self.num do
-        self["choice"..i].enabled = false
-        self["choice"..i]:Hide()
-        self["choice"..i].text:SetTextColor(unpack(choiceTextColor[false]))
-    end
 
-    if self.choose == "SPEC" then
-        self.choice1.enabled = true
-        b.choice1.text:SetTextColor(0, 1, 0.4)
-    elseif self.choose == "TALENT" then
-
-    else
+    if self.data.label == "MOD" then
+        for i=1, self.num do
+            self["choice"..i].enabled = false
+            self["choice"..i]:Hide()
+            self["choice"..i].text:SetTextColor(unpack(choiceTextColor[false]))
+        end
         self.choiceValueSum = 0
         self.data.payload = self._payload
+    elseif self.data.label == "SPEC" then
+        for i=1, self.num do
+            self["choice"..i].enabled = false
+            self["choice"..i]:Hide()
+            self["choice"..i].text:SetTextColor(unpack(choiceTextColor[false]))
+        end
+        self.choice1.enabled = true
+        self.choice1.text:SetTextColor(0, 1, 0.4)
+    elseif self.data.label == "TALENT" then
+        self.bgFrame:Hide()
+        local _btn
+        for i=1, 7 do
+            for j=1, 3 do
+                _btn = self["row"..i]["btn"..j]
+                _btn.enabled = false
+                _btn:Hide()
+                _btn:UnlockHighlight()
+                _btn.icon:SetAlpha(talentIconAlpha[false])
+                _btn.icon:SetDesaturated(true)
+                _btn.talentID:SetTextColor(unpack(talentIDColor[false]))
+            end
+        end
     end
 
     self:SetWidth(self.closeW)
@@ -47,7 +66,7 @@ function MB_OnDragStart(self, button)
     self:SetFrameStrata("TOOLTIP")
 
     if self.InStack then
-        mb.Stack.remBlock(self)
+        mb.Stack:remBlock(self)
     end
 
     mb.Frame.dragging = self
@@ -59,24 +78,24 @@ function MB_OnDragStop(self)
     self:StopMovingOrSizing()
 	self:SetUserPlaced(false)
 
-    if MouseIsOver(mb.Stack) then
+    if mb.Stack:IsMouseOver() then
         if not self.InStack then
             mb.Palette.blocks[self.PaletteID] = mb.MakeBlock(strsub(self.GroupID, 1, 3), self.data, self.PaletteID)
         end
-        if strsub(self.GroupID, 1, 3) ~= "SMT" then
-            mb.Stack.addBlock(self)
-        elseif strsub(self.GroupID, 1, 3) == "SMT" then
+        if strsub(self.GroupID, 1, 3) ~= "LOG" then
+            mb.Stack:addBlock(self)
+        elseif strsub(self.GroupID, 1, 3) == "LOG" then
             if self:CheckNeighbors() then
-                mb.Stack.addBlock(self)
+                mb.Stack:addBlock(self)
             else
                 mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
                 mb.Palette.blocks[self.PaletteID] = self
                 self.InStack = false
                 mb.Stack.displace = false
-                mb.StackAdjust()
+                mb.Stack:Adjust()
             end
         end
-    elseif not MouseIsOver(mb.Stack) and self.InStack then
+    elseif not mb.Stack:IsMouseOver() and self.InStack then
         if self.data.func ~= nil then
             if self.data.func == "USR_SOCKET" then
                 self.data.payload = ""
@@ -95,7 +114,7 @@ function MB_OnDragStop(self)
         mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
         mb.Palette.blocks[self.PaletteID] = self
         
-    elseif MouseIsOver(mb.Stack) and mb.Stack.displace then
+    elseif mb.Stack:IsMouseOver() and mb.Stack.displace then
         mb.Stack.displace = false
     end
 
@@ -106,8 +125,8 @@ function MB_OnDragStop(self)
     mb.Stack.displace = false
     mb.Stack.displaceID = 0
 
-    if self.InStack then mb.StackAdjust() end
-    mb.PaletteAdjust()
+    if self.InStack then mb.Stack:Adjust() end
+    mb.Palette:Adjust()
 end
 
 -- USR input element handler
@@ -160,6 +179,14 @@ function MB_SOCKET_OnClick(self, button, down)
 end
 
 -- USR edit block handlers
+function MB_EDIT_OnEditFocusGained(self)
+    if not self:GetParent().InStack then
+        self:ClearFocus()
+        return
+    else
+        self:HighlightText();
+    end
+end
 function MB_EDIT_OnTextChanged(self, userInput)
     self.instructions:SetShown(self:GetText() == "")
     if userInput then
@@ -182,6 +209,12 @@ function MB_CHOICE_BLOCK_OnShow(self)
     self:SetBackdropColor(0, 128/255, 77/255)
     self.payload = self._payload
     self.text:Hide()
+
+    if self.label == "TALENT" then
+        self.bgFrame:SetBackdrop(mb.USRBackdrop);
+        self.bgFrame:SetBackdropColor(0, 0, 0, 0.8) -- 0, 128/255, 77/255);
+        self.bgFrame:SetBackdropBorderColor(0, 0.9999977946281433, 0.5960771441459656);
+    end
 end
 
 function MB_CHOICE_FlyoutOnClick(self, button, down)
@@ -195,7 +228,7 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
         self.open = not self.open
     end
 
-    if p.data.choose ~= "TALENT" then
+    if p.data.label ~= "TALENT" then
         for i=1, p.num do p["choice"..i]:SetShown(self.open) end
         if self.open then
             p:SetWidth(p.closeW + p.openW)
@@ -211,6 +244,7 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
                 row["btn"..j]:SetShown(self.open)
             end
         end
+        p.bgFrame:SetShown(self.open)
         if self.open then
             p:SetWidth(p.closeW + p.openW)
         else
@@ -220,7 +254,7 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
 
     self.text:SetText(flyoutText[self.open])
 
-    mb.StackAdjust()
+    mb.Stack:Adjust()
 end
 
 function MB_CHOICE_BUTTON_OnLoad(self)
@@ -239,7 +273,7 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
 
     if not p.data then p = p:GetParent() end
 
-    if p.data.choose == "MOD" then
+    if p.data.label == "MOD" then
         if not self.enabled then
             self.enabled = true
             p.choiceValueSum = p.choiceValueSum + self.value
@@ -249,17 +283,26 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
         end
         mb.Stack.payloadTable[p.StackID] = mb.ModCombos[p.choiceValueSum] or "[mod]"
         self.text:SetTextColor(unpack(choiceTextColor[self.enabled]))
-    elseif p.data.choose == "SPEC" then
+    elseif p.data.label == "SPEC" then
         for i=1, p.num do
             p["choice"..i].enabled = p["choice"..i].value == self.value
             p["choice"..i].text:SetTextColor(unpack(choiceTextColor[p["choice"..i].value == self.value]))
         end
         mb.Stack.payloadTable[p.StackID] = "[spec:"..self.value.."]" or p.payload
-    elseif p.data.choose == "TALENT" then
+    elseif p.data.label == "TALENT" then
+        local tBtn
         for i=1, 7 do
             for j=1, 3 do
-                p["row"..i]["btn"..j].enabled = p["row"..i]["btn"..j] == self
-                p["row"..i]["btn"..j].icon:SetDesaturated(p["row"..i]["btn"..j] ~= self)
+                tBtn = p["row"..i]["btn"..j]
+                tBtn.enabled = tBtn == self
+                tBtn.icon:SetAlpha(talentIconAlpha[tBtn.enabled])
+                tBtn.icon:SetDesaturated(not tBtn.enabled)
+                tBtn.talentID:SetTextColor(unpack(talentIDColor[tBtn.enabled]))
+                if tBtn.enabled then
+                    tBtn:LockHighlight()
+                else
+                    tBtn:UnlockHighlight()
+                end
             end
         end
         mb.Stack.payloadTable[p.StackID] = "[talent:"..self.value.."]" or p.payload

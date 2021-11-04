@@ -36,9 +36,14 @@
             <Color r="0" g="0" b="0" a="1"/>
         </Shadow>
     </Font>
-    <Font name="MacroBlocksFont_Small" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansMono\NotoSansMono-ExtraBold.ttf" height="9" virtual="true">
-        <!--<Shadow x="1" y="0">
-            <Color r="0" g="0" b="0" a="1"/>
+    <Font name="MacroBlocksFont_Input" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansMono\NotoSansMono-SemiBold.ttf" height="9" virtual="true">
+        <Shadow x="1" y="-1">
+            <Color r="0" g="0" b="0" a="0.6"/>
+        </Shadow>
+    </Font>
+    <Font name="MacroBlocksFont_Small" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansMono\NotoSansMono-Bold.ttf" height="8" outline="THICK" virtual="true">
+        <!--<Shadow x="-2" y="2">
+            <Color r="0" g="0" b="0" a="0.6"/>
         </Shadow>-->
     </Font>
     <Font name="MacroBlocksFont_Large" font="Interface\AddOns\MacroBlocks\media\fonts\NotoSansMono\NotoSansMono-SemiBold.ttf" height="16" virtual="true">

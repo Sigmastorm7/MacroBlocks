@@ -121,7 +121,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		-- Resize the macro frame and change it's UIPanel attributes to correct repositioning interactions
 		MacroFrame:SetSize(600, 560)
-		UIPanelWindows["MacroFrame"] = { area = "left", pushable = 1, whileDead = 1, width = 600 }
+		UIPanelWindows["MacroFrame"] = { area = "left", pushable = 0, whileDead = 1, width = 600 }
 
 		-- Make the macro frame moveable by the user
 		MacroFrame:SetMovable(true)
@@ -141,9 +141,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		-- Hide the things we can't put in the bin neatly
 		MacroFrame.TopTileStreaks:Hide()
-
-		-- YEEEEET this dumb bar outta here, the right half can't be accessed so its anchor has to be sent somewhere
-		MacroHorizontalBarLeft:SetPoint("TOPLEFT", UIParent, "TOPLEFT", -1000, 1000)
 
 		-- Attach the character count to the text box for easier adjustment of frames
 		MacroFrameCharLimitText:ClearAllPoints()
@@ -360,7 +357,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
     		for _, block in pairs(clearBlocks) do
 				if not block.saved then
-  					mb.Stack.remBlock(block)
+  					mb.Stack:remBlock(block)
 				    MB_OnDragStop(block)
 			    end
 			end
@@ -386,6 +383,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function(_self)
 			mb.Frame:Show()
+			mb.GetUser()
 			mb.Init()
 			_self.textChanged = nil
 			_self.changes = false

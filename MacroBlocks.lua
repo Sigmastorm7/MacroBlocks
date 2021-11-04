@@ -8,6 +8,26 @@ SlashCmdList["PRINT"] = function(msg, editBox)
 	SlashCmdList.SCRIPT("print("..msg..")")
 end
 
+mb.User = {}
+mb.GetUser = function()
+	local className, classFileName, classID = UnitClass(PLAYER)
+	local specID = GetSpecialization()
+	local specEngineID, specName, _, specIcon, specRole = GetSpecializationInfo(specID)
+	mb.User = {
+		["class"] = {
+			["id"] = classID,
+			["name"] = className,
+			["fileName"] = classFileName,
+		},
+		["spec"] = {
+			["id"] = specID,
+			["name"] = specName,
+			["icon"] = specIcon,
+			["role"] = specRole,
+		}
+	}
+end
+
 local mb_init = false
 
 mb.Frame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
@@ -57,9 +77,9 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 	if not data.func or (data.func ~= "USR_SOCKET" and data.func ~= "USR_EDIT") then
 
-		if data.choose then
+		if data.label then
 
-			local activeSpec = GetSpecialization()
+			b.label = data.label
 
 			b.backdropFrame.text:SetText(data.name)
 			b.backdropFrame:SetWidth(b.backdropFrame.text:GetStringWidth() + 18)
@@ -69,7 +89,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 			b.openW = 0
 
-			if data.choose == "MOD" then
+			if data.label == "MOD" then
 				b.num = 3
 				for i=1, 6 do
 					if i <= b.num then
@@ -91,14 +111,14 @@ mb.MakeBlock = function(group, data, PaletteID)
 				end
 
 				b._payload = data.payload
-			elseif data.choose == "SPEC" then
+			elseif data.label == "SPEC" then
 				_, b.class, _ = UnitClass(PLAYER)
 				b.num = mb.Choices.SPEC[b.class]
 				
 				for i=1, 6 do
 					if i <= b.num then
-						local _, specName = GetSpecializationInfo(i)
-						b["choice"..i].text:SetText(specName)
+						local _, spec = GetSpecializationInfo(i)
+						b["choice"..i].text:SetText(spec)
 						b["choice"..i].enabled = false
 						b["choice"..i].value = i
 						b["choice"..i]:SetWidth(b["choice"..i].text:GetStringWidth())
@@ -111,24 +131,39 @@ mb.MakeBlock = function(group, data, PaletteID)
 					end
 				end
 
-				b["choice"..activeSpec].enabled = true
-				data.payload = "[spec:"..activeSpec.."]"
-				b["choice"..activeSpec].text:SetTextColor(0, 1, 0.4)
-			elseif data.choose == "TALENT" then
-				local talentID, talentName, talentIcon
+				b["choice"..mb.User.spec.id].enabled = true
+				data.payload = "[spec:"..mb.User.spec.id.."]"
+				b["choice"..mb.User.spec.id].text:SetTextColor(0, 1, 0.4)
+			elseif data.label == "TALENT" then
 
-				for i=1, 7 do
-					for j=1, 3 do
-						talentID, talentName, talentIcon = GetTalentInfoBySpecialization(activeSpec, i, j)
-						b["row"..i]["btn"..j].icon:SetTexture(talentIcon)
-						b["row"..i]["btn"..j].icon:SetDesaturated(true)
-						b["row"..i]["btn"..j]:SetHighlightAtlas("QuestSharing-QuestLog-ButtonHighlight")
-						b["row"..i]["btn"..j].value = i.."/"..j
-						
+				b.init = true
+				b.OnSpecChanged = function(self)
+					local talentID, talentName, talentIcon
+					for i=1, 7 do
+						for j=1, 3 do
+							talentID, talentName, talentIcon = GetTalentInfoBySpecialization(GetSpecialization(), i, j)
+							self["row"..i]["btn"..j].icon:SetTexture(talentIcon)
+							if self.init then
+								self["row"..i]["btn"..j].icon:SetDesaturated(true)
+								self["row"..i]["btn"..j]:SetHighlightAtlas("ChromieTime-Button-Selection")
+								self["row"..i]["btn"..j].icon:SetAlpha(0.8)
+								self["row"..i]["btn"..j].talentID:SetText(i.."/"..j)
+								self["row"..i]["btn"..j].talentID:SetTextColor(1, 0.8, 0.3)
+								self["row"..i]["btn"..j].value = i.."/"..j
+							end
+						end
 					end
 				end
 
-				b.openW = 54
+				b:OnSpecChanged()
+				b.init = false
+
+				b:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+				b:SetScript("OnEvent", function(self, event, arg)
+					if event == "PLAYER_SPECIALIZATION_CHANGED" then self:OnSpecChanged() end
+				end)
+
+				b.openW = 84
 
 			end
 			b.openW = b.openW + 18
@@ -144,7 +179,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 		end
 	end
 
-	if group == "SMT" then
+	if group == "LOG" then
 		b.CheckNeighbors = function(self)
 			local bool = self.data.name == "or" or self.data.name == "true"
 			if mb.Stack.displace then
@@ -179,7 +214,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 	if b.PaletteID == -1 then
 		b.InStack = true
-		mb.Stack.addBlock(b)
+		mb.Stack:addBlock(b)
 	else
 		b.InStack = false
 	end
@@ -197,7 +232,7 @@ local function delimSwitch(index, block)
 	bool = bool or block.data.func == "NEW_LINE"
 	bool = bool or index == 1
 	bool = bool or #mb.Stack.blocks == 1
-	bool = bool or BID == "SMT" or LBID == "SMT"
+	bool = bool or BID == "LOG" or LBID == "LOG"
 	bool = bool or (BID == "CON" or BID == "TAR") and (LBID == "CON" or LBID == "TAR")
 	bool = bool or block.stackOffset.x == 7
 	bool = bool or block.data.name == ";"
@@ -226,70 +261,70 @@ function UpdateMacroBlockText()
 	MacroFrameText:SetText(mb.Stack.string)
 end
 
-mb.PaletteAdjust = function(group, index, xOff, yOff)
+mb.Palette.Adjust = function(self, group, index, xOff, yOff)
 
 	group = group or "CMD"
 	index = index or 1
 	xOff = xOff or 6
 	yOff = yOff or -6
 
-	if index <= #mb.Palette.blocks then
+	if index <= #self.blocks then
 
 		-- if not mb.Palette.blocks[index]:IsShown() then mb.Palette.blocks[index]:Show() end
 
-		if strsub(mb.Palette.blocks[index].GroupID, 1, 3) ~= group and strsub(mb.Palette.blocks[index].GroupID, 1, 3) ~= "SMT" then
+		if strsub(self.blocks[index].GroupID, 1, 3) ~= group and strsub(self.blocks[index].GroupID, 1, 3) ~= "LOG" then
 			xOff = 6
 			yOff = yOff - 28.5
-			group = strsub(mb.Palette.blocks[index].GroupID, 1, 3)
+			group = strsub(self.blocks[index].GroupID, 1, 3)
 		end
 
-		if (xOff + mb.Palette.blocks[index]:GetWidth()) >= (mb.Palette:GetWidth() - 4) then
+		if (xOff + self.blocks[index]:GetWidth()) >= (self:GetWidth() - 4) then
 			xOff = 6
 			yOff = yOff - 28.5
 		end
 
-		mb.Palette.blocks[index]:ClearAllPoints()
-		mb.Palette.blocks[index]:SetPoint("TOPLEFT", mb.Palette, "TOPLEFT", xOff, yOff)
-		xOff = xOff + mb.Palette.blocks[index]:GetWidth()
+		self.blocks[index]:ClearAllPoints()
+		self.blocks[index]:SetPoint("TOPLEFT", self, "TOPLEFT", xOff, yOff)
+		xOff = xOff + self.blocks[index]:GetWidth()
 
-		mb.PaletteAdjust(group, index + 1, xOff, yOff)
+		self:Adjust(group, index + 1, xOff, yOff)
 	else
 		return
 	end
 end
 
-mb.StackAdjust = function(index, xOff, yOff)
+mb.Stack.Adjust = function(self, index, xOff, yOff)
 
 	index = index or 1
 	xOff = xOff or 7
 	yOff = yOff or -6
 
-	if index <= #mb.Stack.blocks then
+	if index <= #self.blocks then
 
-		if (xOff + mb.Stack.blocks[index]:GetWidth()) >= (mb.Stack:GetWidth() - 6) then
+		if (xOff + self.blocks[index]:GetWidth()) >= (self:GetWidth() - 6) then
 			xOff = 7
 			yOff = yOff - 30
 		end
 
-		if index == mb.Stack.displaceID and mb.Stack.displace then
+		if index == self.displaceID and self.displace then
 			xOff = xOff + 32
 		end
 
-		if mb.Stack.blocks[index].socket then xOff = xOff + 2 end
+		if self.blocks[index].socket then xOff = xOff + 2 end
 
-		mb.Stack.blocks[index]:ClearAllPoints()
-		mb.Stack.blocks[index]:SetPoint("TOPLEFT", mb.Stack, "TOPLEFT", xOff, yOff)
-		mb.Stack.blocks[index].stackOffset = { ["x"] = xOff, ["y"] = yOff }
-		xOff = xOff + mb.Stack.blocks[index]:GetWidth()
+		self.blocks[index]:ClearAllPoints()
+		self.blocks[index]:SetPoint("TOPLEFT", self, "TOPLEFT", xOff, yOff)
+		self.blocks[index].stackOffset = { ["x"] = xOff, ["y"] = yOff }
+		xOff = xOff + self.blocks[index]:GetWidth()
 
 		-- Creates a new line if the updated block is utility block with the NEW_LINE flag
-		if mb.Stack.blocks[index].data.func then
-			if mb.Stack.blocks[index].data.func == "NEW_LINE" then
-				xOff = mb.Stack:GetWidth() - 6
+		if self.blocks[index].data.func then
+			if self.blocks[index].data.func == "NEW_LINE" then
+				xOff = self:GetWidth() - 6
 			end
 		end
 
-		mb.StackAdjust(index + 1, xOff, yOff)
+		self:Adjust(index + 1, xOff, yOff)
 	else
 		UpdateMacroBlockText()
 		return
@@ -297,17 +332,17 @@ mb.StackAdjust = function(index, xOff, yOff)
 end
 
 function StackDisplaceCheck(self)
+	if not self:IsMouseOver() then return end
+
 	local bool = false
 	local dis = 0
 
-	if not MouseIsOver(mb.Stack) then return end
+	if #self.blocks == 0 then return end
 
-	if #mb.Stack.blocks == 0 then return end
-
-	for index, block in pairs(mb.Stack.blocks) do
+	for index, block in pairs(self.blocks) do
 		if block.displaced then dis = 32 end
-		if MouseIsOver(block, 0, 0, -(16+dis), -block:GetWidth()+16) then
-			mb.Stack.displaceID = index
+		if block:IsMouseOver(0, 0, -(16+dis), -block:GetWidth()+16) then
+			self.displaceID = index
 			block.displaced = true
 			bool = bool or true
 		else
@@ -316,44 +351,43 @@ function StackDisplaceCheck(self)
 		end
 	end
 
-	mb.Stack.displace = bool
-
-	mb.StackAdjust()
+	self.displace = bool
+	mb.Stack:Adjust()
 end
 
-mb.Stack.addBlock = function(block)
-	block:SetParent(mb.Stack)
+mb.Stack.addBlock = function(self, block)
+	block:SetParent(self)
 	block.InStack = true
 	block.saved = false
 
-	if mb.Stack.displace then
-		table.insert(mb.Stack.blocks, mb.Stack.displaceID, block)
-		table.insert(mb.Stack.payloadTable, mb.Stack.displaceID, block.data.payload)
+	if self.displace then
+		table.insert(self.blocks, self.displaceID, block)
+		table.insert(self.payloadTable, self.displaceID, block.data.payload)
 	else
-		table.insert(mb.Stack.blocks, block)
-		table.insert(mb.Stack.payloadTable, block.data.payload)
+		table.insert(self.blocks, block)
+		table.insert(self.payloadTable, block.data.payload)
 	end
 
-	for id, b in pairs(mb.Stack.blocks) do b.StackID = id end
-	mb.StackAdjust()
+	for id, b in pairs(self.blocks) do b.StackID = id end
+	mb.Stack:Adjust()
 
-	mb.Stack.Instructions:Hide()
+	self.Instructions:Hide()
 end
 
-mb.Stack.remBlock = function(block)
+mb.Stack.remBlock = function(self, block)
 	block:SetParent(mb.Palette)
-	table.remove(mb.Stack.blocks, block.StackID)
-	table.remove(mb.Stack.payloadTable, block.StackID)
+	table.remove(self.blocks, block.StackID)
+	table.remove(self.payloadTable, block.StackID)
 
-	for id, b in pairs(mb.Stack.blocks) do b.StackID = id end
-	mb.StackAdjust()
+	for id, b in pairs(self.blocks) do b.StackID = id end
+	mb.Stack:Adjust()
 
-	if #mb.Stack.blocks == 0 then
-		mb.Stack.Instructions:Show()
+	if #self.blocks == 0 then
+		self.Instructions:Show()
 	end
 end
 
-local initOrder = {"CMD", "CON", "SMT", "TAR", "USR", "UTL"}
+local initOrder = {"CMD", "CON", "LOG", "TAR", "USR", "UTL"}
 mb.Init = function()
 	if mb_init then return end
 	mb_init = true
@@ -365,7 +399,7 @@ mb.Init = function()
 		for _, data in pairs(mb.BasicBlocks[grp]) do
 			mb.Palette.blocks[itr] = mb.MakeBlock(grp, data, itr)			
 			itr = itr + 1
-			mb.PaletteAdjust()
+			mb.Palette:Adjust()
 		end
 	end
 end
