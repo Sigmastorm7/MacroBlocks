@@ -412,20 +412,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			MacroCancelButton:Disable()
 			MacroFrameText.saved = true
 
-			--[[
-			local getTex
-			for i=1, 120 do
-				getTex = _G["MacroButton"..i.."Icon"]:GetTexture()
-				if not getTex then
-					_G["MacroButton"..i.."Icon"]:SetAtlas("tradeskills-icon-add")
-					_G["MacroButton"..i.."Icon"]:SetBlendMode("ADD")
-					_G["MacroButton"..i.."Icon"]:SetAlpha(0.6)
-					_G["MacroButton"..i]:Enable()
-					-- _G["MacroButton"..i.."Icon"]:Show()
-				end
-			end
-			]]
-
 		end)
 		MacroFrame:HookScript("OnHide", function(_self)
 			mb.Frame:Hide()

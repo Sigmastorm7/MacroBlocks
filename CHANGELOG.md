@@ -1,4 +1,15 @@
 # Macro Blocks Changelog
+### 1.2.0-Release
+#### Fixed
+- Elements of the original MacroFrame should no longer appear
+
+#### Added
+- All blocks now show info tooltips when 'shift' is held
+- 2 New Condition Blocks
+  - specialization selection & talent selection
+- 1 New Logic Block
+  - true '[]'
+
 ### 1.1.0-Release
 #### Fixed
 - Extra spaces in macro text
