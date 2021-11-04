@@ -25,6 +25,16 @@
             <OnLoad function="MB_OnLoad"/>
             <OnDragStart function="MB_OnDragStart"/>
             <OnDragStop function="MB_OnDragStop"/>
+            <OnEnter>
+                if IsShiftKeyDown() then
+                    MB_OnEnter(self);
+                end
+                self:SetScript("OnEvent", MB_Tooltip);
+            </OnEnter>
+            <OnLeave>
+                MB_OnLeave(self);
+                self:SetScript("OnEvent", nil);
+            </OnLeave>
         </Scripts>
     </Frame>
     <!--USR input block template for dragging and dropping spell/item icons onto-->
@@ -284,6 +294,14 @@
             </Anchors>
         </ButtonText>
         <Layers>
+            <Layer level="OVERLAY">
+                <Texture parentKey="selected" atlas="cosmeticiconframe">
+                    <Size x="32" y="32"/>
+                    <Anchors>
+                        <Anchor point="TOP"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
             <Layer level="ARTWORK">
                 <Texture parentKey="icon">
                     <Size x="32" y="32"/>
@@ -294,6 +312,7 @@
                 <MaskTexture parentKey="mask" atlas="UI-Frame-IconMask" setAllPoints="true">
                     <MaskedTextures>
                         <MaskedTexture childKey="icon"/>
+                        <MaskedTexture childKey="selected"/>
                     </MaskedTextures>
                 </MaskTexture>
             </Layer>

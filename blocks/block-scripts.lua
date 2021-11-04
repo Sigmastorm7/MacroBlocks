@@ -58,6 +58,33 @@ end
 function MB_OnLoad(self)
     self:SetClampedToScreen(true)
     self:RegisterForDrag("LeftButton")
+    self:RegisterEvent("MODIFIER_STATE_CHANGED")
+    self.ttEnabled = false
+end
+
+function MB_OnEnter(self)
+    GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", -8, 8)
+	GameTooltip:AddLine(self.tooltip[1])
+    GameTooltip:AddLine(self.tooltip[2])
+    GameTooltip:AddLine(self.tooltip[3])
+    GameTooltip:AddLine(self.tooltip[4])
+    GameTooltip:Show()
+end
+
+function MB_OnLeave(self)
+    if GameTooltip:IsOwned(self) then
+        GameTooltip:Hide()
+    end
+end
+
+function MB_Tooltip(self, event, key, state)
+    if event =="MODIFIER_STATE_CHANGED" then
+        if strsub(key, 2) == "SHIFT" and state == 1 and not GameTooltip:IsOwned(self) then
+            MB_OnEnter(self)
+        else
+            MB_OnLeave(self)
+        end
+    end
 end
 
 function MB_OnDragStart(self, button)
@@ -298,6 +325,7 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
                 tBtn.icon:SetAlpha(talentIconAlpha[tBtn.enabled])
                 tBtn.icon:SetDesaturated(not tBtn.enabled)
                 tBtn.talentID:SetTextColor(unpack(talentIDColor[tBtn.enabled]))
+                tBtn.selected:SetShown(mb.User.talents[i][j])
                 if tBtn.enabled then
                     tBtn:LockHighlight()
                 else

@@ -244,6 +244,27 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.New:SetSize(86, 28)
 		MFSM.New:SetText("New")
 
+		local info = CreateFrame("Frame", "$parentInfo", mb.Frame)
+		info:SetPoint("TOPRIGHT", -6, -29)
+		info:SetSize(36, 36)
+		info.text = info:CreateFontString(nil, "ARTWORK", "MacroBlocksSymbolFont_Large")
+		info.text:SetPoint("CENTER")
+		info.text:SetAlpha(0.5)
+		info.text:SetText("🛈")
+		info:SetScript("OnEnter", function(_self)
+			info.text:SetAlpha(1)
+			GameTooltip:SetOwner(_self, "ANCHOR_RIGHT", 0, -_self:GetHeight());
+			GameTooltip:AddLine("Macro Blocks")
+			GameTooltip:AddLine("Hold 'Shift' with your cursor over any block to display tooltips.")
+        	GameTooltip:Show()
+		end)
+		info:SetScript("OnLeave", function(_self)
+			info.text:SetAlpha(0.5)
+			if GameTooltip:IsOwned(_self) then
+				GameTooltip:Hide()
+			end
+		end)
+
 		-- MFSM.Copy=CreateFrame("Button", "$parentCopy", mb.Frame, "SharedButtonTemplate")
 
 		MFSM.Name.Left:SetAtlas("auctionhouse-ui-inputfield-left"); MFSM.Name.Left:SetSize(8, 28); MFSM.Name.Left:SetPoint("LEFT", -8, -2)

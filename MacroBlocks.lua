@@ -24,8 +24,18 @@ mb.GetUser = function()
 			["name"] = specName,
 			["icon"] = specIcon,
 			["role"] = specRole,
-		}
+		},
 	}
+	mb.User.talents = {}
+
+	local selected
+	for i=1, 7 do
+		mb.User.talents[i] = {}
+		for j=1, 3 do
+			_, _, _, selected = GetTalentInfoBySpecialization(specID, i, j)
+			mb.User.talents[i][j] = selected
+		end
+	end
 end
 
 local mb_init = false
@@ -138,6 +148,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 				b.init = true
 				b.OnSpecChanged = function(self)
+					mb.GetUser()
 					local talentID, talentName, talentIcon
 					for i=1, 7 do
 						for j=1, 3 do
@@ -149,6 +160,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 								self["row"..i]["btn"..j].icon:SetAlpha(0.8)
 								self["row"..i]["btn"..j].talentID:SetText(i.."/"..j)
 								self["row"..i]["btn"..j].talentID:SetTextColor(1, 0.8, 0.3)
+								self["row"..i]["btn"..j].selected:SetShown(mb.User.talents[i][j])
 								self["row"..i]["btn"..j].value = i.."/"..j
 							end
 						end
@@ -202,6 +214,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 	end
 
 	b.data = data
+	b.tooltip = data.tooltip
 
 	b.GroupID = group..PaletteID
 	b.PaletteID = PaletteID or #mb.Palette.blocks + 1
