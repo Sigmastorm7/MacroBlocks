@@ -4,9 +4,9 @@ ignore:
     - Blizzard_MacroUI
     - LICENSE
     - README.md
-    - command_DB.lua
+    - command_list_backup.lua
     - macroblocks.code-workspace
 
 manual-changelog:
-    filename: CHANGELOG.md
+    filename: CHANGELOG.txt
     markup-type: markdown
