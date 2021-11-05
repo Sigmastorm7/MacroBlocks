@@ -416,6 +416,9 @@ mb.Init = function()
 	end
 end
 
+mb.UserMacros = {}
+mb.MacroHistory = {}
+
 frame:SetScript("OnEvent", function(self, event, arg)
 	if event == "PLAYER_SPECIALIZATION_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
 		mb.GetUser()
@@ -424,9 +427,19 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		mb.CharacterID = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
 
-		if UserMacros == nil then UserMacros = {} end
+		if UserMacros == nil then
+			UserMacros = {}
+			mb.UserMacros = {}
+		else
+			mb.UserMacros = UserMacros
+		end
 
-		mb.UserMacros = UserMacros or {}
+		if MacroHistory == nil then
+			MacroHistory = {}
+			mb.MacroHistory = {}
+		else
+			mb.MacroHistory = MacroHistory
+		end
 
 		local numGen, numChar = GetNumMacros()
 		local name, texture, body
@@ -435,7 +448,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			for i=1, numGen do
 				name, texture, body = GetMacroInfo(i)
 				if name ~= nil then
-					mb.UserMacros[i] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
+					mb.UserMacros[i] = { ["name"] = name, ["texture"] = texture, ["body"] = body, }
 				end
 			end
 		end
@@ -445,7 +458,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 				name, texture, body = GetMacroInfo(i)
 				if mb.UserMacros[i] == nil then mb.UserMacros[i] = {} end
 				if name ~= nil then
-					mb.UserMacros[i][mb.CharacterID] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
+					mb.UserMacros[i][mb.CharacterID] = { ["name"] = name, ["texture"] = texture, ["body"] = body, }
 				end
 			end
 		end
@@ -455,10 +468,24 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		-- if MacroChangelog == nil then MacroChangelog = {} end
 	
 		for index, data in pairs(mb.UserMacros) do
-			if index <=120 then
+			if index <= 120 then
 				UserMacros[index] = mb.UserMacros[index]
 			else
 				UserMacros[index][mb.CharacterID] = mb.UserMacros[index][mb.CharacterID]
+			end
+		end
+
+		for index, data in pairs(mb.MacroHistory) do
+			if index <= 120 then
+				-- if MacroHistory[index] == nil then MacroHistory[index] = {} end
+				for time, change in pairs(data) do
+					MacroHistory[index][time] = change
+				end
+			else
+				-- if MacroHistory[index][mb.CharacterID] == nil then MacroHistory[index][mb.CharacterID] = {} end
+				for time, change in pairs(data) do
+					MacroHistory[index][mb.CharacterID][time] = change
+				end
 			end
 		end
 

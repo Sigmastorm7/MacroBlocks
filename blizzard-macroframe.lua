@@ -353,10 +353,21 @@ frame:SetScript("OnEvent", function(self, event, arg)
 				block.saved = true
 			end
 
+			local macroText = MacroFrameText:GetText()
+			local time = date("%x_%X")
+			local charName = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
+			print(time)
+
+			
+
+			if mb.MacroHistory[MacroFrame.selectedMacro] == nil then mb.MacroHistory[MacroFrame.selectedMacro] = {} end
 			if MacroFrame.selectedMacro > 120 then
-				mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
+				if mb.MacroHistory[MacroFrame.selectedMacro][charName] == nil then
+					mb.MacroHistory[MacroFrame.selectedMacro][charName] = {}
+				end
+				mb.MacroHistory[MacroFrame.selectedMacro][charName][time] = macroText
 			else
-				mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
+				mb.MacroHistory[MacroFrame.selectedMacro][time] = macroText
 			end
 
 			MacroFrameText.blockInput = false
