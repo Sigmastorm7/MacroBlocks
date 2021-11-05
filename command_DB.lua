@@ -1,32 +1,32 @@
 local addon, mb = ...
 mb.SlashCommandList = {
 	["BATTLEPET"] = {
-		["/randomfavoritepet"] = "/rfp",
-		["/summonpet"] = "/sp",
-		["/dismisspet"] = "/dismisspet",
+		"/dismisspet",
+		{ "/randomfavoritepet", "/rfp", },
+		{ "/summonpet", "/sp", },
 	},
 	["INTERFACE"] = {
 		["/achievements"] = "/ach",
-		["/calendar"] = "/calendar",
+		"/calendar",
 		["/dungeonfinder"] = "/df",
 		["/guildfinder"] = "/gf",
 		["/lootrolls"] = "/loot",
 		["/macrohelp"] = "/macrohelp",
 		["/macro"] = "/m",
 		["/raidfinder"] = "/rf",
-		["/share"] = "/share",
+		"/share",
 		["/stopwatch"] = "/sw",
-		["/who"] = "/who",
+		"/who",
 	},
 	["CHAT"] = {
 		["/away"] = "/afk",
 		["/announce"] = "/ann",
-		["/ban"] = "/ban",
+		"/ban",
 		["/chathelp"] = "/chat",
 		["/chatlist"] = "/chatwho",
-		["/chatlog"] = "/chatlog",
+		"/chatlog",
 		["/chatinvite"] = "/cinvite",
-		["/ckick"] = "/ckick",
+		"/ckick",
 		["/busy"] = "/dnd",
 		["/emote"] = "/e",
 		["/guild"] = "/g",
@@ -34,43 +34,43 @@ mb.SlashCommandList = {
 		["/channel"] = "/join",
 		["/chatleave"] = "/leave",
 		["/moderator"] = "/mod",
-		["/mute"] = "/mute",
+		"/mute",
 		["/officer"] = "/o",
-		["/owner"] = "/owner",
+		"/owner",
 		["/party"] = "/p",
 		["/password"] = "/pass",
 		["/raid"] = "/ra",
 		["/random"] = "/rnd",
 		["/reply"] = "/r",
-		["/resetchat"] = "/resetchat",
-		["/rw"] = "/rw",
+		"/resetchat",
+		"/rw",
 		["/say"] = "/s",
-		["/unban"] = "/unban",
+		"/unban",
 		["/unmoderator"] = "/unmod",
 		["/unmute"] = "/voice",
 		["/whisper"] = "/w",
 		["/yell"] = "/y",
 	},
 	["CHARACTER"] = {
-		["/dismount"] = "/dismount",
+		"/dismount",
 		["/equip"] = "/eq",
-		["/equipset"] = "/equipset",
-		["/equipslot"] = "/equipslot",
+		"/equipset",
+		"/equipslot",
 		["/friends"] = "/friend",
 		["/follow"] = "/f",
-		["/ignore"] = "/ignore",
+		"/ignore",
 		["/inspect"] = "/ins",
-		["/leavevehicle"] = "/leavevehicle",
-		["/randompet"] = "/randompet",
+		"/leavevehicle",
+		"/randompet",
 		["/removefriend"] = "/remfriend",
-		["/settitle"] = "/settitle",
+		"/settitle",
 		["/trade"] = "/tr",
-		["/unignore"] = "/unignore",
-		["/usetalents"] = "/usetalents",
+		"/unignore",
+		"/usetalents",
 	},
 	["DEV"] = {
-		["/api"] = "/api",
-		["/dump"] = "/dump",
+		"/api",
+		"/dump",
 		["/eventtrace"] = "/etrace",
 		["/framestack"] = "/fstack",
 		["/tableinspect"] = "/tinspect",
@@ -79,21 +79,21 @@ mb.SlashCommandList = {
 		"/absent", "/agree", "/amaze", "/angry", "/apologize", "/applaud", "/arm", "/attackmytarget", "/awe", "/backpack", "/badfeeling", "/bark", "/bashful", "/beckon", "/beg", "/bite", "/blame", "/blank", "/bleed", "/blink", "/blush", "/boggle", "/bonk", "/boop", "/bored", "/bounce", "/bow", "/brandish", "/brb", "/breath", "/burp", "/bye", "/cackle", "/calm", "/challenge", "/charge", "/charm", "/cheer", "/chicken", "/chuckle", "/chug", "/clap", "/cold", "/comfort", "/commend", "/confused", "/congratulate", "/cough", "/coverears", "/cower", "/crack", "/cringe", "/crossarms", "/cry", "/cuddle", "/curious", "/curtsey", "/dance", "/ding", "/disagree", "/doubt", "/drink", "/drool", "/duck", "/eat", "/embarrass", "/encourage", "/enemy", "/eye", "/eyebrow", "/facepalm", "/faint", "/fart", "/fidget", "/flee", "/flee", "/flex", "/flirt", "/flop", "/follow", "/forthealliance", "/forthehorde", "/frown", "/gasp", "/gaze", "/giggle", "/glare", "/gloat", "/glower", "/go", "/going", "/golfclap", "/greet", "/grin", "/groan", "/grovel", "/growl", "/guffaw", "/hail", "/happy", "/headache", "/healme", "/hello", "/helpme", "/hiccup", "/highfive", "/hiss", "/holdhand", "/hug", "/hungry", "/hurry", "/huzzah", "/idea", "/impressed", "/incoming", "/incoming", "/insult", "/introduce", "/jealous", "/jk", "/joke", "/kiss", "/kneel", "/laugh", "/laydown", "/lick", "/listen", "/look", "/lost", "/love", "/luck", "/magnificent", "/map", "/massage", "/meow", "/mercy", "/mock", "/moo", "/moon", "/mountspecial", "/mourn", "/mutter", "/nervous", "/no", "/nod", "/nosepick", "/object", "/offer", "/oom", "/oops", "/openfire", "/panic", "/pat", "/peer", "/pet", "/pinch", "/pity", "/plead", "/point", "/poke", "/ponder", "/pounce", "/pout", "/praise", "/pray", "/promise", "/proud", "/pulse", "/punch", "/purr", "/puzzle", "/raise", "/rasp", "/read", "/ready", "/regret", "/revenge", "/roar", "/rofl", "/rolleyes", "/rude", "/ruffle", "/sad", "/salute", "/scared", "/scoff", "/scold", "/scowl", "/scratch", "/search", "/sexy", "/shakefist", "/shifty", "/shimmy", "/shiver", "/shoo", "/shout", "/shrug", "/shudder", "/shy", "/sigh", "/signal", "/silence", "/sing", "/sit", "/slap", "/sleep", "/smack", "/smile", "/smirk", "/snap", "/snarl", "/sneak", "/sneeze", "/snicker", "/sniff", "/snort", "/snub", "/soothe", "/spit", "/squeal", "/stand", "/stare", "/surprised", "/surrender", "/suspicious", "/sweat", "/talk", "/talkex", "/talkq", "/tap", "/taunt", "/tease", "/thank", "/think", "/thirsty", "/threaten", "/tickle", "/tired", "/train", "/truce", "/twiddle", "/unused", "/veto", "/victory", "/violin", "/wait", "/warn", "/wave", "/welcome", "/whine", "/whistle", "/whoa", "/wince", "/wink", "/work", "/yawn", "/yw",
 	},
 	["COMBAT"] = {
-		["/cancelaura"] = "/cancelaura",
-		["/cancelqueuedspell"] = "/cqs",
-		["/cancelform"] = "/cancelform",
-		["/cast"] = "/cast",
-		["/castrandom"] = "/castrandom",
-		["/castsequence"] = "/castsequence",
-		["/changeactionbar"] = "/changeactionbar",
-		["/startattack"] = "/startattack",
-		["/stopattack"] = "/stopattack",
-		["/stopcasting"] = "/stopcasting",
-		["/stopspelltarget"] = "/stopspelltarget",
-		["/swapactionbar"] = "/swapactionbar",
-		["/use"] = "/use",
-		["/usetoy"] = "/usetoy",
-		["/userandom"] = "/userandom",
+		"/cancelaura",
+		{ "/cancelqueuedspell", "/cqs", },
+		"/cancelform",
+		"/cast",
+		"/castrandom",
+		"/castsequence",
+		"/changeactionbar",
+		"/startattack",
+		"/stopattack",
+		"/stopcasting",
+		"/stopspelltarget",
+		"/swapactionbar",
+		"/use",
+		"/usetoy",
+		"/userandom",
 	},
 	["GUILD"] = {
 		["/guilddisband"] = "/gdisband",
@@ -111,89 +111,784 @@ mb.SlashCommandList = {
 	["PARTY_RAID"] = {
 		["/clearworldmarker"] = "/cwm",
 		["/clearmaintank"] = "/clearmt",
-		["/ffa"] = "/ffa",
-		["/group"] = "/group",
+		"/ffa",
+		"/group",
 		["/invite"] = "/inv",
 		["/maintankoff"] = "/mtoff",
 		["/clearmainassist"] = "/clearma",
 		["/mainassistoff"] = "/maoff",
 		["/mainassist"] = "/ma",
-		["/master"] = "/master",
+		"/master",
 		["/maintank"] = "/mt",
 		["/promote"] = "/pr",
-		["/raidinfo"] = "/raidinfo",
-		["/readycheck"] = "/readycheck",
-		["/requestinvite"] = "/requestinvite",
+		"/raidinfo",
+		"/readycheck",
+		"/requestinvite",
 		["/targetmarker"] = "/tm",
-		["/threshold"] = "/threshold",
+		"/threshold",
 		["/uninvite"] = "/u",
 		["/worldmarker"] = "/wm",
 	},
 	["PET"] = {
-		["/petaggressive"] = "/petaggressive",
-		["/petassist"] = "/petassist",
-		["/petattack"] = "/petattack",
-		["/petautocastoff"] = "/petautocastoff",
-		["/petautocaston"] = "/petautocaston",
-		["/petautocasttoggle"] = "/petautocasttoggle",
-		["/petdefensive"] = "/petdefensive",
-		["/petdismiss"] = "/petdismiss",
-		["/petfollow"] = "/petfollow",
-		["/petmoveto"] = "/petmoveto",
-		["/petpassive"] = "/petpassive",
-		["/petstay"] = "/petstay",
+		"/petaggressive",
+		"/petassist",
+		"/petattack",
+		"/petautocastoff",
+		"/petautocaston",
+		"/petautocasttoggle",
+		"/petdefensive",
+		"/petdismiss",
+		"/petfollow",
+		"/petmoveto",
+		"/petpassive",
+		"/petstay",
 	},
 	["PVP"] = {
-		["/duel"] = "/duel",
-		["/pvp"] = "/pvp",
+		"/duel",
+		"/pvp",
 		["/wargame"] = "/wg",
-		["/yield"] = "/yield",
+		"/yield",
 	},
 	["SYSTEM"] = {
-		["/click"] = "/click",
-		["/combatlog"] = "/combatlog",
-		["/console"] = "/console",
-		["/countdown"] = "/countdown",
-		["/disableaddons"] = "/disableaddons",
-		["/enableaddons"] = "/enableaddons",
+		"/click",
+		"/combatlog",
+		"/console",
+		"/countdown",
+		"/disableaddons",
+		"/enableaddons",
 		["/help"] = "/h",
 		["/logout"] = "/camp",
-		["/played"] = "/played",
-		["/quit"] = "/quit",
-		["/reload"] = "/reload",
+		"/played",
+		"/quit",
+		"/reload",
 		["/script"] = "/run",
-		["/stopmacro"] = "/stopmacro",
-		["/time"] = "/time",
-		["/timetest"] = "/timetest",
-		["/tts"] = "/tts",
-		["/voice"] = "/voice",
+		"/stopmacro",
+		"/time",
+		"/timetest",
+		"/tts",
+		"/voice",
 	},
 	["TARGETING"] = {
 		["/assist"] = "/a",
-		["/focus"] = "/focus",
-		["/clearfocus"] = "/clearfocus",
+		"/focus",
+		"/clearfocus",
 		["/target"] = "/tar",
-		["/cleartarget"] = "/cleartarget",
-		["/targetenemy"] = "/targetenemy",
-		["/targetenemyplayer"] = "/targetenemyplayer",
-		["/targetexact"] = "/targetexact",
-		["/targetfriend"] = "/targetfriend",
-		["/targetfriendplayer"] = "/targetfriendplayer",
-		["/targetlastenemy"] = "/targetlastenemy",
-		["/targetlastfriend"] = "/targetlastfriend",
-		["/targetlasttarget"] = "/targetlasttarget",
-		["/targetparty"] = "/targetparty",
-		["/targetraid"] = "/targetraid",
+		"/cleartarget",
+		"/targetenemy",
+		"/targetenemyplayer",
+		"/targetexact",
+		"/targetfriend",
+		"/targetfriendplayer",
+		"/targetlastenemy",
+		"/targetlastfriend",
+		"/targetlasttarget",
+		"/targetparty",
+		"/targetraid",
 	},
 	["UNKNOWN"] = {
-		["/resetcommentatorsettings"] = "/resetcommentatorsettings",
+		"/resetcommentatorsettings",
 		["/assignplayer"] = "/ap",
-		["/invitespectatormatch"] = "/invitespectatormatch",
-		["/community"] = "/community",
+		"/invitespectatormatch",
+		"/community",
 		["/charwhisper"] = "/cw",
-		["/vt"] = "/vt",
+		"/vt",
 		["/overridename"] = "/on",
 	}
+}
+
+mb.Slash = {
+	["SLASH_TARGET_NEAREST_RAID"] = {
+		["/targetraid"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TEAM_DISBAND"] = {
+		["/tdisband"] = "$PRIMARY_ALIAS",
+		["/teamdisband"] = true,
+	},
+	["SLASH_CHAT_ANNOUNCE"] = {
+		["/ann"] = "$PRIMARY_ALIAS",
+		["/announce"] = true,
+	},
+	["SLASH_UNIGNORE"] = {
+		["/unignore"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_FOLLOW"] = {
+		["/f"] = "$PRIMARY_ALIAS",
+		["/fol"] = true,
+		["/follow"] = true,
+	},
+	["SLASH_GUILD_LEADER"] = {
+		["/gleader"] = true,
+		["/guildleader"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RANDOM"] = {
+		["/roll"] = true,
+		["/random"] = true,
+		["/rnd"] = true,
+		["/rand"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_MAINASSISTOFF"] = {
+		["/mainassistoff"] = "$PRIMARY_ALIAS",
+		["/maoff"] = true,
+	},
+	["SLASH_CHAT_MODERATOR"] = {
+		["/moderator"] = "$PRIMARY_ALIAS",
+		["/mod"] = true,
+	},
+	["SLASH_RAIDBROWSER"] = {
+		["/rb"] = true,
+		["/or"] = true,
+		["/raidbrowser"] = "$PRIMARY_ALIAS",
+		["/otherraids"] = true,
+	},
+	["SLASH_OPEN_LOOT_HISTORY"] = {
+		["/lootrolls"] = true,
+		["/loot"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_MODERATE"] = {
+		["/moderate"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_SET_TITLE"] = {
+		["/settitle"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_PROMOTE"] = {
+		["/guildpromote"] = true,
+		["/gpromote"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_DUMP"] = {
+		["/dump"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_COMMENTATOR_OVERRIDE"] = {
+		["/on"] = true,
+		["/overridename"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CLEAR_WORLD_MARKER"] = {
+		["/clearworldmarker"] = "$PRIMARY_ALIAS",
+		["/cwm"] = true,
+	},
+	["SLASH_MAINTANKOFF"] = {
+		["/mtoff"] = "$PRIMARY_ALIAS",
+		["/maintankoff"] = true,
+	},
+	["SLASH_EMOTE"] = {
+		["/me"] = true,
+		["/emote"] = true,
+		["/em"] = true,
+		["/e"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_KICK"] = {
+		["/ckick"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TEAM_INVITE"] = {
+		["/tinvite"] = "$PRIMARY_ALIAS",
+		["/teaminvite"] = true,
+	},
+	["SLASH_VOICE"] = {
+		["/voice"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_NEAREST_PARTY"] = {
+		["/targetparty"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHANNEL"] = {
+		["/c"] = true,
+		["/csay"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_INSPECT"] = {
+		["/inspect"] = true,
+		["/ins"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_AUTOCASTON"] = {
+		["/petautocaston"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RAF"] = {
+		["/raf"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_WHO"] = {
+		["/who"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RELOAD"] = {
+		["/reload"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_MACROHELP"] = {
+		["/macrohelp"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_JOIN"] = {
+		["/join"] = true,
+		["/channel"] = true,
+		["/chan"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_SUMMON_BATTLE_PET"] = {
+		["/sp"] = "$PRIMARY_ALIAS",
+		["/summonpet"] = true,
+	},
+	["SLASH_GUILD_DISBAND"] = {
+		["/guilddisband"] = "$PRIMARY_ALIAS",
+		["/gdisband"] = true,
+	},
+	["SLASH_TARGET_NEAREST_FRIEND_PLAYER"] = {
+		["/targetfriendplayer"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_COMMENTATOR_NAMETEAM"] = {
+		["/nt"] = "$PRIMARY_ALIAS",
+		["/nameteam"] = true,
+	},
+	["SLASH_COUNTDOWN"] = {
+		["/cd"] = true,
+		["/countdown"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RAID"] = {
+		["/rsay"] = true,
+		["/ra"] = "$PRIMARY_ALIAS",
+		["/raid"] = true,
+	},
+	["SLASH_LOOT_NEEDBEFOREGREED"] = {
+		["/needbeforegreed"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_DISMOUNT"] = {
+		["/dismount"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_LEAVE"] = {
+		["/guildquit"] = "$PRIMARY_ALIAS",
+		["/gquit"] = true,
+	},
+	["SLASH_CASTGLYPH"] = {
+		["/castglyph"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_STOPCASTING"] = {
+		["/stopcasting"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CASTRANDOM"] = {
+		["/castrandom"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TIME"] = {
+		["/time"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_ENABLE_ADDONS"] = {
+		["/enableaddons"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_COMMUNITIES_VOICE"] = {
+		["/cv"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_UNMUTE"] = {
+		["/unsquelch"] = "$PRIMARY_ALIAS",
+		["/voice"] = true,
+		["/unmute"] = true,
+	},
+	["SLASH_USERANDOM"] = {
+		["/userandom"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_PASSWORD"] = {
+		["/password"] = "$PRIMARY_ALIAS",
+		["/pass"] = true,
+	},
+	["SLASH_LOOT_MASTER"] = {
+		["/master"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHATLOG"] = {
+		["/chatlog"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RANDOMPET"] = {
+		["/randompet"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CANCELFORM"] = {
+		["/cancelform"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_DISMISS"] = {
+		["/petdismiss"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_AUTOCASTOFF"] = {
+		["/petautocastoff"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_EXACT"] = {
+		["/targetexact"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_INFO"] = {
+		["/guildinfo"] = true,
+		["/ginfo"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PARTY_VOICE"] = {
+		["/pv"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_BENCHMARK"] = {
+		["/timetest"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_VOICE"] = {
+		["/gv"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_BAN"] = {
+		["/ban"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_LEAVE"] = {
+		["/chatexit"] = "$PRIMARY_ALIAS",
+		["/chatleave"] = true,
+		["/leave"] = true,
+	},
+	["SLASH_RAID_INFO"] = {
+		["/raidinfo"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_AUTOCASTTOGGLE"] = {
+		["/petautocasttoggle"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RAID_WARNING"] = {
+		["/rw"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_LAST_ENEMY"] = {
+		["/targetlastenemy"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_LOGOUT"] = {
+		["/logout"] = true,
+		["/camp"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_HELP"] = {
+		["/help"] = true,
+		["/?"] = true,
+		["/h"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_AGGRESSIVE"] = {
+		["/petaggressive"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_USE_TOY"] = {
+		["/usetoy"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_NEAREST_ENEMY_PLAYER"] = {
+		["/targetenemyplayer"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_WARGAME"] = {
+		["/wg"] = true,
+		["/wargame"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_YELL"] = {
+		["/sh"] = "$PRIMARY_ALIAS",
+		["/shout"] = true,
+		["/yell"] = true,
+		["/y"] = true,
+	},
+	["SLASH_FRAMESTACK"] = {
+		["/fstack"] = true,
+		["/framestack"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_HELP"] = {
+		["/ghelp"] = "$PRIMARY_ALIAS",
+		["/guildhelp"] = true,
+	},
+	["SLASH_STARTATTACK"] = {
+		["/startattack"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RANDOMFAVORITEPET"] = {
+		["/rfp"] = true,
+		["/randomfavoritepet"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_VOICE_TEXT"] = {
+		["/vt"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CLEAR"] = {
+		["/clear"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_FOCUS"] = {
+		["/focus"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_LOOT_ROUNDROBIN"] = {
+		["/roundrobin"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_SCRIPT"] = {
+		["/script"] = true,
+		["/run"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TEAM_UNINVITE"] = {
+		["/teamremove"] = true,
+		["/tremove"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CALENDAR"] = {
+		["/calendar"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_NEAREST_ENEMY"] = {
+		["/targetenemy"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_REMOVEFRIEND"] = {
+		["/removefriend"] = "$PRIMARY_ALIAS",
+		["/remfriend"] = true,
+	},
+	["SLASH_CHAT_UNBAN"] = {
+		["/unban"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_PASSIVE"] = {
+		["/petpassive"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_EQUIP_SET"] = {
+		["/equipset"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TRADE"] = {
+		["/tr"] = true,
+		["/trade"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILDFINDER"] = {
+		["/guildfinder"] = "$PRIMARY_ALIAS",
+		["/gf"] = true,
+	},
+	["SLASH_CHAT_UNMODERATOR"] = {
+		["/unmoderator"] = "$PRIMARY_ALIAS",
+		["/unmod"] = true,
+	},
+	["SLASH_REQUEST_INVITE"] = {
+		["/requestinvite"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_FRIENDS"] = {
+		["/friend"] = true,
+		["/friends"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PVP"] = {
+		["/pvp"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_LAST_FRIEND"] = {
+		["/targetlastfriend"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RESETCHAT"] = {
+		["/resetchat"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_AFK"] = {
+		["/afk"] = true,
+		["/away"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PLAYED"] = {
+		["/played"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_READYCHECK"] = {
+		["/rc"] = "$PRIMARY_ALIAS",
+		["/readycheck"] = true,
+	},
+	["SLASH_CANCELAURA"] = {
+		["/cancelaura"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_STOPATTACK"] = {
+		["/stopattack"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_STAY"] = {
+		["/petstay"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CLEARFOCUS"] = {
+		["/clearfocus"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_CINVITE"] = {
+		["/chatinvite"] = true,
+		["/cinvite"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_LEADER_REPLACE"] = {
+		["/greplace"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_HELP"] = {
+		["/chat"] = "$PRIMARY_ALIAS",
+		["/chathelp"] = true,
+	},
+	["SLASH_SWAPACTIONBAR"] = {
+		["/swapactionbar"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CANCELQUEUEDSPELL"] = {
+		["/cancelqueuedspell"] = true,
+		["/cqs"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_MARKER"] = {
+		["/tm"] = "$PRIMARY_ALIAS",
+		["/targetmarker"] = true,
+	},
+	["SLASH_EQUIP"] = {
+		["/eq"] = "$PRIMARY_ALIAS",
+		["/equip"] = true,
+	},
+	["SLASH_QUIT"] = {
+		["/quit"] = "$PRIMARY_ALIAS",
+		["/exit"] = true,
+	},
+	["SLASH_VOICEMACRO"] = {
+		["/v"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_COMMUNITY"] = {
+		["/community"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_ASSIST"] = {
+		["/petassist"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CLICK"] = {
+		["/click"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_MOTD"] = {
+		["/gmotd"] = true,
+		["/guildmotd"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_DUEL"] = {
+		["/duel"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CLEARMAINTANK"] = {
+		["/clearmaintank"] = true,
+		["/clearmt"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_WHISPER"] = {
+		["/cw"] = true,
+		["/charwhisper"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RAIDFINDER"] = {
+		["/raidfinder"] = true,
+		["/rf"] = true,
+		["/lfr"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_LOOT_GROUP"] = {
+		["/group"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_USE_TALENT_SPEC"] = {
+		["/usetalents"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_VOICECHAT"] = {
+		["/voice"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TEAM_QUIT"] = {
+		["/tquit"] = true,
+		["/teamquit"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_LEAVEVEHICLE"] = {
+		["/leavevehicle"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_USE"] = {
+		["/use"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CASTSEQUENCE"] = {
+		["/castsequence"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_DUEL_CANCEL"] = {
+		["/concede"] = true,
+		["/forfeit"] = "$PRIMARY_ALIAS",
+		["/yield"] = true,
+	},
+	["SLASH_PET_ATTACK"] = {
+		["/petattack"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CLEARMAINASSIST"] = {
+		["/clearma"] = "$PRIMARY_ALIAS",
+		["/clearmainassist"] = true,
+	},
+	["SLASH_EVENTTRACE"] = {
+		["/eventtrace"] = true,
+		["/etrace"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_DISMISSBATTLEPET"] = {
+		["/dismisspet"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_WHO"] = {
+		["/gwho"] = true,
+		["/whoguild"] = true,
+		["/glist"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TRANSMOG_OUTFIT"] = {
+		["/outfit"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_API"] = {
+		["/api"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_ROSTER"] = {
+		["/groster"] = true,
+		["/guildroster"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_MUTE"] = {
+		["/unvoice"] = true,
+		["/squelch"] = "$PRIMARY_ALIAS",
+		["/mute"] = true,
+	},
+	["SLASH_CONSOLE"] = {
+		["/console"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_SAY"] = {
+		["/s"] = "$PRIMARY_ALIAS",
+		["/say"] = true,
+	},
+	["SLASH_COMMENTATOR_ASSIGNPLAYER"] = {
+		["/ap"] = true,
+		["/assignplayer"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_LOOT_SETTHRESHOLD"] = {
+		["/threshold"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD"] = {
+		["/gu"] = true,
+		["/g"] = true,
+		["/guild"] = "$PRIMARY_ALIAS",
+		["/gc"] = true,
+	},
+	["SLASH_ACHIEVEMENTUI"] = {
+		["/achieve"] = true,
+		["/achievements"] = "$PRIMARY_ALIAS",
+		["/ach"] = true,
+		["/achievement"] = true,
+	},
+	["SLASH_STOPSPELLTARGET"] = {
+		["/stopspelltarget"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHANGEACTIONBAR"] = {
+		["/changeactionbar"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_IGNORE"] = {
+		["/ignore"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_MOVE_TO"] = {
+		["/petmoveto"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_STOPMACRO"] = {
+		["/stopmacro"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_OFFICER"] = {
+		["/osay"] = true,
+		["/officer"] = true,
+		["/o"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_DEFENSIVE"] = {
+		["/petdefensive"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PARTY"] = {
+		["/party"] = true,
+		["/p"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PET_FOLLOW"] = {
+		["/petfollow"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_SMART_WHISPER"] = {
+		["/w"] = true,
+		["/t"] = true,
+		["/whisper"] = true,
+		["/tell"] = true,
+		["/send"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_SPECTATOR_WARGAME"] = {
+		["/invitespectatormatch"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_INSTANCE_CHAT"] = {
+		["/instance"] = true,
+		["/battleground"] = true,
+		["/i"] = true,
+		["/bg"] = "$PRIMARY_ALIAS",
+		["/instance_chat"] = true,
+	},
+	["SLASH_TEXTTOSPEECH"] = {
+		["/tts"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_SAVEGUILDROSTER"] = {
+		["/saveguildroster"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_STOPWATCH"] = {
+		["/stopwatch"] = "$PRIMARY_ALIAS",
+		["/timer"] = true,
+		["/sw"] = true,
+	},
+	["SLASH_DUNGEONS"] = {
+		["/df"] = true,
+		["/lfd"] = "$PRIMARY_ALIAS",
+		["/dungeonfinder"] = true,
+	},
+	["SLASH_MAINTANKON"] = {
+		["/maintank"] = true,
+		["/mt"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_ASSIST"] = {
+		["/a"] = true,
+		["/assist"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_LOOT_FFA"] = {
+		["/ffa"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_OWNER"] = {
+		["/owner"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_DISABLE_ADDONS"] = {
+		["/disableaddons"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_PROMOTE"] = {
+		["/promote"] = "$PRIMARY_ALIAS",
+		["/pr"] = true,
+	},
+	["SLASH_EQUIP_TO_SLOT"] = {
+		["/equipslot"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_LAST_TARGET"] = {
+		["/targetlasttarget"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CHAT_DND"] = {
+		["/busy"] = "$PRIMARY_ALIAS",
+		["/dnd"] = true,
+	},
+	["SLASH_TABLEINSPECT"] = {
+		["/tinspect"] = true,
+		["/tableinspect"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_RESET_COMMENTATOR_SETTINGS"] = {
+		["/resetcommentatorsettings"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_DEMOTE"] = {
+		["/guilddemote"] = "$PRIMARY_ALIAS",
+		["/gdemote"] = true,
+	},
+	["SLASH_COMBATLOG"] = {
+		["/combatlog"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_MAINASSISTON"] = {
+		["/mainassist"] = true,
+		["/ma"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_UNINVITE"] = {
+		["/votekick"] = true,
+		["/u"] = true,
+		["/uninvite"] = true,
+		["/kick"] = true,
+		["/un"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_GUILD_INVITE"] = {
+		["/ginvite"] = "$PRIMARY_ALIAS",
+		["/guildinvite"] = true,
+	},
+	["SLASH_TARGET"] = {
+		["/target"] = true,
+		["/tar"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_INVITE"] = {
+		["/inv"] = true,
+		["/invite"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_REPLY"] = {
+		["/reply"] = "$PRIMARY_ALIAS",
+		["/r"] = true,
+	},
+	["SLASH_SHARE"] = {
+		["/share"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_CLEARTARGET"] = {
+		["/cleartarget"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TARGET_NEAREST_FRIEND"] = {
+		["/targetfriend"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TOKEN"] = {
+		["/tk"] = true,
+		["/token"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_WORLD_MARKER"] = {
+		["/wm"] = true,
+		["/worldmarker"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_MACRO"] = {
+		["/m"] = true,
+		["/macro"] = "$PRIMARY_ALIAS",
+	},
+	["SLASH_TEAM_CAPTAIN"] = {
+		["/teamcaptain"] = "$PRIMARY_ALIAS",
+		["/tcaptain"] = true,
+	},
+	["SLASH_GUILD_UNINVITE"] = {
+		["/gremove"] = "$PRIMARY_ALIAS",
+		["/guildremove"] = true,
+	},
+	["SLASH_LIST_CHANNEL"] = {
+		["/chatlist"] = "$PRIMARY_ALIAS",
+		["/chatwho"] = true,
+		["/chatinfo"] = true,
+	},
+	["SLASH_CAST"] = {
+		["/cast"] = true,
+		["/spell"] = "$PRIMARY_ALIAS",
+	},
 }
 
 mb.ModCombos = {

@@ -10,8 +10,6 @@ SlashCmdList["PRINT"] = function(msg, editBox)
 end
 
 mb.User = { ["class"] = {}, ["spec"] = {}, ["talents"] = {} }
-
-
 mb.GetUser = function()
 	local className, classFileName, classID = UnitClass(PLAYER)
 	local specID = GetSpecialization()
@@ -43,6 +41,10 @@ local mb_init = false
 mb.Frame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
 mb.Palette = CreateFrame("Frame", "$parentPaletteBasic", mb.Frame, "InsetFrameTemplate")
+mb.Palette.Tab1 = CreateFrame("Button", "$parentTab1", mb.Palette, "TabButtonTemplate")
+mb.Palette.Tab2 = CreateFrame("Button", "$parentTab2", mb.Palette, "TabButtonTemplate")
+mb.Palette.Basic = CreateFrame("Frame", "$parentBasic", mb.Palette)
+mb.Palette.Expanded = CreateFrame("Frame", "$parentExpanded", mb.Palette)
 
 mb.Palette.name = "Palette"
 mb.Palette.blocks = {}
@@ -416,10 +418,37 @@ mb.Init = function()
 	end
 end
 
+function GetAddonSlashCMD()
+	local addonSlash = {}
+	for key, value in pairs(_G) do
+
+		if strsub(key, 1, 6) == "SLASH_" and strsub(value, 1, 1) == "/" then
+
+			local globalName = gsub(key, "%d+$", "")
+			local cmd
+
+			addonSlash[globalName] = {}
+
+			for i = 1, 20 do
+				cmd = _G[globalName..i]
+				if cmd and strsub(cmd, 1, 1) == "/" then
+					if cmd == value then
+						addonSlash[globalName][cmd] = "$PRIMARY_ALIAS"
+					else
+						addonSlash[globalName][cmd] = true
+					end
+				end
+			end
+		end
+	end
+	return addonSlash
+end
+
 frame:SetScript("OnEvent", function(self, event, arg)
 	if event == "PLAYER_SPECIALIZATION_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
 		mb.GetUser()
 	end
+
 	if event == "PLAYER_ENTERING_WORLD" then
 
 		mb.CharacterID = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
@@ -430,7 +459,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		local numGen, numChar = GetNumMacros()
 		local name, texture, body
-		
+
 		if numGen > 0 then
 			for i=1, numGen do
 				name, texture, body = GetMacroInfo(i)
@@ -439,7 +468,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 				end
 			end
 		end
-	
+
 		if numChar > 0 then
 			for i=1+120, numChar+120 do
 				name, texture, body = GetMacroInfo(i)
@@ -449,10 +478,13 @@ frame:SetScript("OnEvent", function(self, event, arg)
 				end
 			end
 		end
+
+		mb.AddonSlash = GetAddonSlashCMD()
+
 	end
+
 	if event == "PLAYER_LEAVING_WORLD" then
 		if UserMacros == nil then UserMacros = {} end
-		-- if MacroChangelog == nil then MacroChangelog = {} end
 	
 		for index, data in pairs(mb.UserMacros) do
 			if index <=120 then
@@ -462,7 +494,42 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			end
 		end
 
+		if AddonSlashCMD == nil then AddonSlashCMD = {} end
+
+		for global, table in pairs(mb.AddonSlash) do
+			if not mb.Slash[global] then
+				AddonSlashCMD[global] = table
+			end
+		end
+
+	end
+end)
+
+--@do-not-package@
+
+mb.E = {
+	["PEW"] = "PLAYER_ENTERING_WORLD",
+	["PLW"] = "PLAYER_LEAVING_WORLD"
+}
+
+local debug = CreateFrame("Frame", nil, UIParent)
+debug:RegisterEvent(mb.E.PEW)
+debug:RegisterEvent(mb.E.PLW)
+
+debug:SetScript("OnEvent", function(self, event, arg)
+	if event == mb.E.PEW then
+
+	end
+	if event == mb.E.PLW then
+		-- MBDebug = {}
+
 		--[[
+		if mb.Frame.sort ~= nil then
+			MBDebug = mb.Frame.sort
+		end
+
+		if MacroChangelog == nil then MacroChangelog = {} end
+
 		for index, data in pairs(mb.Changelog) do
 			if index <=120 then
 				for time, changes in pairs(data) do
@@ -475,16 +542,10 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			end
 		end
 		]]
+
+
 	end
 end)
-
---@do-not-package@
-
-	--[[
-mb.Stack.saveBlocks = function()
-
-end
-]]
 
 --[[
 mb.Changelog = MacroChangelog or {}
@@ -501,52 +562,32 @@ mb.LogEditHistory = function(index, time)
 end
 ]]
 
-	--[[ testing auto-build/block reconstruction functionality
+-- Export any available addon provided slash commands
+--[[
+mb.AddonSlash = {}
+function CommandList()
+	local t = {}
+	for key, value in pairs(_G) do
 
-	local testBlocks = { "UTL1", "CMD1", "CON1:1", "CON6", "USR1" }
+		if strsub(key, 1, 6) == "SLASH_" and strsub(value, 1, 1) == "/" then
 
-	mb.Stack:SetScript("OnShow", function()
-		local grp, num
-		for i, groupID in pairs(testBlocks) do
-			grp = string.sub(groupID, 1, 3)
-			num = tonumber(string.sub(groupID, 4, 4))
-			if string.len(groupID) > 4 then
-				
-			end
-		end
+			local globalName = gsub(key, "%d+$", "")
+			local cmd
 
-	end)
+			mb.AddonSlash[globalName] = {}
 
-	-- Export all available slash commands
-	function CommandList()
-		local HT = {}
-		HT.Commands = {}
-		HT.NormalizedCommands = {}
-		for key, value in pairs(_G) do
-			if strsub(key, 1, 6) == "SLASH_" then
-				local cTypeKey = gsub(key, "%d+$", "")
-				for cSeq = 1, 20 do
-				  	local cPrime = cTypeKey.."1"
-				  	local cKey = cTypeKey..tostring(cSeq)
-				  	if _G[cPrime] and _G[cKey] then
-						if strsub(_G[cPrime], 1, 1) == "/" and strsub(_G[cKey], 1, 1) == "/" then
-						  	HT.Commands[_G[cKey]~] = _G[cPrime]
-						  	if HT.NormalizedCommands[_G[cPrime]~] then
-						  		-- skip it
-						  	else
-						  		-- make it
-								HT.NormalizedCommands[_G[cPrime]~] = {}
-						  	end
-						  	HT.NormalizedCommands[_G[cPrime]~][_G[cKey]~] = true
-						end
-				  	else
-						break
-				  	end
+			for i = 1, 20 do
+				cmd = _G[globalName..i]
+				if cmd and strsub(cmd, 1, 1) == "/" then
+					if cmd == value then
+						mb.AddonSlash[globalName][cmd] = "$PRIMARY_ALIAS"
+					else
+						mb.AddonSlash[globalName][cmd] = true
+					end
 				end
 			end
 		end
-		return CopyTable(HT)
 	end
-	TargetModifiers = CommandList()]]
-	--]]
+end
+]]
 --@end-do-not-package@

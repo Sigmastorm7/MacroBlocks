@@ -7,7 +7,7 @@
 ## X-Curse-Project-ID: 542777
 ## X-Wago-ID: vEGPVZ61
 
-## SavedVariables: UserMacros, MacroChangelog
+## SavedVariables: UserMacros, MacroChangelog, AddonSlashCMD, MBDebug
 
 embeds.xml
 MacroBlocks.lua
