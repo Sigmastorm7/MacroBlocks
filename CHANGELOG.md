@@ -1,4 +1,9 @@
 # Macro Blocks Changelog
+### 1.2.1-Release
+#### Fixed
+- Corrected tooltip spelling errors
+- Corrected additional spaces in macro text breaking logic blocks
+
 ### 1.2.0-Release
 #### Fixed
 - Elements of the original MacroFrame should no longer appear

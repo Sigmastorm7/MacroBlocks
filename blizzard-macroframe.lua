@@ -121,7 +121,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		-- Resize the macro frame and change it's UIPanel attributes to correct repositioning interactions
 		MacroFrame:SetSize(600, 560)
-		UIPanelWindows["MacroFrame"] = { area = "left", pushable = 0, whileDead = 1, width = 600 }
+		UIPanelWindows["MacroFrame"] = { area = "left", pushable = 1, whileDead = 1, width = 600 }
 
 		-- Make the macro frame moveable by the user
 		MacroFrame:SetMovable(true)
@@ -404,7 +404,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		-- Attach addon's visibility to blizzard's macro frame visibility
 		MacroFrame:HookScript("OnShow", function(_self)
 			mb.Frame:Show()
-			mb.GetUser()
 			mb.Init()
 			_self.textChanged = nil
 			_self.changes = false

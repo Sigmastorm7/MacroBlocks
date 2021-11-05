@@ -2,31 +2,31 @@ local addon, mb = ...
 local frame = CreateFrame("Frame", nil, UIParent)
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:RegisterEvent("PLAYER_LEAVING_WORLD")
+frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 
 SLASH_PRINT1 = "/print"
 SlashCmdList["PRINT"] = function(msg, editBox)
 	SlashCmdList.SCRIPT("print("..msg..")")
 end
 
-mb.User = {}
+mb.User = { ["class"] = {}, ["spec"] = {}, ["talents"] = {} }
+
+
 mb.GetUser = function()
 	local className, classFileName, classID = UnitClass(PLAYER)
 	local specID = GetSpecialization()
 	local specEngineID, specName, _, specIcon, specRole = GetSpecializationInfo(specID)
-	mb.User = {
-		["class"] = {
+	mb.User.class = {
 			["id"] = classID,
 			["name"] = className,
 			["fileName"] = classFileName,
-		},
-		["spec"] = {
+		}
+	mb.User.spec = {
 			["id"] = specID,
 			["name"] = specName,
 			["icon"] = specIcon,
 			["role"] = specRole,
-		},
-	}
-	mb.User.talents = {}
+		}
 
 	local selected
 	for i=1, 7 do
@@ -148,7 +148,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 
 				b.init = true
 				b.OnSpecChanged = function(self)
-					mb.GetUser()
+					-- mb.GetUser()
 					local talentID, talentName, talentIcon
 					for i=1, 7 do
 						for j=1, 3 do
@@ -245,8 +245,7 @@ local function delimSwitch(index, block)
 	bool = bool or block.data.func == "NEW_LINE"
 	bool = bool or index == 1
 	bool = bool or #mb.Stack.blocks == 1
-	bool = bool or BID == "LOG" or LBID == "LOG"
-	bool = bool or (BID == "CON" or BID == "TAR") and (LBID == "CON" or LBID == "TAR")
+	bool = bool or (BID == "LOG" or BID == "CON" or BID == "TAR") and (LBID == "LOG" or LBID == "CON" or LBID == "TAR")
 	bool = bool or block.stackOffset.x == 7
 	bool = bool or block.data.name == ";"
 
@@ -267,7 +266,7 @@ function UpdateMacroBlockText()
 		mb.Stack.string = mb.Stack.string..delim..str
 	end
 
-	mb.Stack.string = gsub(mb.Stack.string, "%$!>%[", delim.."%[no")
+	mb.Stack.string = gsub(mb.Stack.string, "%$!>%[", "%[no")
 	mb.Stack.string = gsub(mb.Stack.string, "%]<%$&>%[", ", ")
 
 	MacroFrameText.blockInput = true
@@ -418,6 +417,9 @@ mb.Init = function()
 end
 
 frame:SetScript("OnEvent", function(self, event, arg)
+	if event == "PLAYER_SPECIALIZATION_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
+		mb.GetUser()
+	end
 	if event == "PLAYER_ENTERING_WORLD" then
 
 		mb.CharacterID = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
@@ -448,7 +450,6 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			end
 		end
 	end
-
 	if event == "PLAYER_LEAVING_WORLD" then
 		if UserMacros == nil then UserMacros = {} end
 		-- if MacroChangelog == nil then MacroChangelog = {} end
