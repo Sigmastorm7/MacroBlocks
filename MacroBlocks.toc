@@ -1,7 +1,7 @@
 ## Interface: 90105
 ## Title: MacroBlocks
 ## Author: Siggy
-## Version: 1.2.0
+## Version: 1.2.1
 ## Notes: Easily create macros with drag'n'drop blocks
 
 ## X-Curse-Project-ID: 542777
