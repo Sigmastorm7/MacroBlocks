@@ -11,7 +11,6 @@ end
 
 mb.User = { ["class"] = {}, ["spec"] = {}, ["talents"] = {} }
 
-
 mb.GetUser = function()
 	local className, classFileName, classID = UnitClass(PLAYER)
 	local specID = GetSpecialization()
@@ -475,6 +474,9 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			end
 		end
 
+		MacroHistory = mb.MacroHistory
+
+		--[[
 		for index, data in pairs(mb.MacroHistory) do
 			if index <= 120 then
 				-- if MacroHistory[index] == nil then MacroHistory[index] = {} end
@@ -488,7 +490,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 				end
 			end
 		end
-
+		]]
 		--[[
 		for index, data in pairs(mb.Changelog) do
 			if index <=120 then

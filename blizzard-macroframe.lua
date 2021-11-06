@@ -244,6 +244,13 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MFSM.New:SetSize(86, 28)
 		MFSM.New:SetText("New")
 
+		MFSM.History=CreateFrame("Button", "$parentHistory", mb.Frame)
+		MFSM.History:SetPoint("TOPLEFT", MFSM.Cancel, "BOTTOMRIGHT")
+		MFSM.History:SetSize(64, 64)
+		MFSM.History.icon = MFSM.History:CreateTexture(nil, "ARTWORK")
+		MFSM.History.icon:SetAllPoints()
+		MFSM.History.icon:SetAtlas("unitframeicon-chromietime")
+
 		local info = CreateFrame("Frame", "$parentInfo", mb.Frame)
 		info:SetPoint("TOPRIGHT", -6, -29)
 		info:SetSize(36, 36)
@@ -353,21 +360,25 @@ frame:SetScript("OnEvent", function(self, event, arg)
 				block.saved = true
 			end
 
+			local over120 = MacroFrame.selectedMacro > 120
+			local smacro = MacroFrame.selectedMacro
 			local macroText = MacroFrameText:GetText()
 			local time = date("%x_%X")
 			local charName = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
-			print(time)
+			local toonID = ""
+			if over120 then toonID = " ("..charName..")" end
+			print("Macro Edited: ID-"..MacroFrame.selectedMacro..toonID)
+			print("Time: "..time)
 
-			
+			if mb.MacroHistory[smacro] == nil then mb.MacroHistory[smacro] = {} end
+			if over120 and mb.MacroHistory[smacro][charName] == nil then
+				mb.MacroHistory[smacro][charName] = {}
+			end
 
-			if mb.MacroHistory[MacroFrame.selectedMacro] == nil then mb.MacroHistory[MacroFrame.selectedMacro] = {} end
-			if MacroFrame.selectedMacro > 120 then
-				if mb.MacroHistory[MacroFrame.selectedMacro][charName] == nil then
-					mb.MacroHistory[MacroFrame.selectedMacro][charName] = {}
-				end
-				mb.MacroHistory[MacroFrame.selectedMacro][charName][time] = macroText
+			if over120 then
+				mb.MacroHistory[smacro][charName][time] = macroText
 			else
-				mb.MacroHistory[MacroFrame.selectedMacro][time] = macroText
+				mb.MacroHistory[smacro][time] = macroText
 			end
 
 			MacroFrameText.blockInput = false
