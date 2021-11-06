@@ -1,4 +1,10 @@
 # Macro Blocks Changelog
+### 1.3.0-Release
+#### Fixed
+
+#### Added
+- Slash commands added by Addons are now archived
+
 ### 1.2.1-Release
 #### Fixed
 - Corrected tooltip spelling errors

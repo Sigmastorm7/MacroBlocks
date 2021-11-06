@@ -38,13 +38,51 @@ end
 
 local mb_init = false
 
+local function SwitchPalettes(tab)
+	local pal = tab.palette
+end
+
 mb.Frame = CreateFrame("Frame", "MacroBlocks", MacroFrame)
 
 mb.Palette = CreateFrame("Frame", "$parentPaletteBasic", mb.Frame, "InsetFrameTemplate")
-mb.Palette.Tab1 = CreateFrame("Button", "$parentTab1", mb.Palette, "TabButtonTemplate")
-mb.Palette.Tab2 = CreateFrame("Button", "$parentTab2", mb.Palette, "TabButtonTemplate")
 mb.Palette.Basic = CreateFrame("Frame", "$parentBasic", mb.Palette)
 mb.Palette.Expanded = CreateFrame("Frame", "$parentExpanded", mb.Palette)
+
+PanelTemplates_SetNumTabs(mb.Palette, 2)
+
+local pTab1 = CreateFrame("Button", "$parentTab1", mb.Palette, "TabButtonTemplate")
+local pTab2 = CreateFrame("Button", "$parentTab2", mb.Palette, "TabButtonTemplate")
+
+pTab1:SetPoint("BOTTOMLEFT", "$parent", "TOPLEFT", 4, 0)
+pTab2:SetPoint("LEFT", pTab1, "RIGHT")
+
+pTab1.Text:SetText("Basic Palette")
+pTab2.Text:SetText("Expanded Palette")
+
+pTab1:SetID(1)
+pTab2:SetID(2)
+
+pTab1.palette = mb.Palette.Basic
+pTab2.palette = mb.Palette.Expanded
+
+pTab1:SetScript("OnShow", function(self)
+	PanelTemplates_TabResize(self, -15, nil, self.Text:GetStringWidth() - 8)
+	self.HighlightTexture:SetWidth(self.Text:GetStringWidth() + 31)
+end)
+pTab2:SetScript("OnShow", function(self)
+	PanelTemplates_TabResize(self, -15, nil, self.Text:GetStringWidth() - 8)
+	self.HighlightTexture:SetWidth(self.Text:GetStringWidth() + 31)
+end)
+
+pTab1:SetScript("OnClick", function(self, button, down)
+	PanelTemplates_Tab_OnClick(self, mb.Palette)
+end)
+pTab2:SetScript("OnClick", function(self, button, down)
+	PanelTemplates_Tab_OnClick(self, mb.Palette)
+end)
+
+PanelTemplates_SelectTab(pTab1)
+
 
 mb.Palette.name = "Palette"
 mb.Palette.blocks = {}
