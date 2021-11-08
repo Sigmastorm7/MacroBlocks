@@ -14,7 +14,7 @@
         </KeyValues>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="text" text="BLOCK" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont"> 
+                <FontString parentKey="text" text="BLOCK" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont">
                     <Anchors>
                         <Anchor point="CENTER" x="0" y="-0.5"/>
                     </Anchors>
@@ -234,7 +234,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
-                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont"> 
+                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont">
                             <Anchors>
                                 <Anchor point="CENTER" x="-0.5" y="-0.5"/>
                             </Anchors>
@@ -375,7 +375,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
-                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont"> 
+                        <FontString parentKey="text" text="" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont">
                             <Anchors>
                                 <Anchor point="CENTER" x="-0.5" y="-0.5"/>
                             </Anchors>

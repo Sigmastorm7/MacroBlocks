@@ -91,7 +91,7 @@ local MACRO_FRAME_UPDATE = function()
 		MacroFrame_HideDetails();
 		MacroDeleteButton:Disable();
 	end
-	
+
 	--Update New Button
 	if ( numMacros < MacroFrame.macroMax ) then
 		MacroNewButton:Enable();
@@ -113,11 +113,106 @@ local MACRO_FRAME_UPDATE = function()
 	end
 end
 
+local MB_SAVE_CHANGES = function()
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+	MacroFrame_SaveMacro()
+	MACRO_FRAME_UPDATE()
+	MacroPopupFrame:Hide()
+	MacroFrameText:ClearFocus()
+
+	local t = {}
+
+	for i, block in pairs(mb.Stack.blocks) do
+		block.saved = true
+		t[i] = block.GroupID
+	end
+
+	if MacroFrame.selectedMacro > 120 then
+		mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
+		mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["blocks"] = t
+	else
+		mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
+		mb.UserMacros[MacroFrame.selectedMacro]["blocks"] = t
+	end
+
+	MacroFrameText.blockInput = false
+	MacroFrameText.saved = true
+	MACRO_FRAME_BUTTONS_SETENABLED(false)
+end
+
+local MB_DISCARD_CHANGES = function()
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+	MACRO_FRAME_UPDATE()
+	MacroPopupFrame:Hide()
+	MacroFrameText:ClearFocus()
+
+	-- mb.Stack.preserve = true
+
+	local clearTable = {}
+	for _, block in pairs(mb.Stack.blocks) do table.insert(clearTable, block) end
+    for _, block in pairs(clearTable) do
+		if preserve then
+			if not block.saved then
+  				mb.Stack:remBlock(block)
+			    MB_OnDragStop(block)
+	    	end
+		else
+			mb.Stack:remBlock(block)
+			MB_OnDragStop(block)
+		end
+	end
+
+	if MacroFrame.selectedMacro > 120 then
+		MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"])
+	else
+		MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro]["body"])
+	end
+	MacroFrame.changes = false
+
+	-- clearBlocks = nil
+
+	MacroFrameText.saved = true
+	-- mb.Stack.preserve = false
+	MacroFrameText.blockInput = false
+	MACRO_FRAME_BUTTONS_SETENABLED(false)
+end
+
+local _MacroButton_OnClick = MacroButton_OnClick
+MBMacroButton_OnClick = function(self, button, down)
+	if MacroFrame.macroBase + self:GetID() == MacroFrame.selectedMacro then return end
+	MacroFrame_SaveMacro();
+	MacroFrameText.blockInput = false
+	MacroFrame_SelectMacro(MacroFrame.macroBase + self:GetID());
+	MacroFrame_Update();
+	MacroPopupFrame:Hide();
+	MacroFrameText:ClearFocus();
+
+
+
+end
+
+MBMacroFrameTab_OnClick = function(self, button, down)
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+	PanelTemplates_SetTab(MacroFrame, self:GetID());
+	MacroFrame_SaveMacro();
+	MacroFrame_SetAccountMacros();
+	MACRO_FRAME_UPDATE();
+	MacroButtonScrollFrame:SetVerticalScroll(0);
+end
+
 local frame = CreateFrame("Frame", nil, UIParent)
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, arg)
     if event == "ADDON_LOADED" and arg == "Blizzard_MacroUI" then
 		if not MacroFrame then return end
+
+		-- hook into the macro icons' OnClick handlers to clear blocks when changing macros
+		for i=1, 120 do
+			_G["MacroButton"..i]:SetScript("OnClick", MBMacroButton_OnClick)
+		end
+
+		-- MacroFrameTab1:SetScript("OnClick",	MBMacroFrameTab_OnClick)
+		-- MacroFrameTab2:SetScript("OnClick",	MBMacroFrameTab_OnClick)
 
 		-- Resize the macro frame and change it's UIPanel attributes to correct repositioning interactions
 		MacroFrame:SetSize(600, 560)
@@ -168,6 +263,21 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		MacroFrameCharLimitText:SetJustifyH("LEFT")
 		MacroFrameCharLimitText:SetFontObject(MacroBlocksMonoFont)
+
+		---------------------
+		-- MacroPopupFrame --
+		---------------------
+		local iconInfo = MacroPopupFrame.BorderBox:CreateFontString("IconPath", "ARTWORK", "MacroBlocksFont")
+		iconInfo:SetPoint("BOTTOMLEFT", "$parent", "BOTTOMLEFT", 8, 8)
+		iconInfo:SetPoint("TOPRIGHT", MacroPopupFrame.BorderBox.OkayButton, "TOPLEFT")
+
+		local function MacroPopupButton_OnEnter(_self)
+			iconInfo:SetText(self:GetTexture())
+		end
+
+		-- for i=1, 90 do
+		-- 	_G["MacroPopupButton"..i.."Icon"]:SetScript("OnEnter", MacroPopupButton_OnEnter)
+		-- end
 
 		-- Macro frame inset adjustment
 		MacroFrame.Inset:SetPoint("BOTTOMRIGHT", -12 - 256, 26 + 128 + 193)
@@ -341,63 +451,8 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		end)
 
 
-		MacroSaveButton:SetScript("OnClick", function(_self, button)
-
-			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-			MacroFrame_SaveMacro()
-			MacroFrame_Update()
-			MacroPopupFrame:Hide()
-			MacroFrameText:ClearFocus()
-
-			for _, block in pairs(mb.Stack.blocks) do
-				block.saved = true
-			end
-
-			if MacroFrame.selectedMacro > 120 then
-				mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
-			else
-				mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
-			end
-
-			MacroFrameText.blockInput = false
-			MacroFrameText.saved = true
-			MACRO_FRAME_BUTTONS_SETENABLED(false)
-
-		end)
-		MacroCancelButton:SetScript("OnClick", function(_self, button)
-
-			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-			MacroFrame_Update()
-			MacroPopupFrame:Hide()
-			MacroFrameText:ClearFocus()
-
-			mb.Stack.preserve = true
-
-    		local clearBlocks = {}
-			for _, block in pairs(mb.Stack.blocks) do table.insert(clearBlocks, block) end
-
-    		for _, block in pairs(clearBlocks) do
-				if not block.saved then
-  					mb.Stack:remBlock(block)
-				    MB_OnDragStop(block)
-			    end
-			end
-
-			if MacroFrame.selectedMacro > 120 then
-				MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"])
-			else
-				MacroFrameText:SetText(mb.UserMacros[MacroFrame.selectedMacro]["body"])
-			end
-			MacroFrame.changes = false
-
-			clearBlocks = nil
-
-			MacroFrameText.saved = true
-			mb.Stack.preserve = false
-			MacroFrameText.blockInput = false
-			MACRO_FRAME_BUTTONS_SETENABLED(false)
-
-		end)
+		MacroSaveButton:SetScript("OnClick", function(_self, button, down) MB_SAVE_CHANGES() end)
+		MacroCancelButton:SetScript("OnClick", function(_self, button, down) MB_DISCARD_CHANGES() end)
 
 		MacroFrame_Update = MACRO_FRAME_UPDATE
 

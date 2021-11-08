@@ -107,16 +107,16 @@ function MB_OnDragStop(self)
 
     if mb.Stack:IsMouseOver() then
         if not self.InStack then
-            mb.Palette.blocks[self.PaletteID] = mb.MakeBlock(strsub(self.GroupID, 1, 3), self.data, self.PaletteID)
+            mb.Palette.blocks[self.ID] = mb.MakeBlock(self.group, self.ID, self.data)
         end
-        if strsub(self.GroupID, 1, 3) ~= "LOG" then
+        if self.group ~= "LOG" then
             mb.Stack:addBlock(self)
-        elseif strsub(self.GroupID, 1, 3) == "LOG" then
+        elseif self.group == "LOG" then
             if self:CheckNeighbors() then
                 mb.Stack:addBlock(self)
             else
-                mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
-                mb.Palette.blocks[self.PaletteID] = self
+                mb.BlockPoolCollection:Release(mb.Palette.blocks[self.ID])
+                mb.Palette.blocks[self.ID] = self
                 self.InStack = false
                 mb.Stack.displace = false
                 mb.Stack:Adjust()
@@ -138,9 +138,9 @@ function MB_OnDragStop(self)
         self.saved = false
         self.InStack = false
 
-        mb.BlockPoolCollection:Release(mb.Palette.blocks[self.PaletteID])
-        mb.Palette.blocks[self.PaletteID] = self
-        
+        mb.BlockPoolCollection:Release(mb.Palette.blocks[self.ID])
+        mb.Palette.blocks[self.ID] = self
+
     elseif mb.Stack:IsMouseOver() and mb.Stack.displace then
         mb.Stack.displace = false
     end

@@ -10,8 +10,6 @@ SlashCmdList["PRINT"] = function(msg, editBox)
 end
 
 mb.User = { ["class"] = {}, ["spec"] = {}, ["talents"] = {} }
-
-
 mb.GetUser = function()
 	local className, classFileName, classID = UnitClass(PLAYER)
 	local specID = GetSpecialization()
@@ -60,7 +58,6 @@ mb.Stack.sTable = {}
 mb.Stack.string = ""
 mb.Stack.displace = false
 mb.Stack.displaceID = 0
-mb.Stack.undo = ""
 mb.Stack.preserve = false
 mb.Stack.payloadTable = {}
 
@@ -79,7 +76,7 @@ for i=1, #templates do
 end
 
 -- Acquires a new block from one of the block frame pools
-mb.MakeBlock = function(group, data, PaletteID)
+mb.MakeBlock = function(group, itr, data)
 
 	local b = mb.BlockPoolCollection:Acquire(data.template or "MacroBlockTemplate")
 
@@ -124,7 +121,7 @@ mb.MakeBlock = function(group, data, PaletteID)
 			elseif data.label == "SPEC" then
 				_, b.class, _ = UnitClass(PLAYER)
 				b.num = mb.Choices.SPEC[b.class]
-				
+
 				for i=1, 6 do
 					if i <= b.num then
 						local _, spec = GetSpecializationInfo(i)
@@ -196,17 +193,17 @@ mb.MakeBlock = function(group, data, PaletteID)
 			local bool = self.data.name == "or" or self.data.name == "true"
 			if mb.Stack.displace then
 				if strfind(data.payload, ">") then
-					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "CON"
-					bool = bool or (strsub(mb.Stack.blocks[mb.Stack.displaceID].GroupID, 1, 3) == "TAR" and self.data.name == "and")
+					bool = bool or mb.Stack.blocks[mb.Stack.displaceID].group == "CON"
+					bool = bool or (mb.Stack.blocks[mb.Stack.displaceID].group == "TAR" and self.data.name == "and")
 				end
 				if strfind(data.payload, "<") then
-					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID-1].GroupID, 1, 3) == "CON"
-					bool = bool or strsub(mb.Stack.blocks[mb.Stack.displaceID-1].GroupID, 1, 3) == "TAR"
+					bool = bool or mb.Stack.blocks[mb.Stack.displaceID-1].group == "CON"
+					bool = bool or mb.Stack.blocks[mb.Stack.displaceID-1].group == "TAR"
 				end
 			elseif #mb.Stack.blocks > 0 then
 				if strfind(data.payload, "<") then
-					bool = bool or strsub(mb.Stack.blocks[#mb.Stack.blocks].GroupID, 1, 3) == "CON"
-					bool = bool or strsub(mb.Stack.blocks[#mb.Stack.blocks].GroupID, 1, 3) == "TAR"
+					bool = bool or mb.Stack.blocks[#mb.Stack.blocks].group == "CON"
+					bool = bool or mb.Stack.blocks[#mb.Stack.blocks].group == "TAR"
 				end
 			end
 			return bool
@@ -214,23 +211,19 @@ mb.MakeBlock = function(group, data, PaletteID)
 	end
 
 	b.data = data
+	b.parameters = {}
 	b.tooltip = data.tooltip
 
-	b.GroupID = group..PaletteID
-	b.PaletteID = PaletteID or #mb.Palette.blocks + 1
+	b.group = group
+	b.groupID = group..itr
+	b.ID = itr
 
 	b:SetBackdrop(mb.blockBackdrop)
 	b:SetBackdropColor(unpack(mb.GroupColors[group].rgb))
 	b:SetBackdropBorderColor(unpack(mb.GroupColors[group].rgb))
 
 	b:Show()
-
-	if b.PaletteID == -1 then
-		b.InStack = true
-		mb.Stack:addBlock(b)
-	else
-		b.InStack = false
-	end
+	b.InStack = false
 
 	return b
 end
@@ -238,9 +231,9 @@ end
 local function delimSwitch(index, block)
 	local bool = false
 
-	local BID = strsub(block.GroupID, 1, 3)
+	local BID = block.group
 	local LBID = ""
-	if index > 1 then LBID = strsub(mb.Stack.blocks[index-1].GroupID, 1, 3) end
+	if index > 1 then LBID = mb.Stack.blocks[index-1].group end
 
 	bool = bool or block.data.func == "NEW_LINE"
 	bool = bool or index == 1
@@ -282,12 +275,10 @@ mb.Palette.Adjust = function(self, group, index, xOff, yOff)
 
 	if index <= #self.blocks then
 
-		-- if not mb.Palette.blocks[index]:IsShown() then mb.Palette.blocks[index]:Show() end
-
-		if strsub(self.blocks[index].GroupID, 1, 3) ~= group and strsub(self.blocks[index].GroupID, 1, 3) ~= "LOG" then
+		if self.blocks[index].group ~= group and self.blocks[index].group ~= "LOG" then
 			xOff = 6
 			yOff = yOff - 28.5
-			group = strsub(self.blocks[index].GroupID, 1, 3)
+			group = self.blocks[index].group
 		end
 
 		if (xOff + self.blocks[index]:GetWidth()) >= (self:GetWidth() - 4) then
@@ -369,6 +360,7 @@ end
 
 mb.Stack.addBlock = function(self, block)
 	block:SetParent(self)
+
 	block.InStack = true
 	block.saved = false
 
@@ -381,22 +373,23 @@ mb.Stack.addBlock = function(self, block)
 	end
 
 	for id, b in pairs(self.blocks) do b.StackID = id end
+
 	mb.Stack:Adjust()
 
-	self.Instructions:Hide()
+	if self.Instructions:IsShown() then self.Instructions:Hide() end
 end
 
 mb.Stack.remBlock = function(self, block)
 	block:SetParent(mb.Palette)
+
 	table.remove(self.blocks, block.StackID)
 	table.remove(self.payloadTable, block.StackID)
 
 	for id, b in pairs(self.blocks) do b.StackID = id end
+
 	mb.Stack:Adjust()
 
-	if #self.blocks == 0 then
-		self.Instructions:Show()
-	end
+	if #self.blocks == 0 then self.Instructions:Show() end
 end
 
 local initOrder = {"CMD", "CON", "LOG", "TAR", "USR", "UTL"}
@@ -404,12 +397,11 @@ mb.Init = function()
 	if mb_init then return end
 	mb_init = true
 
-	local block
 	local itr = 1
 
 	for _, grp in pairs(initOrder) do
 		for _, data in pairs(mb.BasicBlocks[grp]) do
-			mb.Palette.blocks[itr] = mb.MakeBlock(grp, data, itr)			
+			mb.Palette.blocks[itr] = mb.MakeBlock(grp, itr, data)
 			itr = itr + 1
 			mb.Palette:Adjust()
 		end
@@ -430,30 +422,37 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		local numGen, numChar = GetNumMacros()
 		local name, texture, body
-		
+
 		if numGen > 0 then
 			for i=1, numGen do
 				name, texture, body = GetMacroInfo(i)
 				if name ~= nil then
-					mb.UserMacros[i] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
+					mb.UserMacros[i] = { ["name"] = name, ["texture"] = texture, ["body"] = body, ["blocks"] = {} }
 				end
 			end
 		end
-	
+
 		if numChar > 0 then
 			for i=1+120, numChar+120 do
 				name, texture, body = GetMacroInfo(i)
 				if mb.UserMacros[i] == nil then mb.UserMacros[i] = {} end
 				if name ~= nil then
-					mb.UserMacros[i][mb.CharacterID] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
+					mb.UserMacros[i][mb.CharacterID] = { ["name"] = name, ["texture"] = texture, ["body"] = body, ["blocks"] = {} }
 				end
 			end
 		end
+
 	end
 	if event == "PLAYER_LEAVING_WORLD" then
 		if UserMacros == nil then UserMacros = {} end
 		-- if MacroChangelog == nil then MacroChangelog = {} end
-	
+
+		MBDebug = {}
+
+		for i, block in pairs(mb.Stack.blocks) do
+			-- MBDebug[i] = block.data
+		end
+
 		for index, data in pairs(mb.UserMacros) do
 			if index <=120 then
 				UserMacros[index] = mb.UserMacros[index]
@@ -511,7 +510,7 @@ end
 			grp = string.sub(groupID, 1, 3)
 			num = tonumber(string.sub(groupID, 4, 4))
 			if string.len(groupID) > 4 then
-				
+
 			end
 		end
 
