@@ -228,6 +228,10 @@ mb.MakeBlock = function(group, itr, data)
 	return b
 end
 
+mb.BlockGen = function()
+
+end
+
 local function delimSwitch(index, block)
 	local bool = false
 
