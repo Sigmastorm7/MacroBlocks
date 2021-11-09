@@ -89,462 +89,417 @@ mb.BasicBlocks = {
 		{
 			["name"] = "/use",
 			["payload"] = "/use",
-			["tooltip"] = {
-				"Use",
-				"Usage: /use",
-				"Type: Command",
-				"Function: Uses an item or spell (prefers items)",
-			},
 		},{
 			["name"] = "/cast",
 			["payload"] = "/cast",
-			["tooltip"] = {
-				"Cast",
-				"Usage: /cast",
-				"Type: Command",
-				"Function: Uses a spell or item (prefers spells)",
-			},
 		},{
 			["name"] = "/target",
 			["payload"] = "/tar",
-			["tooltip"] = {
-				"Target",
-				"Usage: /target, /tar",
-				"Type: Command",
-				"Function: Set target to unit or @ modifier",
-			},
 		},{
 			["name"] = "/focus",
 			["payload"] = "/focus",
-			["tooltip"] = {
-				"Focus",
-				"Usage: /focus",
-				"Type: Command",
-				"Function: Set focus target",
-			},
 		},{
 			["name"] = "/cleartarget",
 			["payload"] = "/cleartarget",
-			["tooltip"] = {
-				"Clear Target",
-				"Usage: /cleartarget",
-				"Type: Command",
-				"Function: Clears current target",
-			},
 		},{
 			["name"] = "/clearfocus",
 			["payload"] = "/clearfocus",
-			["tooltip"] = {
-				"Clear Focus",
-				"Usage: /clearfocus",
-				"Type: Command",
-				"Function: Clears focus target",
-			},
 		},{
 			["name"] = "/equip",
 			["payload"] = "/eq",
-			["tooltip"] = {
-				"Equip",
-				"Usage: /equip, /eq",
-				"Type: Command",
-				"Function: Equip an item to its default slot",
-			},
 		},{
 			["name"] = "/equipset",
 			["payload"] = "/equipset",
-			["tooltip"] = {
-				"Equip Set",
-				"Usage: /equipset",
-				"Type: Command",
-				"Function: Change equipped items to a set from the Equipment Manager",
-			},
 		},{
 			["name"] = "/equipslot",
 			["payload"] = "/equipslot",
-			["tooltip"] = {
-				"Equip Slot",
-				"Usage: /equipslot",
-				"Type: Command",
-				"Function: Equip an item to a specific slot",
-			},
 		},{
 			["name"] = "/targetfriend",
 			["payload"] = "/targetfriend",
-			["tooltip"] = {
-				"Target Friend",
-				"Usage: /targetfriend",
-				"Type: Command",
-				"Function: Cycle through friendly units in line of sight",
-			},
 		},{
 			["name"] = "/targetenemy",
 			["payload"] = "/targetenemy",
-			["tooltip"] = {
-				"Target Enemy",
-				"Usage: /targetenemy",
-				"Type: Command",
-				"Function: Cycle through enemy units in line of sight",
-			},
 		},--[[{
 			["name"] = "/click",
 			["payload"] = "/click",
-			["tooltip"] = {
-				"___", "___",
-				"Commad"},
-				"Set focus target",
-			},
 		},{
 			["name"] = "/assist",
 			["payload"] = "/a",
-			["tooltip"] = {
-				"___", "___",
-				"Commad"},
-				"Set focus target",
-			},
 		},{
 			["name"] = "/golfclap",
 			["payload"] = "/golfclap",
-			["tooltip"] = {
-				"___", "___",
-				"Commad"},
-				"Set focus target",
-			},
 		},{
 			["name"] = "/summonpet",
 			["payload"] = "/sp"
-			["tooltip"] = {
-				"___", "___",
-				"Commad"},
-				"Set focus target",
-			},
 		},]]
 	},
 	["CON"] = { -- conditionals
 		{
 			["name"] = "combat",
 			["payload"] = "[combat]",
-			["tooltip"] = {
-				"Combat",
-				"Usage: [combat]",
-				"Type: Condition",
-				"Function: Returns true if player is in combat",
-			},
 		},{
 			["name"] = "exists",
 			["payload"] = "[exists]",
-			["tooltip"] = {
-				"Exists",
-				"Usage: [exists]",
-				"Type: Condition",
-				"Function: Returns true if specified unit exists",
-			},
 		},{
 			["name"] = "help",
 			["payload"] = "[help]",
-			["tooltip"] = {
-				"Help",
-				"Usage: [help]",
-				"Type: Condition",
-				"Function: Returns true if specified unit is friendly",
-			},
 		},{
 			["name"] = "harm",
 			["payload"] = "[harm]",
-			["tooltip"] = {
-				"Harm",
-				"Usage: [harm]",
-				"Type: Condition",
-				"Function: Returns true if specified unit is an enemy",
-			},
 		},{
 			["name"] = "dead",
 			["payload"] = "[dead]",
-			["tooltip"] = {
-				"Dead",
-				"Usage: [dead]",
-				"Type: Condition",
-				"Function: Returns true if specified unit is dead",
-			},
 		},--[[{
 			["name"] = "ghost",
 			["payload"] = "[ghost]",
-			["tooltip"] = {
-				"Ghost",
-				"[ghost]",
-				"Condition",
-				"Specified player is dead",
-			},
 		},{
 			["name"] = "stealth",
 			["payload"] = "[stealth]",
-			["tooltip"] = {
-				"___", "___",
-				"Condiion"},
-				"Set focus target",
-			},
 		},]]
 		{
 			["name"] = "mod",
-			["payload"] = "[mod]",
-			["tooltip"] = {
-				"Modifier",
-				"Usage: [modifier], [modifier:key], [mod], [mod:key]",
-				"Type: Condition",
-				"Function: Returns true if one or more modifier keys are pressed",
-			},
-			["template"] = "ChoiceBlockTemplate",
-			["func"] = "USR_CHOICE",
 			["label"] = "MOD",
+			["template"] = "ChoiceBlockTemplate",
+			["config"] = {
+				["sum"] = 0,
+				["mods"] = { "shift", "ctrl", "alt", },
+				["buttons"] = {
+					[1] = false,
+					[2] = false,
+					[3] = false,
+				},
+				["modCombos"] = {
+					[0] = "[mod]",
+					[1] = "[mod:shift]",
+					[2] = "[mod:ctrl]",
+					[3] = "[mod:shiftctrl]",
+					[4] = "[mod:alt]",
+					[5] = "[mod:shiftalt]",
+					[6] = "[mod:ctrlalt]",
+					[7] = "[mod:shiftctrlalt]",
+				},
+				["textColor"] = {
+					[true] = { 0, 1, 0.4 },
+					[false] = { 0.55, 0.55, 0.55 },
+				},
+			},
 		},{
 			["name"] = "spec",
-			["tooltip"] = {
-				"Specialization",
-				"Usage: [spec:num]",
-				"Type: Condition",
-				"Function: Returns true if player's active spec matches the spec number",
-			},
+			["label"] = "SPEC",
 			["template"] = "ChoiceBlockTemplate",
-			["func"] = "USR_CHOICE",
-			["label"] = "SPEC"
+			["config"] = {
+				["enabledSpec"] = 0,
+				["buttons"] = {
+					false, -- [1] = false,
+					false, -- [2] = false,
+					false, -- [3] = false,
+					false, -- [4] = false,
+				},
+				["textColor"] = {
+					[true] = { 0, 1, 0.4 },
+					[false] = { 0.55, 0.55, 0.55 },
+				},
+			},
 		},{
 			["name"] = "talent",
-			["payload"] = "[talent]",
-			["tooltip"] = {
-				"Talent",
-				"Usage: [talent:row/column]",
-				"Type: Condition",
-				"Function: Returns true if the specified talent is active",
-			},
+			["label"] = "TALENT",
 			["template"] = "TalentBlockTemplate",
-			["func"] = "USR_CHOICE",
-			["label"] = "TALENT"
-		},--[[{
-			["name"] = "button",
-			["payload"] = "[btn]",
-			["tooltip"] = {
-				"___", "___",
-				"Condiion"},
-				"Set focus target",
+			["config"] = {
+				["enabledSpec"] = 0,
+				["buttons"] = {
+					{ false, false, false, }, -- [1] =
+					{ false, false, false, }, -- [2] =
+					{ false, false, false, }, -- [3] =
+					{ false, false, false, }, -- [4] =
+					{ false, false, false, }, -- [5] =
+					{ false, false, false, }, -- [6] =
+					{ false, false, false, }, -- [7] =
+				},
+				["iconAlpha"] = {
+					[true] = 1,
+					[false] = 0.8,
+				},
+				["textColor"] = {
+					[true] = { 1, 1, 1 },
+					[false] = { 1, 0.8, 0.3 },
+				},
 			},
-			["template"] = "ChoiceBlockTemplate",
-			["func"] = "USR_CHOICE",
-			["choices"] = {
-				{ ["name"] = "Left", ["value"] = 1, },
-				{ ["name"] = "Right", ["value"] = 2, },
-				{ ["name"] = "Middle", ["value"] = 3, },
-			}
-		},]]
+		},
 	},
 	["TAR"] = { -- target modifiers
 		{
 			["name"] = "@player",
 			["payload"] = "[@player]",
-			["tooltip"] = {
-				"Use on Player",
-				"Usage: [@player]",
-				"Type: Target Modifier",
-				"Function: Use macro action on yourself",
-			},
 		},{
 			["name"] = "@target",
 			["payload"] = "[@target]",
-			["tooltip"] = {
-				"Use on Target",
-				"Usage: [@target]",
-				"Type: Target Modifier",
-				"Function: Use macro action on current target",
-			},
 		},{
 			["name"] = "@focus",
 			["payload"] = "[@focus]",
-			["tooltip"] = {
-				"Use on Focus",
-				"Usage: [@focus]",
-				"Type: Target Modifier",
-				"Function: Use macro action on focus target",
-			},
 		},{
 			["name"] = "@pet",
 			["payload"] = "[@pet]",
-			["tooltip"] = {
-				"Use on Pet",
-				"Usage: [@pet]",
-				"Type: Target Modifier",
-				"Function: Use macro action on your pet",
-			},
 		},{
 			["name"] = "@mouseover",
 			["payload"] = "[@mouseover]",
-			["tooltip"] = {
-				"Use on Mouseover",
-				"Usage: [@mouseover]",
-				"Type: Target Modifier",
-				"Function: Use macro action on unit or nameplate under cursor",
-			},
 		},{
 			["name"] = "@cursor",
 			["payload"] = "[@cursor]",
-			["tooltip"] = {
-				"Use at Cursor",
-				"Usage: [@cursor]",
-				"Type: Target Modifier",
-				"Function: Use macro action on the ground at the cursor location",
-			},
 		},--[[{
 			["name"] = "@party1",
 			["payload"] = "[@party1]",
-			["tooltip"] = {
-				"___", "___",
-				"Target Modifier"},
-				"Set focus target",
-			},
 		},{
 			["name"] = "@arena1",
 			["payload"] = "[@arena1]",
-			["tooltip"] = {
-				"___", "___",
-				"Target Modifier"},
-				"Set focus target",
-			},
 		},{
 			["name"] = "@boss1",
 			["payload"] = "[@boss1]",
-			["tooltip"] = {
-				"___", "___",
-				"Target Modifier"},
-				"Set focus target",
-			},
 		},{
 			["name"] = "@targettarget",
 			["payload"] = "[@targettarget]",
-			["tooltip"] = {
-				"___", "___",
-				"Target Modifier"},
-				"Set focus target",
-			},
 		},]]
-	},--[[
-	["Social"] = {
-		["@#"] = {
-			["name"] = "AaBbCc",
-			["payload"] = "AaBbCc",
-			["tooltip"] = {
-				"___", "___",
-				"Target Modifier"},
-				"Set focus target",
-			},
-		},
-	},]]
+	},
 	["USR"] = { -- user input
 		{
 			["name"] = "socket",
-			["payload"] = "",
-			["tooltip"] = {
-				"Action Icon",
-				"Action Name",
-				"Custom Argument",
-				"Place a spell, item, mount, or pet icon into the socket",
+			["label"] = "SOCKET",
+			["template"] = "SocketBlockTemplate",
+			["config"] = {
+			--[[ template table structure for saved blocks
+				["abilityInfo] = {
+					["name"] = string,
+					["type"] = string,
+					["ID"] = number,
+					["icon"] = number,
+					["macroReference"] = string or number
+				}
+			]]
 			},
-			["func"] = "USR_SOCKET",
-			["template"] = "SocketBlockTemplate"
+			["abilityInfo"] = false,
+
 		},{
 			["name"] = "custom input",
-			["payload"] = "",
-			["tooltip"] = {
-				"Text Box",
-				"Custom Text",
-				"Custom Argument",
-				"Enter custom macro arguments",
-			},
-			["func"] = "USR_EDIT",
+			["label"] = "EDIT",
 			["template"] = "EditBlockTemplate",
+			["config"] = {
+				["text"] = false,
+			},
 		},
 	},
 	["UTL"] = { -- utility
 		{
 			["name"] = "#show",
+			["label"] = "RETURN",
 			["payload"] = "#show\n",
-			["tooltip"] = {
-				"Show",
-				"Usage: #show",
-				"Type: Utility",
-				"Function: Dynamically changes macro icon based on condtions",
-			},
-			["func"] = "NEW_LINE",
+			["template"] = "MacroBlockTemplate",
 		},{
 			["name"] = "#showtooltip",
+			["label"] = "RETURN",
 			["payload"] = "#showtooltip\n",
-			["tooltip"] = {
-				"Show Tooltip",
-				"Usage: #showtooltip",
-				"Type: Utility",
-				"Function: Dynamically changes macro icon and action tooltip based on condtions",
-			},
-			["func"] = "NEW_LINE",
+			["template"] = "MacroBlockTemplate",
 		},{
 			["name"] = "⮐",
+			["label"] = "RETURN",
 			["payload"] = "\n",
-			["tooltip"] = {
-				"New Line",
-				"Usage: '\\n'",
-				"Type: Utility",
-				"Function: Creates a new line",
-			},
+			["template"] = "MacroBlockTemplate",
 			["symbol"] = true,
-			["func"] = "NEW_LINE",
 		},{
 			["name"] = ";",
+			["label"] = "SEMICLN",
 			["payload"] = ";",
-			["tooltip"] = {
-				"Else",
-				"Usage: ';'",
-				"Type: Utility",
-				"Function: Separates condition statements, the first true statement will be used",
-			},
 		},
 	},
 	["LOG"] = { -- logic
 		{
 			["name"] = "no",
+			["label"] = "STR_MOD",
 			["payload"] = "$!>",
-			["tooltip"] = {
-				"No",
-				"Usage: 'no'",
-				"Type: Logic / Condition Modifier",
-				"Function: Modified condition returns true if NOT true",
-			},
-			["neighbors"] = 1,
+			["template"] = "MacroBlockTemplate",
 		},{
 			["name"] = "and",
+			["label"] = "STR_MOD",
 			["payload"] = "<$&>",
-			["tooltip"] = {
-				"And",
-				"Usage: ', '",
-				"Type: Logic / Condition Modifier",
-				"Function: Joins adjacent condition blocks. Modified conditions return true if BOTH are true",
-			},
-			["neighbors"] = 2,
+			["template"] = "MacroBlockTemplate",
 		},{
 			["name"] = "true",
 			["payload"] = "[]",
-			["tooltip"] = {
-				"True",
-				"Usage: '[]'",
-				"Type: Logic / Condition Modifier",
-				"Function: Always returns true",
-			},
-		},--[[{
-			["name"] = "else",
-			["payload"] = ";",
-			["tooltip"] = {
-				"___", "___",
-				"Logic",
-				"Set focus target",
-			},
-		},]]
+		},
+	},
+}
+
+mb.BasicTooltips = {
+	{	"Use",
+		"Usage: /use",
+		"Type: Command",
+		"Function: Uses an item or spell (prefers items)",
+	},{
+		"Cast",
+		"Usage: /cast",
+		"Type: Command",
+		"Function: Uses a spell or item (prefers spells)",
+	},{
+		"Target",
+		"Usage: /target, /tar",
+		"Type: Command",
+		"Function: Set target to unit or @ modifier",
+	},{
+		"Focus",
+		"Usage: /focus",
+		"Type: Command",
+		"Function: Set focus target",
+	},{
+		"Clear Target",
+		"Usage: /cleartarget",
+		"Type: Command",
+		"Function: Clears current target",
+	},{
+		"Clear Focus",
+		"Usage: /clearfocus",
+		"Type: Command",
+		"Function: Clears focus target",
+	},{
+		"Equip",
+		"Usage: /equip, /eq",
+		"Type: Command",
+		"Function: Equip an item to its default slot",
+	},{
+		"Equip Set",
+		"Usage: /equipset",
+		"Type: Command",
+		"Function: Change equipped items to a set from the Equipment Manager",
+	},{
+		"Equip Slot",
+		"Usage: /equipslot",
+		"Type: Command",
+		"Function: Equip an item to a specific slot",
+	},{
+		"Target Friend",
+		"Usage: /targetfriend",
+		"Type: Command",
+		"Function: Cycle through friendly units in line of sight",
+	},{
+		"Target Enemy",
+		"Usage: /targetenemy",
+		"Type: Command",
+		"Function: Cycle through enemy units in line of sight",
+	},{
+		"Combat",
+		"Usage: [combat]",
+		"Type: Condition",
+		"Function: Returns true if player is in combat",
+	},{
+		"Exists",
+		"Usage: [exists]",
+		"Type: Condition",
+		"Function: Returns true if specified unit exists",
+	},{
+		"Help",
+		"Usage: [help]",
+		"Type: Condition",
+		"Function: Returns true if specified unit is friendly",
+	},{
+		"Harm",
+		"Usage: [harm]",
+		"Type: Condition",
+		"Function: Returns true if specified unit is an enemy",
+	},{
+		"Dead",
+		"Usage: [dead]",
+		"Type: Condition",
+		"Function: Returns true if specified unit is dead",
+	},{
+		"Modifier",
+		"Usage: [modifier], [modifier:key], [mod], [mod:key]",
+		"Type: Condition",
+		"Function: Returns true if one or more modifier keys are pressed",
+	},{
+		"Specialization",
+		"Usage: [spec:num]",
+		"Type: Condition",
+		"Function: Returns true if player's active spec matches the spec number",
+	},{
+		"Talent",
+		"Usage: [talent:row/column]",
+		"Type: Condition",
+		"Function: Returns true if the specified talent is active",
+	},{
+		"Use on Player",
+		"Usage: [@player]",
+		"Type: Target Modifier",
+		"Function: Use macro action on yourself",
+	},{
+		"Use on Target",
+		"Usage: [@target]",
+		"Type: Target Modifier",
+		"Function: Use macro action on current target",
+	},{
+		"Use on Focus",
+		"Usage: [@focus]",
+		"Type: Target Modifier",
+		"Function: Use macro action on focus target",
+	},{
+		"Use on Pet",
+		"Usage: [@pet]",
+		"Type: Target Modifier",
+		"Function: Use macro action on your pet",
+	},{
+		"Use on Mouseover",
+		"Usage: [@mouseover]",
+		"Type: Target Modifier",
+		"Function: Use macro action on unit or nameplate under cursor",
+	},{
+		"Use at Cursor",
+		"Usage: [@cursor]",
+		"Type: Target Modifier",
+		"Function: Use macro action on the ground at the cursor location",
+	},{
+		"Action Icon",
+		"Action Name",
+		"Custom Argument",
+		"Place a spell, item, mount, or pet icon into the socket",
+	},{
+		"Text Box",
+		"Custom Text",
+		"Custom Argument",
+		"Enter custom macro arguments",
+	},{
+		"Show",
+		"Usage: #show",
+		"Type: Utility",
+		"Function: Dynamically changes macro icon based on condtions",
+	},{
+		"Show Tooltip",
+		"Usage: #showtooltip",
+		"Type: Utility",
+		"Function: Dynamically changes macro icon and action tooltip based on condtions",
+	},{
+		"New Line",
+		"Usage: '\\n'",
+		"Type: Utility",
+		"Function: Creates a new line",
+	},{
+		"Else",
+		"Usage: ';'",
+		"Type: Utility",
+		"Function: Separates condition statements, the first true statement will be used",
+	},{
+		"No",
+		"Usage: 'no'",
+		"Type: Logic / Condition Modifier",
+		"Function: Modified condition returns true if NOT true",
+	},{
+		"And",
+		"Usage: ', '",
+		"Type: Logic / Condition Modifier",
+		"Function: Joins adjacent condition blocks. Modified conditions return true if BOTH are true",
+	},{
+		"True",
+		"Usage: '[]'",
+		"Type: Logic / Condition Modifier",
+		"Function: Always returns true",
 	},
 }
 
 mb.AdvancedBlocks = {
-    
+
 }

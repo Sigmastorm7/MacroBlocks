@@ -8,13 +8,9 @@
         <Size>
             <AbsDimension x="28" y="28"/>
         </Size>
-        <KeyValues>
-            <KeyValue key="payload" value="nil" nillable="true" type="string"/>
-            <KeyValue key="group" value="nil" nillable="true" type="string"/>
-        </KeyValues>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="text" text="BLOCK" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont">
+                <FontString parentKey="text" justifyH="CENTER" justifyV="MIDDLE" inherits="MacroBlocksFont">
                     <Anchors>
                         <Anchor point="CENTER" x="0" y="-0.5"/>
                     </Anchors>
@@ -242,32 +238,32 @@
                     </Layer>
                 </Layers>
             </Frame>
-            <Button parentKey="choice1" inherits="ChoiceButtonTemplate">
+            <Button parentKey="choice1" id="1" inherits="ChoiceButtonTemplate">
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.backdropFrame" relativePoint="RIGHT" x="4"/>
                 </Anchors>
             </Button>
-            <Button parentKey="choice2" inherits="ChoiceButtonTemplate">
+            <Button parentKey="choice2" id="2" inherits="ChoiceButtonTemplate">
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.choice1" relativePoint="RIGHT" x="4"/>
                 </Anchors>
             </Button>
-            <Button parentKey="choice3" inherits="ChoiceButtonTemplate">
+            <Button parentKey="choice3" id="3" inherits="ChoiceButtonTemplate">
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.choice2" relativePoint="RIGHT" x="4"/>
                 </Anchors>
             </Button>
-            <Button parentKey="choice4" inherits="ChoiceButtonTemplate">
+            <Button parentKey="choice4" id="4" inherits="ChoiceButtonTemplate">
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.choice3" relativePoint="RIGHT" x="4"/>
                 </Anchors>
             </Button>
-            <Button parentKey="choice5" inherits="ChoiceButtonTemplate">
+            <Button parentKey="choice5" id="5" inherits="ChoiceButtonTemplate">
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.choice4" relativePoint="RIGHT" x="4"/>
                 </Anchors>
             </Button>
-            <Button parentKey="choice6" inherits="ChoiceButtonTemplate">
+            <Button parentKey="choice6" id="6" inherits="ChoiceButtonTemplate">
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.choice5" relativePoint="RIGHT" x="4"/>
                 </Anchors>
