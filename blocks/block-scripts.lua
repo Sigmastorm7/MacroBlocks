@@ -11,65 +11,79 @@ local ToyBox = C_ToyBox
 
 local flyoutText = { [false] = "❭❭", [true] = "❬❬" }
 
-local function MB_CHOICE_BLOCK_RESET(block)
+local function MB_Reset(block)
 
+    local label = block.param.label
     local btn
 
-    if block.param.label == "MOD" then
+    if block.group == "CON" then
+        if label == "MOD" then
 
-        for i=1, #block.config.buttons do
+            for i=1, #block.config.buttons do
 
-            btn = block["choice"..i]
-
-            btn.enabled = false
-            btn:Hide()
-            btn.text:SetTextColor(unpack(block.config.textColor[false]))
-
-        end
-
-        block.sum = 0
-        block.config.sum = block.sum
-        block.payload = "[mod]"
-
-    elseif block.param.label == "SPEC" then
-
-        for i=1, #block.config.buttons do
-
-            btn = block["choice"..i]
-
-            btn:Hide()
-
-            btn.enabled = i == block.config.enabledSpec
-            btn.text:SetTextColor(unpack(block.config.textColor[i == block.config.enabledSpec]))
-
-        end
-
-    elseif block.param.label == "TALENT" then
-
-        block.bgFrame:Hide()
-
-        for i=1, 7 do
-
-            for j=1, 3 do
-
-                btn = block["row"..i]["btn"..j]
+                btn = block["choice"..i]
 
                 btn.enabled = false
-
                 btn:Hide()
-                btn:UnlockHighlight()
-
-                btn.icon:SetAlpha(block.config.iconAlpha[false])
-                btn.icon:SetDesaturated(true)
-
-                btn.talentID:SetTextColor(unpack(block.config.textColor[false]))
+                btn.text:SetTextColor(unpack(block.config.textColor[false]))
 
             end
 
+            block.sum = 0
+            block.config.sum = block.sum
+            block.payload = "[mod]"
+
+        elseif label == "SPEC" then
+
+            for i=1, #block.config.buttons do
+
+                btn = block["choice"..i]
+
+                btn:Hide()
+
+                btn.enabled = i == block.config.enabledSpec
+                btn.text:SetTextColor(unpack(block.config.textColor[i == block.config.enabledSpec]))
+
+            end
+
+        elseif label == "TALENT" then
+
+            block.bgFrame:Hide()
+            for i=1, 7 do
+
+                for j=1, 3 do
+
+                    btn = block["row"..i]["btn"..j]
+
+                    btn.enabled = false
+
+                    btn:Hide()
+                    btn:UnlockHighlight()
+
+                    btn.icon:SetAlpha(block.config.iconAlpha[false])
+                    btn.icon:SetDesaturated(true)
+
+                    btn.talentID:SetTextColor(unpack(block.config.textColor[false]))
+
+                end
+
+            end
+            block.payload = "[talent:0/0]"
         end
+    elseif block.group == "USR" then
 
-        block.payload = "[talent:0/0]"
+        self.payload = "{empty}"
 
+        if label == "SOCKET" then
+
+            self.socket.icon:SetColorTexture(0, 0, 0, 0)
+
+        elseif label == "EDIT" then
+
+            self.edit:SetText("")
+            self.edit:ClearFocus()
+
+        end
     end
 
     block:SetWidth(block.closeWidth)
@@ -156,9 +170,7 @@ function MB_OnDragStop(self)
     elseif not mb.Stack:IsMouseOver() and self.InStack then
 
         if self.param.label then
-            if self.param.label == "USR_SOCKET" then
-                self.payload = ""
-                self.socket.icon:SetColorTexture(0, 0, 0, 0)
+            if self.param.label == "SOCKET" then
             elseif self.param.label == "USR_EDIT" then
                 self.payload = ""
                 self.edit:SetText("")
