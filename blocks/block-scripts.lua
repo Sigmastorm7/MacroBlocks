@@ -1,6 +1,5 @@
 local addon, mb = ...
 
-local MakeBlock = mb.MakeBlock
 local groupColors = mb.GroupColors
 
 -- Blizzard API
@@ -9,9 +8,9 @@ local Mounts = C_MountJournal
 local Pets = C_PetJournal
 local ToyBox = C_ToyBox
 
-local flyoutText = { [false] = "❭❭", [true] = "❬❬" }
+mb.flyoutText = { [false] = "❭❭", [true] = "❬❬" }
 
-local function MB_Reset(block)
+mb.ResetBlock = function(block)
 
     local label = block.param.label
     local btn
@@ -29,8 +28,8 @@ local function MB_Reset(block)
 
             end
 
-            block.sum = 0
-            block.config.sum = block.sum
+            block.value = 0
+            block.config.value = block.value
             block.payload = "[mod]"
 
         elseif label == "SPEC" then
@@ -41,8 +40,8 @@ local function MB_Reset(block)
 
                 btn:Hide()
 
-                btn.enabled = i == block.config.enabledSpec
-                btn.text:SetTextColor(unpack(block.config.textColor[i == block.config.enabledSpec]))
+                btn.enabled = i == block.config.value
+                btn.text:SetTextColor(unpack(block.config.textColor[i == block.config.value]))
 
             end
 
@@ -69,26 +68,29 @@ local function MB_Reset(block)
 
             end
             block.payload = "[talent:0/0]"
+            block.value = "0/0"
         end
+
+        block:SetWidth(block.closeWidth)
+        block.flyout.text:SetText(mb.flyoutText[false])
+        block.flyout.open = false
+
     elseif block.group == "USR" then
 
-        self.payload = "{empty}"
+        block.payload = "{empty}"
 
         if label == "SOCKET" then
 
-            self.socket.icon:SetColorTexture(0, 0, 0, 0)
+            block.socket.icon:SetColorTexture(0, 0, 0, 0)
 
         elseif label == "EDIT" then
 
-            self.edit:SetText("")
-            self.edit:ClearFocus()
+            block.edit:SetText("")
+            block.value = "{empty}"
+            block.edit:ClearFocus()
 
         end
     end
-
-    block:SetWidth(block.closeWidth)
-    block.flyout.text:SetText(flyoutText[false])
-    block.flyout.open = false
 
 end
 
@@ -103,10 +105,10 @@ end
 
 function MB_OnEnter(self)
     GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", -8, 8)
-	GameTooltip:AddLine(mb.BasicTooltips[self.ID][1])
-    GameTooltip:AddLine(mb.BasicTooltips[self.ID][2])
-    GameTooltip:AddLine(mb.BasicTooltips[self.ID][3])
-    GameTooltip:AddLine(mb.BasicTooltips[self.ID][4])
+	GameTooltip:AddLine(mb.BasicTooltips[self.paletteIndex][1])
+    GameTooltip:AddLine(mb.BasicTooltips[self.paletteIndex][2])
+    GameTooltip:AddLine(mb.BasicTooltips[self.paletteIndex][3])
+    GameTooltip:AddLine(mb.BasicTooltips[self.paletteIndex][4])
     GameTooltip:Show()
 end
 
@@ -147,16 +149,16 @@ function MB_OnDragStop(self)
     if mb.Stack:IsMouseOver() then
 
         if not self.InStack then
-            mb.Palette.blocks[self.ID] = mb.BlockGen(self.group, self.ID, self.param)
+            mb.Palette.blocks[self.paletteIndex] = mb.MakeBlock(mb.GetFlags(self))
         end
-        if self.group ~= "LOG" then
+        if self.group ~= "LOG" or self.param.name == "true" then
             mb.Stack:addBlock(self)
         elseif self.group == "LOG" then
-            if self:checkString() then
+            if mb.LogicPlacement(self) then
                 mb.Stack:addBlock(self)
             else
-                mb.BlockPools:Release(mb.Palette.blocks[self.ID])
-                mb.Palette.blocks[self.ID] = self
+                mb.BlockPools:Release(mb.Palette.blocks[self.paletteIndex])
+                mb.Palette.blocks[self.paletteIndex] = self
                 self.InStack = false
                 mb.Stack.displace = false
                 mb.Stack:Adjust()
@@ -168,27 +170,7 @@ function MB_OnDragStop(self)
         mb.Stack.displace = false
 
     elseif not mb.Stack:IsMouseOver() and self.InStack then
-
-        if self.param.label then
-            if self.param.label == "SOCKET" then
-            elseif self.param.label == "USR_EDIT" then
-                self.payload = ""
-                self.edit:SetText("")
-            -- elseif self.param.label == "USR_CHOICE" then
-            --     MB_CHOICE_BLOCK_RESET(self)
-            end
-        end
-
-        if self.config and self.group == "CON" then
-            MB_CHOICE_BLOCK_RESET(self)
-        end
-
-        self.saved = false
-        self.InStack = false
-
-        mb.BlockPools:Release(mb.Palette.blocks[self.ID])
-        mb.Palette.blocks[self.ID] = self
-
+        mb.EraseBlock(self)
     end
 
     mb.Frame.dragging = nil
@@ -212,14 +194,20 @@ end
 
 -- USR socket block handlers
 function MB_SOCKET_OnClick(self, button, down)
-    local itemType, name, spellID, itemID, mountID, iconID
+
+    local p = self:GetParent()
+    local iconID
 
     if GetCursorInfo() ~= nil then
-        itemType, itemID, mountID, spellID = GetCursorInfo()
+
+        --[[
         if itemType == "spell" then
+
+            mb.GetAbilityInfo("spell")
             name, _, iconID = GetSpellInfo(spellID)
 
-            mb.Stack.payloadTable[self:GetParent().StackID] = name
+            p.value = name
+            abilityID = spellID
 
         elseif itemType == "item" then
             iconID = Item.GetItemIconByID(itemID)
@@ -228,20 +216,30 @@ function MB_SOCKET_OnClick(self, button, down)
                 itemType = "toy"
             end
 
-            mb.Stack.payloadTable[self:GetParent().StackID] = "item:"..itemID
+            p.value = "item:"..itemID
+            abilityID = itemID
 
         elseif itemType == "mount" then
             name, _, iconID = Mounts.GetMountInfoByID(itemID)
 
-            mb.Stack.payloadTable[self:GetParent().StackID] = name
+            p.value = name
+            abilityID = itemID
 
         elseif itemType == "battlepet" then
             local petInfo = Pets.GetPetInfoTableByPetID(itemID)
 
             iconID = petInfo.icon
-            mb.Stack.payloadTable[self:GetParent().StackID] = petInfo.name
+            p.value = petInfo.name
+            abilityID = itemID
 
         end
+        ]]
+
+        p.value, p.payload, p.itemType, iconID = mb.GetAbilityInfo(GetCursorInfo())
+
+        mb.Stack.payloadTable[p.StackID] = p.payload
+
+        p.config.abilityID = p.value
 
 	    self.icon:SetTexture(iconID)
         ClearCursor()
@@ -259,9 +257,16 @@ function MB_EDIT_OnEditFocusGained(self)
     end
 end
 function MB_EDIT_OnTextChanged(self, userInput)
+    local p = self:GetParent()
+
     self.instructions:SetShown(self:GetText() == "")
+
     if userInput then
-        mb.Stack.payloadTable[self:GetParent().StackID] = self:GetText()
+
+        p.value = self:GetText()
+        p.payload = p.value
+
+        mb.Stack.payloadTable[p.StackID] = p.payload
         UpdateMacroBlockText()
     end
 end
@@ -324,7 +329,7 @@ function MB_CHOICE_FlyoutOnClick(self, button, down)
         end
     end
 
-    self.text:SetText(flyoutText[self.open])
+    self.text:SetText(mb.flyoutText[self.open])
 
     mb.Stack:Adjust()
 end
@@ -351,26 +356,29 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
         if not self.enabled then
 
             self.enabled = true
-            p.sum = p.sum + self.value
+            p.value = p.value + self.value
 
         elseif self.enabled then
 
             self.enabled = false
-            p.sum = p.sum - self.value
+            p.value = p.value - self.value
 
         end
 
         p.config.buttons[self:GetID()] = self.enabled
-        p.config.sum = p.sum
+        p.config.sum = p.value
 
-        mb.Stack.payloadTable[p.StackID] = p.config.modCombos[p.sum]
+        p.payload = p.config.modCombos[p.value]
+        mb.Stack.payloadTable[p.StackID] = p.payload
         self.text:SetTextColor(unpack(p.config.textColor[self.enabled]))
     elseif p.param.label == "SPEC" then
         for i=1, #p.config.buttons do
             p["choice"..i].enabled = p["choice"..i].value == self.value
             p["choice"..i].text:SetTextColor(unpack(p.config.textColor[p["choice"..i].value == self.value]))
         end
-        mb.Stack.payloadTable[p.StackID] = "[spec:"..self.value.."]" or p.payload
+        p.value = self.value
+        p.payload = "[spec:"..self.value.."]"
+        mb.Stack.payloadTable[p.StackID] = p.payload
     elseif p.param.label == "TALENT" then
         local tBtn
         for i=1, 7 do
@@ -389,6 +397,7 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
                 tBtn.selected:SetShown(mb.User.talents[i][j])
 
                 if tBtn.enabled then
+                    p.value = i.."/"..j
                     tBtn:LockHighlight()
                 else
                     tBtn:UnlockHighlight()
@@ -396,7 +405,8 @@ function MB_CHOICE_BUTTON_OnClick(self, button, down)
 
             end
         end
-        mb.Stack.payloadTable[p.StackID] = "[talent:"..self.value.."]" or p.payload
+        p.payload = "[talent:"..self.value.."]"
+        mb.Stack.payloadTable[p.StackID] = p.payload
     end
     UpdateMacroBlockText()
 end

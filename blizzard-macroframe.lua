@@ -111,6 +111,7 @@ local MACRO_FRAME_UPDATE = function()
 	if ( not MacroFrame.selectedMacro ) then
 		MacroDeleteButton:Disable();
 	end
+
 end
 
 local MB_SAVE_CHANGES = function()
@@ -120,20 +121,20 @@ local MB_SAVE_CHANGES = function()
 	MacroPopupFrame:Hide()
 	MacroFrameText:ClearFocus()
 
-	local t = {}
+	-- local t = {}
 
-	for i, block in pairs(mb.Stack.blocks) do
-		block.saved = true
-		t[i] = block.GroupID
-	end
+	-- for i, block in pairs(mb.Stack.blocks) do
+	-- 	block.saved = true
+	-- 	t[i] = { block.group, block.ID, block.param }
+	-- end
 
-	if MacroFrame.selectedMacro > 120 then
-		mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
-		mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["blocks"] = t
-	else
-		mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
-		mb.UserMacros[MacroFrame.selectedMacro]["blocks"] = t
-	end
+	-- if MacroFrame.selectedMacro > 120 then
+	-- 	mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
+	-- 	mb.UserBlocks[MacroFrame.selectedMacro][mb.CharacterID] = t
+	-- else
+	-- 	mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
+	-- 	mb.UserBlocks[MacroFrame.selectedMacro] = t
+	-- end
 
 	MacroFrameText.blockInput = false
 	MacroFrameText.saved = true
@@ -183,12 +184,19 @@ MBMacroButton_OnClick = function(self, button, down)
 	MacroFrame_SaveMacro();
 	MacroFrameText.blockInput = false
 	MacroFrame_SelectMacro(MacroFrame.macroBase + self:GetID());
+
+	if #mb.Stack.blocks > 0 then
+		for i=#mb.Stack.blocks, 1, -1 do
+			mb.EraseBlock(mb.Stack.blocks[i])
+		end
+		mb.Stack:Adjust()
+		mb.Palette:Adjust()
+	end
+	mb.GetSavedBlocks(MacroFrame.selectedMacro)
+
 	MacroFrame_Update();
 	MacroPopupFrame:Hide();
 	MacroFrameText:ClearFocus();
-
-
-
 end
 
 MBMacroFrameTab_OnClick = function(self, button, down)
@@ -205,6 +213,29 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, arg)
     if event == "ADDON_LOADED" and arg == "Blizzard_MacroUI" then
 		if not MacroFrame then return end
+
+		MacroFrame_SaveMacro = function()
+			if ( MacroFrame.textChanged and MacroFrame.selectedMacro ) then
+				EditMacro(MacroFrame.selectedMacro, nil, nil, MacroFrameText:GetText());
+				MacroFrame.textChanged = nil;
+			end
+
+			local t = {}
+
+			for i,block in ipairs(mb.Stack.blocks) do
+				block.saved = true
+				t[i] = mb.GetFlags(block)
+			end
+
+			if MacroFrame.selectedMacro > 120 then
+				mb.UserMacros[MacroFrame.selectedMacro][mb.CharacterID]["body"] = MacroFrameText:GetText()
+				mb.UserBlocks[MacroFrame.selectedMacro][mb.CharacterID] = t
+			else
+				mb.UserMacros[MacroFrame.selectedMacro]["body"] = MacroFrameText:GetText()
+				mb.UserBlocks[MacroFrame.selectedMacro] = t
+			end
+
+		end
 
 		-- hook into the macro icons' OnClick handlers to clear blocks when changing macros
 		for i=1, 120 do
@@ -460,6 +491,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		MacroFrame:HookScript("OnShow", function(_self)
 			mb.Frame:Show()
 			mb.Init()
+			mb.GetSavedBlocks(MacroFrame.selectedMacro)
 			_self.textChanged = nil
 			_self.changes = false
 			MacroSaveButton:Disable()

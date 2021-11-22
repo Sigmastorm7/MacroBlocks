@@ -56,10 +56,14 @@ mb.Stack.name = "Stack"
 mb.Stack.blocks = {}
 mb.Stack.sTable = {}
 mb.Stack.string = ""
+
 mb.Stack.displace = false
 mb.Stack.displaceID = 0
+
 mb.Stack.preserve = false
 mb.Stack.payloadTable = {}
+
+mb.Stack.blockFlags = {}
 
 mb.BlockPools = CreateFramePoolCollection()
 
@@ -84,37 +88,87 @@ local function resizeBlock(block)
 	end
 end
 
-mb.GetAbilityInfo = function(abilityID, abilityType)
-	local name, iconID
+mb.GetFlags = function(block)
+	local str = strjoin("-", block.group, block.paletteIndex, block.paramIndex)
 
-	if abilityType == "spell" then
-		name, _, iconID = GetSpellInfo(abilityID)
+	if block.label then str = str.."-"..block.label end
+	-- if block.config then
+		if block.value then str = str.."-"..block.value end
+		if block.itemType then str = str.."-"..block.itemType end
+	-- end
 
-	elseif abilityType == "item" then
-		name = "item:"..abilityID
-		iconID = C_Item.GetItemIconByID(abilityID)
-
-	elseif abilityType == "mount" then
-		name, _, iconID = C_MountJournal.GetMountInfoByID(abilityID)
-
-	elseif abilityType == "battlepet" then
-		local petInfo = C_PetJournal.GetPetInfoTableByPetID(abilityID)
-		name = petInfo.name
-		iconID = petInfo.icon
-
-	end
-
-	return name, iconID
+	return str
 end
 
-mb.BlockGen = function(group, num, param)
+mb.LogicPlacement = function(block)
+
+	local n = block.param.name
+	local p = block.param
+	local b = false
+
+	if mb.Stack.displace then
+		if strfind(p.payload, ">") then
+			b = b or mb.Stack.blocks[mb.Stack.displaceID].group == "CON"
+			b = b or (mb.Stack.blocks[mb.Stack.displaceID].group == "TAR" and n == "and")
+		end
+		if strfind(p.payload, "<") then
+			b = b or mb.Stack.blocks[mb.Stack.displaceID-1].group == "CON"
+			b = b or mb.Stack.blocks[mb.Stack.displaceID-1].group == "TAR"
+		end
+	elseif #mb.Stack.blocks > 0 then
+		if strfind(p.payload, "<") then
+			b = b or mb.Stack.blocks[#mb.Stack.blocks].group == "CON"
+			b = b or mb.Stack.blocks[#mb.Stack.blocks].group == "TAR"
+		end
+	end
+
+	return b
+end
+
+mb.GetAbilityInfo = function(itemType, itemID, mountID, spellID)
+	local abilityID, payload, iconID
+
+	if itemType == "spell" then
+		abilityID = spellID
+		payload, _, iconID = GetSpellInfo(spellID)
+	elseif itemType == "item" then
+		abilityID = itemID
+		payload = "item:"..abilityID
+		iconID = C_Item.GetItemIconByID(itemID)
+	elseif itemType == "mount" then
+		abilityID = itemID
+		payload, _, iconID = C_MountJournal.GetMountInfoByID(itemID)
+	elseif itemType == "battlepet" then
+		local petInfo = C_PetJournal.GetPetInfoTableByPetID(itemID)
+		abilityID = itemID
+		payload = petInfo.name
+		iconID = petInfo.icon
+	end
+
+	return abilityID, payload, itemType, iconID
+end
+
+mb.MakeBlock = function(str) -- group, paletteIndex, paramIndex, label, value, itemType)
+
+	local group, paletteIndex, paramIndex, label, value, itemType = strsplit("-", str)
+
+	paletteIndex = tonumber(paletteIndex)
+	paramIndex = tonumber(paramIndex)
+
+	local param = mb.BasicBlocks[group][paramIndex]
 
 	local block = mb.BlockPools:Acquire(param.template or "MacroBlockTemplate")
+
 	local name = param.name
 
 	if param.config then
 
 		local config = param.config
+
+		if strfind(value, "%d+") and not strfind(value, "%d/%d") then value = tonumber(value) end
+
+		if value then config.value = value end
+		if itemType then config.itemType = itemType end
 
 		if group == "CON" then
 
@@ -127,10 +181,6 @@ mb.BlockGen = function(group, num, param)
 
 			block.closeWidth = block:GetWidth()
 			block.openWidth = 18
-
-			if config.enabledSpec then
-				if config.enabledSpec == 0 then config.enabledSpec = GetSpecialization() end
-			end
 
 			if param.label == "MOD" then
 
@@ -167,9 +217,14 @@ mb.BlockGen = function(group, num, param)
 					end
 				end
 
-				param.payload = config.modCombos[config.sum]
+				block.value = tostring(config.value)
+				block.payload = config.modCombos[config.value]
 
 			elseif param.label == "SPEC" then
+
+				if value == 0 then
+					value = GetSpecialization()
+				end
 
 				local specNum = GetNumSpecializations()
 				local preset = false
@@ -190,7 +245,7 @@ mb.BlockGen = function(group, num, param)
 				for i, state in ipairs(config.buttons) do
 
 					local _, specName = GetSpecializationInfo(i)
-					specCheck = i == config.enabledSpec
+					specCheck = i == value
 					bc = block["choice"..i]
 
 					bc.text:SetText(specName)
@@ -206,42 +261,45 @@ mb.BlockGen = function(group, num, param)
 					block.openWidth = block.openWidth + bc:GetWidth()
 				end
 
-				param.payload = "[spec:"..config.enabledSpec.."]"
+				block.value = value
+				config.value = value
+				param.payload = "[spec:"..value.."]"
 
 			elseif param.label == "TALENT" then
 
-				local tIcon, tStr
-				local r, c = 0, 0
+				if config.spec == 0 then config.spec = GetSpecialization() end
+
+				local tIcon, tStr, tBool
+				local _, _, r, c = strfind(value, "(%d)/(%d)")
+				r = tonumber(r)
+				c = tonumber(c)
 
 				for i=1, 7 do
 					for j=1, 3 do
 
-						_, _, tIcon = GetTalentInfoBySpecialization(config.enabledSpec, i, j)
+						_, _, tIcon = GetTalentInfoBySpecialization(config.spec, i, j)
 						bc = block["row"..i]["btn"..j]
 						tStr = i.."/"..j
+						tBool = i == r and j == c
 
 						bc:SetHighlightAtlas("ChromieTime-Button-Selection")
 
 						bc.icon:SetTexture(tIcon)
-						bc.icon:SetDesaturated(not config.buttons[i][j])
-						bc.icon:SetAlpha(config.iconAlpha[config.buttons[i][j]])
+						bc.icon:SetDesaturated(not tBool)
+						bc.icon:SetAlpha(config.iconAlpha[tBool])
 
 						bc.talentID:SetText(tStr)
-						bc.talentID:SetTextColor(unpack(config.textColor[config.buttons[i][j]]))
+						bc.talentID:SetTextColor(unpack(config.textColor[tBool]))
 
-						bc.selected:SetShown(config.buttons[i][j])
+						bc.selected:SetShown(tBool)
 
 						bc.value = tStr
-
-						if config.buttons[i][j] then
-							r = i
-							c = j
-						end
 
 					end
 				end
 
-				block.payload = "[talent:"..r.."/"..c.."]"
+				block.value = value
+				block.payload = "[talent:"..value.."]"
 
 				block.openWidth = 102
 
@@ -249,12 +307,12 @@ mb.BlockGen = function(group, num, param)
 				block:SetScript("OnEvent", function(self, event, arg)
 					if event == "PLAYER_SPECIALIZATION_CHANGED" then
 
-						config.enabledSpec = GetSpecialization()
+						config.spec = GetSpecialization()
 
 						for i=1, 7 do
 							for j=1, 3 do
 
-								_, _, talentIcon = GetTalentInfoBySpecialization(config.enabledSpec, i, j)
+								local _, _, talentIcon = GetTalentInfoBySpecialization(config.spec, i, j)
 								bc = self["row"..i]["btn"..j]
 
 								bc.icon:SetTexture(talentIcon)
@@ -268,66 +326,30 @@ mb.BlockGen = function(group, num, param)
 
 		elseif group == "USR" then
 
-			if param.label == "SOCKET" then
+			if label == "SOCKET" then
 
 				local btn = block.socket
-				local abilityID
+				local iconID
 
-				if config.abilityInfo then
+				block.value = value
+				block.itemType = itemType
 
-					block.payload = config.macroReference
-					btn.icon:SetTexture(config.icon)
+				_, block.payload, _, iconID = mb.GetAbilityInfo(itemType, value, nil, value)
 
+				btn.icon:SetTexture(iconID)
+
+			elseif label == "EDIT" then
+
+				block.value = value
+				block.payload = value
+
+				if value ~= "{empty}" then
+					block.edit:SetText(value)
 				else
-					block.payload = "{empty}"
-				end
-
-			elseif param.label == "EDIT" then
-
-				if param.text then
-					block.payload = param.text
-					block.edit:SetText(param.text)
-				else
-					block.payload = "{empty}"
+					block.edit:SetText("")
 				end
 
 			end
-
-		elseif group == "LOG" then
-
-			if param.label == "STR_MOD" then
-				block.payload = param.payload
-
-				block.checkString = function(self)
-
-					local _n = self.param.name
-					local _p = self.param
-					local MBS = mb.Stack.blocks
-					local MBSdid = mb.Stack.displaceID
-					local _b = _n == "true"
-
-					if mb.Stack.displace then
-						if strfind(_p.modifier, ">") then
-							_b = _b or MBS[MBSdid].group == "CON"
-							_b = _b or (MBS[MBSdid].group == "TAR" and _n == "and")
-						end
-						if strfind(_p.modifier, "<") then
-							_b = _b or MBS[MBSdid-1].group == "CON"
-							_b = _b or MBS[MBSdid-1].group == "TAR"
-						end
-					elseif #MBS > 0 then
-						if strfind(_p.modifier, "<") then
-							_b = _b or MBS[#MBS].group == "CON"
-							_b = _b or MBS[#MBS].group == "TAR"
-						end
-					end
-
-					return _b
-				end
-			end -- function end
-
-			block.text:SetText(name)
-			resizeBlock(block)
 
 		end
 
@@ -346,9 +368,13 @@ mb.BlockGen = function(group, num, param)
 	end
 
 	block.group = group
-	block.ID = num
+	block.paletteIndex = paletteIndex
+	block.paramIndex = paramIndex
+
 	block.payload = block.payload or param.payload
 	block.param = param
+
+	if label then block.label = label end
 
 	block:SetBackdrop(mb.blockBackdrop)
 	block:SetBackdropColor(unpack(mb.GroupColors[group].rgb))
@@ -357,6 +383,38 @@ mb.BlockGen = function(group, num, param)
 	block:Show()
 
 	return block
+
+end
+
+mb.EraseBlock = function(block)
+
+    if block.config and (block.group == "CON" or block.group == "USR") then
+        mb.ResetBlock(block)
+    end
+
+	block.saved = false
+    block.InStack = false
+
+	mb.BlockPools:Release(mb.Palette.blocks[block.paletteIndex])
+    mb.Palette.blocks[block.paletteIndex] = block
+	mb.Palette:Adjust()
+	mb.Stack:Adjust()
+end
+
+mb.GetSavedBlocks = function(selected)
+	local flags
+
+	if selected <= 120 then
+		flags = mb.UserBlocks[selected]
+	else
+		flags = mb.UserBlocks[selected][mb.CharacterID]
+	end
+
+	if flags and #flags > 0 then
+		for i, flag in ipairs(flags) do
+			mb.Stack:addBlock(mb.MakeBlock(flag))
+		end
+	end
 
 end
 
@@ -398,7 +456,6 @@ function UpdateMacroBlockText()
 	MacroFrameText:SetText(mb.Stack.string)
 end
 
-local paBlock
 mb.Palette.Adjust = function(self, group, index, xOff, yOff)
 
 	group = group or "CMD"
@@ -502,14 +559,18 @@ mb.Stack.addBlock = function(self, block)
 	if self.displace then
 		table.insert(self.blocks, self.displaceID, block)
 		table.insert(self.payloadTable, self.displaceID, block.payload)
+		table.insert(self.blockFlags, self.displaceID, block.flags)
 	else
 		table.insert(self.blocks, block)
 		table.insert(self.payloadTable, block.payload)
+		table.insert(self.blockFlags, block.flags)
 	end
 
-	for id, b in pairs(self.blocks) do b.StackID = id end
+	for id, b in ipairs(self.blocks) do b.StackID = id end
 
 	mb.Stack:Adjust()
+
+	print(mb.GetFlags(block))
 
 	if self.Instructions:IsShown() then self.Instructions:Hide() end
 end
@@ -519,8 +580,9 @@ mb.Stack.remBlock = function(self, block)
 
 	table.remove(self.blocks, block.StackID)
 	table.remove(self.payloadTable, block.StackID)
+	table.remove(self.blockFlags, block.StackID)
 
-	for id, b in pairs(self.blocks) do b.StackID = id end
+	for id, b in ipairs(self.blocks) do b.StackID = id end
 
 	mb.Stack:Adjust()
 
@@ -532,16 +594,32 @@ mb.Init = function()
 	if mb_init then return end
 	mb_init = true
 
-	local index = 1
-	local block
+	local paletteIndex = 1
+	local block, str, label, val, item
 
-	for _, group in pairs(initOrder) do
-		for _, parameters in pairs(mb.BasicBlocks[group]) do
-			block = mb.BlockGen(group, index, parameters)
+	for i, group in pairs(initOrder) do
+		for paramIndex, param in pairs(mb.BasicBlocks[group]) do
+
+			str = strjoin("-", group, paletteIndex, paramIndex)
+
+			if param.label then
+				str = str.."-"..param.label
+			end
+
+			if param.config then
+				if param.config.value then
+					str = str.."-"..param.config.value
+				end
+				if param.config.itemType then
+					str = str.."-"..param.config.itemType
+				end
+			end
+
+			block = mb.MakeBlock(str)
 			block.InStack = false
 
-			mb.Palette.blocks[index] = block
-			index = index + 1
+			mb.Palette.blocks[paletteIndex] = block
+			paletteIndex = paletteIndex + 1
 
 			mb.Palette:Adjust()
 		end
@@ -557,8 +635,10 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		mb.CharacterID = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
 
 		if UserMacros == nil then UserMacros = {} end
+		if UserBlocks == nil then UserBlocks = {} end
 
-		mb.UserMacros = UserMacros or {}
+		mb.UserMacros = UserMacros
+		mb.UserBlocks = UserBlocks
 
 		local numGen, numChar = GetNumMacros()
 		local name, texture, body
@@ -567,7 +647,14 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			for i=1, numGen do
 				name, texture, body = GetMacroInfo(i)
 				if name ~= nil then
-					mb.UserMacros[i] = { ["name"] = name, ["texture"] = texture, ["body"] = body, ["blocks"] = {} }
+					mb.UserMacros[i] = {
+						["name"] = name,
+						["texture"] = texture,
+						["body"] = body,
+					}
+				end
+				if mb.UserBlocks[i] == nil then
+					mb.UserBlocks[i] = UserBlocks[i] or {}
 				end
 			end
 		end
@@ -575,25 +662,36 @@ frame:SetScript("OnEvent", function(self, event, arg)
 		if numChar > 0 then
 			for i=1+120, numChar+120 do
 				name, texture, body = GetMacroInfo(i)
-				if mb.UserMacros[i] == nil then mb.UserMacros[i] = {} end
 				if name ~= nil then
-					mb.UserMacros[i][mb.CharacterID] = { ["name"] = name, ["texture"] = texture, ["body"] = body, ["blocks"] = {} }
+					if mb.UserMacros[i] == nil then mb.UserMacros[i] = {} end
+					mb.UserMacros[i][mb.CharacterID] = {
+						["name"] = name,
+						["texture"] = texture,
+						["body"] = body,
+					}
+				end
+				if mb.UserBlocks[i] == nil then
+					mb.UserBlocks[i] = UserBlocks[i] or {}
 				end
 			end
 		end
 
 	end
 	if event == "PLAYER_LEAVING_WORLD" then
-		if UserMacros == nil then UserMacros = {} end
-		-- if MacroChangelog == nil then MacroChangelog = {} end
-
-		MBDebug = {}
 
 		for index, data in pairs(mb.UserMacros) do
 			if index <=120 then
 				UserMacros[index] = mb.UserMacros[index]
 			else
 				UserMacros[index][mb.CharacterID] = mb.UserMacros[index][mb.CharacterID]
+			end
+		end
+
+		for index, blocks in pairs(mb.UserBlocks) do
+			if index <=120 then
+				UserBlocks[index] = mb.UserBlocks[index]
+			else
+				UserBlocks[index][mb.CharacterID] = mb.UserBlocks[index][mb.CharacterID]
 			end
 		end
 

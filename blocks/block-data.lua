@@ -161,7 +161,7 @@ mb.BasicBlocks = {
 			["label"] = "MOD",
 			["template"] = "ChoiceBlockTemplate",
 			["config"] = {
-				["sum"] = 0,
+				["value"] = 0,
 				["mods"] = { "shift", "ctrl", "alt", },
 				["buttons"] = {
 					[1] = false,
@@ -188,7 +188,7 @@ mb.BasicBlocks = {
 			["label"] = "SPEC",
 			["template"] = "ChoiceBlockTemplate",
 			["config"] = {
-				["enabledSpec"] = 0,
+				["value"] = 0,
 				["buttons"] = {
 					false, -- [1] = false,
 					false, -- [2] = false,
@@ -205,7 +205,8 @@ mb.BasicBlocks = {
 			["label"] = "TALENT",
 			["template"] = "TalentBlockTemplate",
 			["config"] = {
-				["enabledSpec"] = 0,
+				["value"] = "0/0",
+				["spec"] = 0,
 				["buttons"] = {
 					{ false, false, false, }, -- [1] =
 					{ false, false, false, }, -- [2] =
@@ -265,24 +266,17 @@ mb.BasicBlocks = {
 			["label"] = "SOCKET",
 			["template"] = "SocketBlockTemplate",
 			["config"] = {
-			--[[ template table structure for saved blocks
-				["abilityInfo] = {
-					["name"] = string,
-					["type"] = string,
-					["ID"] = number,
-					["icon"] = number,
-					["macroReference"] = string or number
-				}
-			]]
+				["payload"] = false,
+				["value"] = "{empty}",
+				["itemType"] = false,
+				["icon"] = false,
 			},
-			["abilityInfo"] = false,
-
 		},{
 			["name"] = "custom input",
 			["label"] = "EDIT",
 			["template"] = "EditBlockTemplate",
 			["config"] = {
-				["text"] = false,
+				["value"] = "{empty}",
 			},
 		},
 	},
@@ -314,17 +308,24 @@ mb.BasicBlocks = {
 			["name"] = "no",
 			["label"] = "STR_MOD",
 			["payload"] = "$!>",
-			["template"] = "MacroBlockTemplate",
 		},{
 			["name"] = "and",
 			["label"] = "STR_MOD",
 			["payload"] = "<$&>",
-			["template"] = "MacroBlockTemplate",
 		},{
 			["name"] = "true",
 			["payload"] = "[]",
 		},
 	},
+}
+
+mb.BlockFlags = { --  local _, _, group, index, label, num, string = string.find(str, "(%u+)(%d+)-?(%u+)-?(%d*)(.*)")
+	"CMD3",
+	"CON17-MOD-5",
+	"CON18-SPEC-1",
+	"CON19-TALENT-52",
+	"USR29-SOCKET-548-mount",
+	"USR30-EDIT-custom string",
 }
 
 mb.BasicTooltips = {
