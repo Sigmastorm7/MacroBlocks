@@ -4,6 +4,7 @@ frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:RegisterEvent("PLAYER_LEAVING_WORLD")
 frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 
+
 SLASH_PRINT1 = "/print"
 SlashCmdList["PRINT"] = function(msg, editBox)
 	SlashCmdList.SCRIPT("print("..msg..")")
