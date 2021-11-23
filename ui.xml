@@ -1,20 +1,31 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 
-    <Script file="script.lua"/>
+    <Script file="ui-script.lua"/>
 
     <!-- UIFrame Mechagon -->
 
-    <Frame name="MacroBlocks" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true" inherits="">
-        <Size>
-            <AbsDimension x="600" y="560"/>
-        </Size>
+    <Frame name="MacroBlocks" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true">
+        <Size x="400" y="600"/>
         <Anchors>
-            <Anchor point=""/>
+            <Anchor point="CENTER" x="0" y="0"/>
         </Anchors>
         <Layers>
         </Layers>
         <Frames>
-
+            <Frame parentKey="NineSlice" inherits="NineSlicePanelTemplate">
+                <KeyValues>
+                    <KeyValue key="layoutType" value="mb.NineSlice" type="string"/>
+                    <!-- <KeyValue key="layoutTextureKit" value="Oribos" type="string"/> -->
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="-6" y="6"/>
+                    <Anchor point="BOTTOMRIGHT" x="6" y="-6"/>
+                </Anchors>
+            </Frame>
+            <Frame name="$parentStack" parentKey="Stack" enableMouse="true">
+            </Frame>
+            <Frame name="$parentPalette" parentKey="Palette" enableMouse="true">
+            </Frame>
         </Frames>
     </Frame>
 

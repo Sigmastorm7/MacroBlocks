@@ -9,5 +9,7 @@
 
 ## SavedVariables: UserMacros, UserBlocks, MacroChangelog
 
-embeds.xml
-MacroBlocks.lua
+ui.xml
+ui-script.lua
+#embeds.xml
+#MacroBlocks.lua
