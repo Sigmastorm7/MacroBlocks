@@ -1,0 +1,21 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+    <Script file="script.lua"/>
+
+    <!-- UIFrame Mechagon -->
+
+    <Frame name="MacroBlocks" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true" inherits="">
+        <Size>
+            <AbsDimension x="600" y="560"/>
+        </Size>
+        <Anchors>
+            <Anchor point=""/>
+        </Anchors>
+        <Layers>
+        </Layers>
+        <Frames>
+
+        </Frames>
+    </Frame>
+
+</Ui>

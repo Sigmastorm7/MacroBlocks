@@ -401,13 +401,13 @@ mb.EraseBlock = function(block)
 	mb.Stack:Adjust()
 end
 
-mb.GetSavedBlocks = function(selected)
+mb.FillStack = function(selected)
 	local flags
 
 	if selected <= 120 then
 		flags = mb.UserBlocks[selected]
 	else
-		flags = mb.UserBlocks[selected][mb.CharacterID]
+		flags = mb.UserBlocks[selected][mb.Char]
 	end
 
 	if flags and #flags > 0 then
@@ -415,6 +415,9 @@ mb.GetSavedBlocks = function(selected)
 			mb.Stack:addBlock(mb.MakeBlock(flag))
 		end
 	end
+end
+
+mb.EmptyStack = function()
 
 end
 
@@ -594,6 +597,8 @@ mb.Init = function()
 	if mb_init then return end
 	mb_init = true
 
+	mb.Frame:Show()
+
 	local paletteIndex = 1
 	local block, str, label, val, item
 
@@ -632,7 +637,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 	end
 	if event == "PLAYER_ENTERING_WORLD" then
 
-		mb.CharacterID = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
+		mb.Char = string.format("%s-%s", PlayerName:GetText(), GetNormalizedRealmName())
 
 		if UserMacros == nil then UserMacros = {} end
 		if UserBlocks == nil then UserBlocks = {} end
@@ -664,7 +669,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 				name, texture, body = GetMacroInfo(i)
 				if name ~= nil then
 					if mb.UserMacros[i] == nil then mb.UserMacros[i] = {} end
-					mb.UserMacros[i][mb.CharacterID] = {
+					mb.UserMacros[i][mb.Char] = {
 						["name"] = name,
 						["texture"] = texture,
 						["body"] = body,
@@ -683,7 +688,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			if index <=120 then
 				UserMacros[index] = mb.UserMacros[index]
 			else
-				UserMacros[index][mb.CharacterID] = mb.UserMacros[index][mb.CharacterID]
+				UserMacros[index][mb.Char] = mb.UserMacros[index][mb.Char]
 			end
 		end
 
@@ -691,7 +696,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 			if index <=120 then
 				UserBlocks[index] = mb.UserBlocks[index]
 			else
-				UserBlocks[index][mb.CharacterID] = mb.UserBlocks[index][mb.CharacterID]
+				UserBlocks[index][mb.Char] = mb.UserBlocks[index][mb.Char]
 			end
 		end
 
@@ -703,7 +708,7 @@ frame:SetScript("OnEvent", function(self, event, arg)
 				end
 			else
 				for time, changes in pairs(data) do
-					if MacroChangelog[index][mb.CharacterID][time] == nil then MacroChangelog[index][mb.CharacterID][time] = changes end
+					if MacroChangelog[index][mb.Char][time] == nil then MacroChangelog[index][mb.Char][time] = changes end
 				end
 			end
 		end
@@ -728,8 +733,8 @@ mb.LogEditHistory = function(index, time)
 	if index <= 120 then
 		mb.Changelog[index][time] = { ["name"] = name, ["texture"] = texture, ["body"] = body }
 	elseif index > 120 then
-		if mb.Changelog[index][mb.CharacterID] == nil then mb.Changelog[index][mb.CharacterID] = {} end
-		mb.Changelog[index][mb.CharacterID][time] = t
+		if mb.Changelog[index][mb.Char] == nil then mb.Changelog[index][mb.Char] = {} end
+		mb.Changelog[index][mb.Char][time] = t
 	end
 end
 ]]
