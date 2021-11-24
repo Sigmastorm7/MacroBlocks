@@ -1,7 +1,5 @@
 local addon, mb = ...
 
-MB_NineSlice =
-
 -- local frame = CreateFrame("Frame", nil, UIParent)
 -- frame:RegisterEvent("ADDON_LOADED")
 -- frame:SetScript("OnEvent", function(f, event, arg)

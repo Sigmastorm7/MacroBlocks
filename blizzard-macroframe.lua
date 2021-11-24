@@ -206,8 +206,17 @@ frame:SetScript("OnEvent", function(self, event, arg)
 
 		btn.selected.Config:SetScript("OnClick", function() MacroFrame_SaveMacro(); MacroPopupFrame.mode = "edit"; MacroPopupFrame:Show(); end)
 
-		dragBar:SetScript("OnMouseDown", function(_self, button) if button == "LeftButton" then MacroFrame:StartMoving() end end)
-		dragBar:SetScript("OnMouseUp", function(_self, button) if button == "LeftButton" then MacroFrame:StopMovingOrSizing() end end)
+		dragBar:SetScript("OnMouseDown", function(_self, button)
+			if button == "LeftButton" then
+				MacroFrame:StartMoving()
+			end
+		end)
+
+		dragBar:SetScript("OnMouseUp", function(_self, button)
+			if button == "LeftButton" then
+				MacroFrame:StopMovingOrSizing()
+			end
+		end)
 
 
 

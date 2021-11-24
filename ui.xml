@@ -4,27 +4,200 @@
 
     <!-- UIFrame Mechagon -->
 
-    <Frame name="MacroBlocks" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true">
-        <Size x="400" y="600"/>
+    <Frame name="MacroBlocks" toplevel="true" frameStrata="BACKGROUND" parent="UIParent" movable="true" clampedToScreen="true" enableMouse="true" hidden="true">
+        <Size x="500" y="400"/>
         <Anchors>
             <Anchor point="CENTER" x="0" y="0"/>
         </Anchors>
         <Layers>
         </Layers>
         <Frames>
-            <Frame parentKey="NineSlice" inherits="NineSlicePanelTemplate">
+            <Frame name="$parentBackdrop" frameLevel="1" setAllPoints="true" inherits="BackdropTemplate">
                 <KeyValues>
-                    <KeyValue key="layoutType" value="mb.NineSlice" type="string"/>
-                    <!-- <KeyValue key="layoutTextureKit" value="Oribos" type="string"/> -->
+                    <KeyValue key="backdropInfo" value="MB_BACKDROP" type="global"/>
+                    <KeyValue key="backdropBorderColor" value="MB_COLOR_METAL_LIGHT" type="global"/>
+                    <KeyValue key="backdropColorAlpha" value="0" type="number"/>
                 </KeyValues>
+                <Layers>
+                    <Layer level="BACKGROUND" textureSubLevel="0">
+                        <Texture parentKey="TOPLEFT" file="Interface/FrameGeneral/UIFrameGenericMetal">
+                            <Size x="80" y="80"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="1" y="-24.5"/>
+                            </Anchors>
+                            <TexCoords left="0.00390625" right="0.65234375" top="0.25390625" bottom="0.90234375"/>
+                            <!-- <TexCoords left="0.0009765625" right="0.1640625" top="0.5791015625" bottom="0.7412109375"/> -->
+                        </Texture>
+                        <Texture parentKey="TOPRIGHT" file="Interface/FrameGeneral/UIFrameGenericMetal">
+                            <Size x="80" y="80"/>
+                            <Anchors>
+                                <Anchor point="TOPRIGHT" x="-1" y="-24.5"/>
+                            </Anchors>
+                            <TexCoords left="0.65234375" right="0.00390625" top="0.25390625" bottom="0.90234375"/>
+                            <!-- <TexCoords left="0.1640625" right="0.0009765625" top="0.5791015625" bottom="0.7412109375"/> -->
+                        </Texture>
+                        <Texture parentKey="BOTTOMLEFT" file="Interface/FrameGeneral/UIFrameGenericMetal">
+                            <Size x="80" y="80"/>
+                            <Anchors>
+                                <Anchor point="BOTTOMLEFT" x="1" y="1"/>
+                            </Anchors>
+                            <TexCoords left="0.00390625" right="0.65234375" top="0.90234375" bottom="0.25390625"/>
+                            <!-- <TexCoords left="0.0009765625" right="0.1640625" top="0.7412109375" bottom="0.5791015625" /> -->
+                        </Texture>
+                        <Texture parentKey="BOTTOMRIGHT" file="Interface/FrameGeneral/UIFrameGenericMetal">
+                            <Size x="80" y="80"/>
+                            <Anchors>
+                                <Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+                            </Anchors>
+                            <TexCoords left="0.65234375" right="0.00390625" top="0.90234375" bottom="0.25390625"/>
+                            <!-- <TexCoords left="0.1640625" right="0.0009765625" top="0.7412109375" bottom="0.5791015625" /> -->
+                        </Texture>
+                    </Layer>
+                    <Layer level="BACKGROUND" textureSubLevel="-1">
+                        <Texture parentKey="LEFT" file="Interface/FrameGeneral/UIFrameGenericMetalVertical">
+                            <Size x="14.2" y="1"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.TOPLEFT" relativePoint="BOTTOMLEFT"/>
+                                <Anchor point="BOTTOMLEFT" relativeKey="$parent.BOTTOMLEFT" relativePoint="TOPLEFT"/>
+                            </Anchors>
+                            <!-- 1/64=0.015625 -->
+                            <TexCoords left="0.015625" right="0.484375" top="0" bottom="1"/>
+                        </Texture>
+                        <Texture parentKey="RIGHT" file="Interface/FrameGeneral/UIFrameGenericMetalVertical">
+                            <Size x="14.2" y="1"/>
+                            <Anchors>
+                                <Anchor point="TOPRIGHT" relativeKey="$parent.TOPRIGHT" relativePoint="BOTTOMRIGHT"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.BOTTOMRIGHT" relativePoint="TOPRIGHT"/>
+                            </Anchors>
+                            <TexCoords left="0.515625" right="0.984375" top="0" bottom="1"/>
+                        </Texture>
+                        <Texture parentKey="TOP" horizTile="true" file="Interface/FrameGeneral/UIFrameGenericMetal">
+                            <Size x="1" y="14.2"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.TOPLEFT" relativePoint="TOPRIGHT"/>
+                                <Anchor point="TOPRIGHT" relativeKey="$parent.TOPRIGHT" relativePoint="TOPLEFT"/>
+                            </Anchors>
+                            <TexCoords left="0" right="1" top="0.128907" bottom="0.246095"/>
+                            <!-- <TexCoords left="0.125" right="0.375" top="0.1171875" bottom="0.146484375" /> -->
+                        </Texture>
+                        <Texture parentKey="BOTTOM" horizTile="true" hWrapMode="CLAMP" file="Interface/FrameGeneral/UIFrameGenericMetal">
+                            <Size x="1" y="14.2"/>
+                            <Anchors>
+                                <Anchor point="BOTTOMLEFT" relativeKey="$parent.BOTTOMLEFT" relativePoint="BOTTOMRIGHT"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.BOTTOMRIGHT" relativePoint="BOTTOMLEFT"/>
+                            </Anchors>
+                            <TexCoords left="0" right="1" top="0.005859" bottom="0.121095"/>
+                            <!-- <TexCoords left="0.1640625" right="0.0009765625" top="0.085937" bottom="0.115234" /> -->
+                            <!-- HEIGHT 0.146484375 - 0.1171875 = 0.029297 -->
+                            <!-- TOP 0.1171875 - 0.029297 - ((1/1024)*2)=0.085937 -->
+                            <!-- BOTTOM 0.085937 + 0.029297=0.115234 -->
+                        </Texture>
+                    </Layer>
+                    <Layer level="BACKGROUND" textureSubLevel="-2">
+                        <Texture parentKey="CENTER" atlas="UI-Frame-Mechagon-CardParchmentWider">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="4" y="-28"/>
+                                <Anchor point="BOTTOMRIGHT" x="-8" y="8"/>
+                            </Anchors>
+                            <Color r="0.42" g="0.36" b="0.4"/>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="$parentTitleBar" frameLevel="2" enableMouse="true">
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="-6" y="6"/>
-                    <Anchor point="BOTTOMRIGHT" x="6" y="-6"/>
+                    <Anchor point="TOPLEFT" x="4" y="-5"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT" x="-4" y="-27"/>
                 </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND" textureSubLevel="1">
+                        <Texture parentKey="LEFT" file="Interface/FrameGeneral/UIFrameMechagon">
+                            <Size x="57" y="25"/>
+                            <Anchors>
+                                <Anchor point="LEFT"/>
+                            </Anchors>
+                            <Color r="1" g="0.9" b="1"/>
+                            <TexCoords left="0.0009765625" right="0.1982421875" top="0.9970703125" bottom="0.913086"/>
+                            <!-- top="0.913086" bottom="0.9970703125" -->
+                        </Texture>
+                        <Texture parentKey="RIGHT" file="Interface/FrameGeneral/UIFrameMechagon">
+                            <Size x="57" y="25"/>
+                            <Anchors>
+                                <Anchor point="RIGHT"/>
+                            </Anchors>
+                            <Color r="1" g="0.9" b="1"/>
+                            <TexCoords left="0.755859375" right="0.953125" top="0.33984375" bottom="0.253906"/>
+                            <!-- top="0.253906" bottom="0.33984375" -->
+                        </Texture>
+                    </Layer>
+                    <Layer level="BACKGROUND" textureSubLevel="0">
+                        <Texture parentKey="CENTER" file="Interface/FrameGeneral/UIFrameMechagon">
+                            <Size x="1" y="25"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.LEFT" relativePoint="TOP"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.RIGHT" relativePoint="BOTTOM"/>
+                            </Anchors>
+                            <Color r="1" g="0.9" b="1"/>
+                            <TexCoords left="0" right="1" top="0.083984375" bottom="0"/>
+                            <!-- top="0" bottom="0.083984375" -->
+                        </Texture>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnMouseDown>
+                        if button == "LeftButton" then
+                            self:GetParent():StartMoving();
+                        end;
+                    </OnMouseDown>
+                    <OnMouseUp>
+                        if button == "LeftButton" then
+                            self:GetParent():StopMovingOrSizing();
+                        end;
+                    </OnMouseUp>
+                </Scripts>
             </Frame>
-            <Frame name="$parentStack" parentKey="Stack" enableMouse="true">
+            <Button name="$parentExitButton" frameLevel="3" inherits="BigRedExitButtonTemplate">
+                <Size x="22" y="22"/>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="$parentTitleBar" x="-2" y="0"/>
+                </Anchors>
+            </Button>
+            <Frame name="$parentMacroButtons" inherits="BackdropTemplate">
+                <Size x="250" y="200"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentTitleBar" relativePoint="BOTTOMLEFT" x="12" y="-12"/>
+                </Anchors>
+                <KeyValues>
+                    <KeyValue key="backdropInfo" value="MB_BACKDROP" type="global"/>
+                    <KeyValue key="backdropBorderColor" value="MB_COLOR_METAL_LIGHT" type="global"/>
+                    <KeyValue key="backdropBorderColorAlpha" value="0" type="number"/>
+                    <!-- <KeyValue key="backdropColor" value="MB_COLOR_ORANGE" type="global"/> -->
+                    <KeyValue key="backdropColorAlpha" value="0" type="number"/>
+                </KeyValues>
             </Frame>
-            <Frame name="$parentPalette" parentKey="Palette" enableMouse="true">
+            <Frame name="$parentPalette" parentKey="Palette" enableMouse="true" inherits="BackdropTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentMacroButtons" relativePoint="TOPRIGHT" x="0" y="0"/>
+                    <Anchor point="BOTTOMRIGHT" x="-16" y="14"/>
+                </Anchors>
+                <KeyValues>
+                    <KeyValue key="backdropInfo" value="MB_BACKDROP" type="global"/>
+                    <KeyValue key="backdropBorderColor" value="MB_COLOR_METAL_MEDIUM" type="global"/>
+                    <KeyValue key="backdropBorderColorAlpha" value="0" type="number"/>
+                    <KeyValue key="backdropColorAlpha" value="0" type="number"/>
+                </KeyValues>
+            </Frame>
+            <Frame name="$parentStack" parentKey="Stack" enableMouse="true" inherits="BackdropTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentMacroButtons" relativePoint="BOTTOMLEFT"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentPalette" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+                <KeyValues>
+                    <KeyValue key="backdropInfo" value="MB_BACKDROP" type="global"/>
+                    <KeyValue key="backdropBorderColor" value="MB_COLOR_METAL_DARK" type="global"/>
+                    <KeyValue key="backdropBorderColorAlpha" value="0" type="number"/>
+                    <KeyValue key="backdropColorAlpha" value="0" type="number"/>
+                </KeyValues>
             </Frame>
         </Frames>
     </Frame>
